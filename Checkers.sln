@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Checkers", "Checkers\Checkers.csproj", "{0E937947-859E-4EDB-B281-09BFF91EB1AC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Checkers.UI", "Checkers.UI\Checkers.UI.csproj", "{0E937947-859E-4EDB-B281-09BFF91EB1AC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
