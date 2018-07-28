@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{0E937947-859E-4EDB-B281-09BFF91EB1AC}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>Checkers</RootNamespace>
-    <AssemblyName>Checkers</AssemblyName>
+    <RootNamespace>Checkers.UI</RootNamespace>
+    <AssemblyName>Checkers.UI</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -102,6 +102,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Checkers.Logic\Checkers.Logic.csproj">
+      <Project>{ADF960B2-4B29-4F34-AFB8-4C26D216245F}</Project>
+      <Name>Checkers.Logic</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

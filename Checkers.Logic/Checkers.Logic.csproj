@@ -7,8 +7,8 @@
     <ProjectGuid>{ADF960B2-4B29-4F34-AFB8-4C26D216245F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Checkers.Common</RootNamespace>
-    <AssemblyName>Checkers.Common</AssemblyName>
+    <RootNamespace>Checkers.Logic</RootNamespace>
+    <AssemblyName>Checkers.Logic</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -40,7 +40,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GameObjects\CheckersBoard.cs" />
+    <Compile Include="Engines\IEngine.cs" />
+    <Compile Include="Engines\RandomEngine.cs" />
+    <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="GameObjects\Game.cs" />
+    <Compile Include="GameObjects\Move.cs" />
+    <Compile Include="GameObjects\Piece.cs" />
+    <Compile Include="Enums\PieceColor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
