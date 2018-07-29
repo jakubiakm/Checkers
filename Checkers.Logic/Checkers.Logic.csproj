@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Exceptions\NotAvailableMoveException.cs" />
     <Compile Include="GameObjects\CheckersBoard.cs" />
     <Compile Include="Engines\IEngine.cs" />
     <Compile Include="Engines\RandomEngine.cs" />

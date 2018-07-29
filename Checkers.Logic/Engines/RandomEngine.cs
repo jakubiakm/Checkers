@@ -1,4 +1,5 @@
 ﻿using Checkers.Logic.Enums;
+using Checkers.Logic.Exceptions;
 using Checkers.Logic.GameObjects;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ namespace Checkers.Logic.Engines
             List<Move> allPossibleMoves = currentBoard.GetAllPossibleMoves(Color);
             int count = allPossibleMoves.Count;
             if (count == 0)
-                throw new NotImplementedException();
+                throw new NotAvailableMoveException(Color);
             int elemIndex = random.Next(count - 1);       
             return allPossibleMoves[elemIndex];
         }

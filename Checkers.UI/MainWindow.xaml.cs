@@ -1,5 +1,7 @@
-﻿using Checkers.UI.ViewModel;
+﻿using Checkers.Logic.Exceptions;
+using Checkers.UI.ViewModel;
 using MahApps.Metro.Controls;
+using MahApps.Metro.Controls.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,9 +38,17 @@ namespace Checkers.UI
             BoardViewControl.DataContext = BboardViewModelObject;
         }
 
-        private void BoardViewControl_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private async void BoardViewControl_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            BboardViewModelObject.NextMove();
+            try
+            {
+                BboardViewModelObject.NextMove();
+            }
+            catch (NotAvailableMoveException exception)
+            {
+                await this.ShowMessageAsync("REMIS", $"Gra zakończona remisem gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie może już wykonywać ruchów");
+                BboardViewModelObject.StartNewGame();
+            }
         }
     }
 }
