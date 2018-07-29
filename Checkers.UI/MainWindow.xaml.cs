@@ -1,5 +1,6 @@
 ﻿using Checkers.Logic;
 using Checkers.Logic.Engines;
+using Checkers.Logic.Enums;
 using Checkers.Logic.GameObjects;
 using MahApps.Metro.Controls;
 using System;
@@ -29,7 +30,12 @@ namespace Checkers.UI
         public MainWindow()
         {
             InitializeComponent();
-            Game = new Game(new RandomEngine(), new RandomEngine());
+            Game = new Game(new RandomEngine(PieceColor.White), new RandomEngine(PieceColor.Black));
+            for (int i = 0; i != 111; i++)
+            {
+                Game.MakeMove(PieceColor.White);
+                Game.MakeMove(PieceColor.Black);
+            }
         }
     }
 }

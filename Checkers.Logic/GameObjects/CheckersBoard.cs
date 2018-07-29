@@ -18,6 +18,7 @@ namespace Checkers.Logic.GameObjects
         public CheckersBoard(int size, int numberOfWhitePieces, int numberOfBlackPieces)
         {
             PiecesOnBoard = new List<Piece>();
+            Size = size;
             int row = 0;
             int column = 0;
             if (size * size / 2 < numberOfWhitePieces + numberOfBlackPieces)
