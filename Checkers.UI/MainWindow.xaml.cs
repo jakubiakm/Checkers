@@ -1,7 +1,4 @@
-﻿using Checkers.Logic;
-using Checkers.Logic.Engines;
-using Checkers.Logic.Enums;
-using Checkers.Logic.GameObjects;
+﻿using Checkers.UI.ViewModel;
 using MahApps.Metro.Controls;
 using System;
 using System.Collections.Generic;
@@ -25,17 +22,23 @@ namespace Checkers.UI
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
-        public Game Game { get; set; }
 
         public MainWindow()
         {
             InitializeComponent();
-            Game = new Game(new RandomEngine(PieceColor.White), new RandomEngine(PieceColor.Black));
-            for (int i = 0; i != 111; i++)
-            {
-                Game.MakeMove(PieceColor.White);
-                Game.MakeMove(PieceColor.Black);
-            }
+        }
+
+        BoardViewModel BboardViewModelObject = new BoardViewModel();
+
+        public void BoardViewControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            BboardViewModelObject.StartNewGame();
+            BoardViewControl.DataContext = BboardViewModelObject;
+        }
+
+        private void BoardViewControl_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            BboardViewModelObject.NextMove();
         }
     }
 }
