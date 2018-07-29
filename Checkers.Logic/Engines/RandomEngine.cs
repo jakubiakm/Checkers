@@ -25,7 +25,7 @@ namespace Checkers.Logic.Engines
             int count = allPossibleMoves.Count;
             if (count == 0)
                 throw new NotAvailableMoveException(Color);
-            int elemIndex = random.Next(count - 1);       
+            int elemIndex = random.Next(count);       
             return allPossibleMoves[elemIndex];
         }
     }
