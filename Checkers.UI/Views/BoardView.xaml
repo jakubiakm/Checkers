@@ -7,15 +7,15 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-        <ItemsControl ItemsSource="{Binding Pieces}">
+        <ItemsControl ItemsSource="{Binding BoardCanvasElements}">
             <ItemsControl.Resources>
-                <DataTemplate DataType="{x:Type local:Piece}">
+                <DataTemplate DataType="{x:Type local:CanvasElement}">
                     <Path Data="{Binding Geometry}" Stroke="{Binding Stroke}" Fill="{Binding Fill}"/>
                 </DataTemplate>
             </ItemsControl.Resources>
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <Canvas />
+                    <Canvas Name="BoardCanvas" />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemContainerStyle>

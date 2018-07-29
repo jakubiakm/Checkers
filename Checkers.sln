@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Checkers.UI", "Checkers.UI\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Checkers.Logic", "Checkers.Logic\Checkers.Logic.csproj", "{ADF960B2-4B29-4F34-AFB8-4C26D216245F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Checkers.Tests", "Checkers.Tests\Checkers.Tests.csproj", "{4796CE45-09A2-498A-AE84-8A8E439034CA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{ADF960B2-4B29-4F34-AFB8-4C26D216245F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ADF960B2-4B29-4F34-AFB8-4C26D216245F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ADF960B2-4B29-4F34-AFB8-4C26D216245F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4796CE45-09A2-498A-AE84-8A8E439034CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4796CE45-09A2-498A-AE84-8A8E439034CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4796CE45-09A2-498A-AE84-8A8E439034CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4796CE45-09A2-498A-AE84-8A8E439034CA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
