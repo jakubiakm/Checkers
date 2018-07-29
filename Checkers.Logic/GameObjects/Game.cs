@@ -1,5 +1,6 @@
 ﻿using Checkers.Logic.Engines;
 using Checkers.Logic.Enums;
+using Checkers.Logic.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,11 +21,21 @@ namespace Checkers.Logic.GameObjects
 
         public IEngine BlackPlayerEngine { get; private set; }
 
+        public Move LastMove { get; private set; }
+
         public Game(IEngine whiteEngine, IEngine blackEngine, int boardSize = 10, int numberOfWhitePieces = 20, int numberOfBlackPieces = 20)
         {
             WhitePlayerEngine = whiteEngine;
             BlackPlayerEngine = blackEngine;
             Board = new CheckersBoard(boardSize, numberOfWhitePieces, numberOfBlackPieces);
+            History = new List<CheckersBoard>();
+        }
+
+        public Game(IEngine whiteEngine, IEngine blackEngine, int boardSize, List<Piece> pieces)
+        {
+            WhitePlayerEngine = whiteEngine;
+            BlackPlayerEngine = blackEngine;
+            Board = new CheckersBoard(boardSize, pieces);
             History = new List<CheckersBoard>();
         }
 
@@ -34,12 +45,16 @@ namespace Checkers.Logic.GameObjects
             switch(color)
             {
                 case PieceColor.White:
-                    Board.MakeMove(WhitePlayerEngine.MakeMove(Board));
+                    LastMove = Board.MakeMove(WhitePlayerEngine.MakeMove(Board));
                     break;
                 case PieceColor.Black:
-                    Board.MakeMove(BlackPlayerEngine.MakeMove(Board));
+                    LastMove = Board.MakeMove(BlackPlayerEngine.MakeMove(Board));
                     break;
             }
+            if (Board.PiecesOnBoard.Where(p => p.Color == PieceColor.Black).Count() == 0)
+                throw new NoAvailablePiecesException(PieceColor.Black);
+            if (Board.PiecesOnBoard.Where(p => p.Color == PieceColor.White).Count() == 0)
+                throw new NoAvailablePiecesException(PieceColor.White);
         }
     }
 }

@@ -15,6 +15,12 @@ namespace Checkers.Logic.GameObjects
 
         public List<Piece> PiecesOnBoard { get; private set; }
 
+        public CheckersBoard(int size, List<Piece> pieces)
+        {
+            Size = size;
+            PiecesOnBoard = pieces;
+        }
+
         public CheckersBoard(int size, int numberOfWhitePieces, int numberOfBlackPieces)
         {
             PiecesOnBoard = new List<Piece>();
@@ -52,19 +58,102 @@ namespace Checkers.Logic.GameObjects
         public List<Move> GetAllPossibleMoves(PieceColor color)
         {
             List<Move> possibleMoves = new List<Move>();
-            PiecesOnBoard.Where(p => p.Color == color).ToList().ForEach(p => possibleMoves.AddRange(GetPiecePossibleMoves(p)));
+            PiecesOnBoard.Where(p => p.Color == color && p.IsKing == false).ToList().ForEach(p => possibleMoves.AddRange(GetPawnPossibleMoves(p)));
+            PiecesOnBoard.Where(p => p.Color == color && p.IsKing == true).ToList().ForEach(p => possibleMoves.AddRange(GetKingPossibleMoves(p)));
+            possibleMoves.ForEach(move => move.NewPiece.IsKing = move.OldPiece.IsKing || (move.NewPiece.Color == PieceColor.White ? move.NewPiece.Row == Size - 1 : move.NewPiece.Row == 0));
             var maximumBeatedPieces = possibleMoves.Count == 0 ? 0 : possibleMoves.Max(m => m.BeatedPieces?.Count ?? 0);
             return possibleMoves.Where(m => (m.BeatedPieces?.Count ?? 0) == maximumBeatedPieces)?.ToList() ?? new List<Move>();
         }
 
-        public void MakeMove(Move move)
+        public Move MakeMove(Move move)
         {
             PiecesOnBoard[PiecesOnBoard.FindIndex(p => p.Row == move.OldPiece.Row && p.Column == move.OldPiece.Column)] = move.NewPiece;
             foreach (var piece in move.BeatedPieces ?? new List<Piece>())
                 PiecesOnBoard.Remove(piece);
+            return move;
         }
 
-        private List<Move> GetPiecePossibleMoves(Piece piece)
+        private List<Move> GetKingPossibleMoves(Piece piece)
+        {
+            List<Move> possibleMoves = new List<Move>();
+            //normalne ruchy w czterech kierunkach aż do napotkania pionka lub końca planszy
+            for (int ind = 1; ind < Size; ind++)
+            {
+                if (CanMoveToPosition(piece.Row + ind, piece.Column + ind))
+                    possibleMoves.Add(new Move(piece, new Piece(piece.Row + ind, piece.Column + ind, piece.Color, piece.IsKing), null));
+                else
+                    break;
+            }
+            for (int ind = 1; ind < Size; ind++)
+            {
+                if (CanMoveToPosition(piece.Row + ind, piece.Column - ind))
+                    possibleMoves.Add(new Move(piece, new Piece(piece.Row + ind, piece.Column - ind, piece.Color, piece.IsKing), null));
+                else
+                    break;
+            }
+            for (int ind = 1; ind < Size; ind++)
+            {
+                if (CanMoveToPosition(piece.Row - ind, piece.Column + ind))
+                    possibleMoves.Add(new Move(piece, new Piece(piece.Row - ind, piece.Column + ind, piece.Color, piece.IsKing), null));
+                else
+                    break;
+            }
+            for (int ind = 1; ind < Size; ind++)
+            {
+                if (CanMoveToPosition(piece.Row - ind, piece.Column - ind))
+                    possibleMoves.Add(new Move(piece, new Piece(piece.Row - ind, piece.Column - ind, piece.Color, piece.IsKing), null));
+                else
+                    break;
+            }
+            //próba bicia w czterech różnych kierunkach damką
+            for (int ind = 1; ind < Size; ind++)
+                if (CanBeatPiece(piece, piece.Row - ind, piece.Column - ind))
+                {
+                    Piece beatedPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == piece.Row - ind && p.Column == piece.Column - ind);
+                    GetAllKingBeatMoves(piece, new List<Piece>() { beatedPiece }, piece.Row, piece.Column, piece.Row - ind - 1, piece.Column - ind - 1, ref possibleMoves);
+                }
+                else
+                {
+                    if (!CanMoveToPosition(piece.Row - ind, piece.Column - ind))
+                        break;
+                }
+            for (int ind = 1; ind < Size; ind++)
+                if (CanBeatPiece(piece, piece.Row + ind, piece.Column - ind))
+                {
+                    Piece beatedPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == piece.Row + ind && p.Column == piece.Column - ind);
+                    GetAllKingBeatMoves(piece, new List<Piece>() { beatedPiece }, piece.Row, piece.Column, piece.Row + ind + 1, piece.Column - ind - 1, ref possibleMoves);
+                }
+                else
+                {
+                    if (!CanMoveToPosition(piece.Row + ind, piece.Column - ind))
+                        break;
+                }
+            for (int ind = 1; ind < Size; ind++)
+                if (CanBeatPiece(piece, piece.Row - ind, piece.Column + ind))
+                {
+                    Piece beatedPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == piece.Row - ind && p.Column == piece.Column + ind);
+                    GetAllKingBeatMoves(piece, new List<Piece>() { beatedPiece }, piece.Row, piece.Column, piece.Row - ind - 1, piece.Column + ind + 1, ref possibleMoves);
+                }
+                else
+                {
+                    if (!CanMoveToPosition(piece.Row - ind, piece.Column + ind))
+                        break;
+                }
+            for (int ind = 1; ind < Size; ind++)
+                if (CanBeatPiece(piece, piece.Row + ind, piece.Column + ind))
+                {
+                    Piece beatedPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == piece.Row + ind && p.Column == piece.Column + ind);
+                    GetAllKingBeatMoves(piece, new List<Piece>() { beatedPiece }, piece.Row, piece.Column, piece.Row + ind + 1, piece.Column + ind + 1, ref possibleMoves);
+                }
+                else
+                {
+                    if (!CanMoveToPosition(piece.Row + ind, piece.Column + ind))
+                        break;
+                }
+            return possibleMoves;
+        }
+
+        private List<Move> GetPawnPossibleMoves(Piece piece)
         {
             List<Move> possibleMoves = new List<Move>();
             //normalne ruchy do przodu
@@ -106,6 +195,7 @@ namespace Checkers.Logic.GameObjects
             }
             return possibleMoves;
         }
+
         private bool CanMoveToPosition(int row, int column)
         {
             return
@@ -115,8 +205,8 @@ namespace Checkers.Logic.GameObjects
 
         private bool CanBeatPiece(Piece piece, int row, int column)
         {
-            int rowAfterBeat = row + (row - piece.Row);
-            int columnAfterBeat = column + (column - piece.Column);
+            int rowAfterBeat = row + (row - piece.Row > 0 ? 1 : -1);
+            int columnAfterBeat = column + (column - piece.Column > 0 ? 1 : -1);
             //sprawdzenie czy bite pole i pole po biciu mieszczą się w planszy
             if (!(row >= 0 && row < Size && column >= 0 && column < Size &&
                 rowAfterBeat >= 0 && rowAfterBeat < Size && columnAfterBeat >= 0 && columnAfterBeat < Size))
@@ -130,7 +220,7 @@ namespace Checkers.Logic.GameObjects
 
         private void GetAllBeatMoves(Piece piece, List<Piece> beatedPieces, int sourceRow, int sourceColumn, int targetRow, int targetColumn, ref List<Move> allMoves)
         {
-            Piece newPiece = new Piece(targetRow, targetColumn, piece.Color, piece.Color == PieceColor.White ? targetRow == Size - 1 : targetRow == 0);
+            Piece newPiece = new Piece(targetRow, targetColumn, piece.Color, piece.IsKing);
             allMoves.Add(new Move(piece, newPiece, beatedPieces));
             if (CanBeatPiece(newPiece, targetRow - 1, targetColumn - 1))
             {
@@ -172,6 +262,103 @@ namespace Checkers.Logic.GameObjects
                     GetAllBeatMoves(piece, newBeatedPieces, targetRow, targetColumn, targetRow + 2, targetColumn + 2, ref allMoves);
                 }
             }
+        }
+
+        private void GetAllKingBeatMoves(Piece piece, List<Piece> beatedPieces, int sourceRow, int sourceColumn, int targetRow, int targetColumn, ref List<Move> allMoves)
+        {
+            Piece newPiece = new Piece(targetRow, targetColumn, piece.Color, piece.IsKing);
+            allMoves.Add(new Move(piece, newPiece, beatedPieces));
+            for (int ind = 1; ind < Size; ind++)
+            {
+                if (targetRow - sourceRow > 0 && targetColumn - sourceColumn > 0)
+                    if (CanMoveToPosition(targetRow + ind, targetColumn + ind))
+                        GetAllKingBeatMoves(piece, new List<Piece>(beatedPieces), targetRow, targetColumn, targetRow + ind, targetColumn + ind, ref allMoves);
+                    else
+                        break;
+                if (targetRow - sourceRow > 0 && targetColumn - sourceColumn < 0)
+                    if (CanMoveToPosition(targetRow + ind, targetColumn - ind))
+                        GetAllKingBeatMoves(piece, new List<Piece>(beatedPieces), targetRow, targetColumn, targetRow + ind, targetColumn - ind, ref allMoves);
+                    else
+                        break;
+                if (targetRow - sourceRow < 0 && targetColumn - sourceColumn > 0)
+                    if (CanMoveToPosition(targetRow - ind, targetColumn + ind))
+                        GetAllKingBeatMoves(piece, new List<Piece>(beatedPieces), targetRow, targetColumn, targetRow - ind, targetColumn + ind, ref allMoves);
+                    else
+                        break;
+                if (targetRow - sourceRow < 0 && targetColumn - sourceColumn < 0)
+                    if (CanMoveToPosition(targetRow - ind, targetColumn - ind))
+                        GetAllKingBeatMoves(piece, new List<Piece>(beatedPieces), targetRow, targetColumn, targetRow - ind, targetColumn - ind, ref allMoves);
+                    else
+                        break;
+            }
+            if (!(targetRow - sourceRow > 0 && targetColumn - sourceColumn > 0))
+                for (int ind = 1; ind < Size; ind++)
+                    if (CanBeatPiece(newPiece, targetRow - ind, targetColumn - ind))
+                    {
+                        Piece beatedPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == targetRow - ind && p.Column == targetColumn - ind);
+                        if (beatedPieces.Where(p => p.Row == beatedPiece.Row && p.Column == beatedPiece.Column && p.Color == beatedPiece.Color).Count() == 0)
+                        {
+                            List<Piece> newBeatedPieces = new List<Piece>(beatedPieces);
+                            newBeatedPieces.Add(beatedPiece);
+                            GetAllKingBeatMoves(piece, newBeatedPieces, targetRow, targetColumn, targetRow - ind - 1, targetColumn - ind - 1, ref allMoves);
+                        }
+                    }
+                    else
+                    {
+                        if (!beatedPieces.Any(p => p.Row == targetRow - ind && p.Column == targetColumn - ind) && !CanMoveToPosition(targetRow - ind, targetColumn - ind))
+                            break;
+                    }
+            if (!(targetRow - sourceRow < 0 && targetColumn - sourceColumn > 0))
+                for (int ind = 1; ind < Size; ind++)
+                    if (CanBeatPiece(newPiece, targetRow + ind, targetColumn - ind))
+                    {
+                        Piece beatedPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == targetRow + ind && p.Column == targetColumn - ind);
+                        if (beatedPieces.Where(p => p.Row == beatedPiece.Row && p.Column == beatedPiece.Column && p.Color == beatedPiece.Color).Count() == 0)
+                        {
+                            List<Piece> newBeatedPieces = new List<Piece>(beatedPieces);
+                            newBeatedPieces.Add(beatedPiece);
+                            GetAllKingBeatMoves(piece, newBeatedPieces, targetRow, targetColumn, targetRow + ind + 1, targetColumn - ind - 1, ref allMoves);
+                        }
+                    }
+                    else
+                    {
+                        if (!beatedPieces.Any(p => p.Row == targetRow + ind && p.Column == targetColumn - ind) && !CanMoveToPosition(targetRow + ind, targetColumn - ind))
+                            break;
+                    }
+            if (!(targetRow - sourceRow > 0 && targetColumn - sourceColumn < 0))
+                for (int ind = 1; ind < Size; ind++)
+                    if (CanBeatPiece(newPiece, targetRow - ind, targetColumn + ind))
+                    {
+                        Piece beatedPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == targetRow - ind && p.Column == targetColumn + ind);
+                        if (beatedPieces.Where(p => p.Row == beatedPiece.Row && p.Column == beatedPiece.Column && p.Color == beatedPiece.Color).Count() == 0)
+                        {
+                            List<Piece> newBeatedPieces = new List<Piece>(beatedPieces);
+                            newBeatedPieces.Add(beatedPiece);
+                            GetAllKingBeatMoves(piece, newBeatedPieces, targetRow, targetColumn, targetRow - ind - 1, targetColumn + ind + 1, ref allMoves);
+                        }
+                    }
+                    else
+                    {
+                        if (!beatedPieces.Any(p => p.Row == targetRow - ind && p.Column == targetColumn + ind) && !CanMoveToPosition(targetRow - ind, targetColumn + ind))
+                            break;
+                    }
+            if (!(targetRow - sourceRow < 0 && targetColumn - sourceColumn < 0))
+                for (int ind = 1; ind < Size; ind++)
+                    if (CanBeatPiece(newPiece, targetRow + ind, targetColumn + ind))
+                    {
+                        Piece beatedPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == targetRow + ind && p.Column == targetColumn + ind);
+                        if (beatedPieces.Where(p => p.Row == beatedPiece.Row && p.Column == beatedPiece.Column && p.Color == beatedPiece.Color).Count() == 0)
+                        {
+                            List<Piece> newBeatedPieces = new List<Piece>(beatedPieces);
+                            newBeatedPieces.Add(beatedPiece);
+                            GetAllKingBeatMoves(piece, newBeatedPieces, targetRow, targetColumn, targetRow + ind + 1, targetColumn + ind + 1, ref allMoves);
+                        }
+                    }
+                    else
+                    {
+                        if (!beatedPieces.Any(p => p.Row == targetRow + ind && p.Column == targetColumn + ind) && !CanMoveToPosition(targetRow + ind, targetColumn + ind))
+                            break;
+                    }
         }
     }
 }

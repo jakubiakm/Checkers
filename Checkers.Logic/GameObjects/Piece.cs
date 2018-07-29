@@ -23,7 +23,7 @@ namespace Checkers.Logic.GameObjects
             Row = row;
             Column = column;
             Color = color;
-            IsKing = false;
+            IsKing = isKing;
         }
 
         public override string ToString()

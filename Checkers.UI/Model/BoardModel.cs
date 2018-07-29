@@ -9,7 +9,7 @@ using System.Windows.Media;
 namespace Checkers.UI.Model
 {
     public class BoardModel { }
-    public class Piece : INotifyPropertyChanged
+    public class CanvasElement : INotifyPropertyChanged
     {
         public double Row { get; set; }
         public double Column { get; set; }

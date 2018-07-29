@@ -14,7 +14,7 @@ namespace Checkers.UI.ViewModel
 {
     public class BoardViewModel
     {
-        public ObservableCollection<Model.Piece> Pieces { get; } = new ObservableCollection<Model.Piece>();
+        public ObservableCollection<Model.CanvasElement> BoardCanvasElements { get; } = new ObservableCollection<Model.CanvasElement>();
 
         public Game Game { get; private set; }
 
@@ -35,16 +35,16 @@ namespace Checkers.UI.ViewModel
             RefreshBoard();
         }
 
-        private void RefreshBoard()
+        public void RefreshBoard()
         {
-            Pieces.Clear();
+            BoardCanvasElements.Clear();
             int skipSize = 700 / Game.Board.Size;
             int index = 0;
             for (int i = 0; i != Game.Board.Size; i++)
             {
                 for (int j = 0; j != Game.Board.Size; j++)
                 {
-                    Pieces.Add(new Model.Piece
+                    BoardCanvasElements.Add(new Model.CanvasElement
                     {
                         Row = skipSize * j,
                         Column = skipSize * i,
@@ -54,15 +54,52 @@ namespace Checkers.UI.ViewModel
                 }
                 index++;
             }
+            if (Game.LastMove != null)
+            {
+                BoardCanvasElements.Add(new Model.CanvasElement
+                {
+                    Row = skipSize * (Game.Board.Size - 1 - Game.LastMove.OldPiece.Row),
+                    Column = skipSize * Game.LastMove.OldPiece.Column,
+                    Geometry = new RectangleGeometry { Rect = new System.Windows.Rect(0, 0, skipSize, skipSize) },
+                    Fill = Brushes.GreenYellow
+                });
+                BoardCanvasElements.Add(new Model.CanvasElement
+                {
+                    Row = skipSize * (Game.Board.Size - 1 - Game.LastMove.NewPiece.Row),
+                    Column = skipSize * Game.LastMove.NewPiece.Column,
+                    Geometry = new RectangleGeometry { Rect = new System.Windows.Rect(0, 0, skipSize, skipSize) },
+                    Fill = Brushes.GreenYellow
+                });
+                foreach (var piece in Game.LastMove?.BeatedPieces ?? new List<Logic.GameObjects.Piece>())
+                {
+                    BoardCanvasElements.Add(new Model.CanvasElement
+                    {
+                        Row = skipSize * (Game.Board.Size - 1 - piece.Row),
+                        Column = skipSize * piece.Column,
+                        Geometry = new RectangleGeometry { Rect = new System.Windows.Rect(0, 0, skipSize, skipSize) },
+                        Fill = Brushes.Crimson
+                    });
+                }
+            }
             foreach (var elem in Game.Board.PiecesOnBoard)
             {
-                Pieces.Add(new Model.Piece
+                BoardCanvasElements.Add(new Model.CanvasElement
                 {
                     Row = skipSize * (Game.Board.Size - 1 - elem.Row) + skipSize / 2,
                     Column = skipSize * elem.Column + skipSize / 2,
                     Geometry = new EllipseGeometry { RadiusX = skipSize / 3, RadiusY = skipSize / 3 },
                     Fill = elem.Color == PieceColor.Black ? Brushes.Black : Brushes.White
                 });
+                if (elem.IsKing)
+                {
+                    BoardCanvasElements.Add(new Model.CanvasElement
+                    {
+                        Row = skipSize * (Game.Board.Size - 1 - elem.Row) + skipSize / 2,
+                        Column = skipSize * elem.Column + skipSize / 2,
+                        Geometry = new EllipseGeometry { RadiusX = skipSize / 4, RadiusY = skipSize / 4 },
+                        Stroke = elem.Color == PieceColor.Black ? Brushes.White : Brushes.Black
+                    });
+                }
             }
         }
     }
