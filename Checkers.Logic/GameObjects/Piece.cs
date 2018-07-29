@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Checkers.Logic.GameObjects
 {
+    [Serializable]
     public class Piece
     {
         public int Row { get; set; }
@@ -14,15 +15,20 @@ namespace Checkers.Logic.GameObjects
         public int Column { get; set; }
 
         public bool IsKing { get; set; }
-        
+
         public PieceColor Color { get; private set; }
 
-        public Piece(int row, int column, PieceColor color)
+        public Piece(int row, int column, PieceColor color, bool isKing)
         {
             Row = row;
             Column = column;
             Color = color;
             IsKing = false;
+        }
+
+        public override string ToString()
+        {
+            return $"[({Row},{Column}),King:{IsKing},{Color}]";
         }
     }
 }

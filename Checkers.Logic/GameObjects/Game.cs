@@ -25,6 +25,7 @@ namespace Checkers.Logic.GameObjects
             WhitePlayerEngine = whiteEngine;
             BlackPlayerEngine = blackEngine;
             Board = new CheckersBoard(boardSize, numberOfWhitePieces, numberOfBlackPieces);
+            History = new List<CheckersBoard>();
         }
 
         public void MakeMove(PieceColor color)
