@@ -130,41 +130,46 @@ namespace Checkers.Logic.GameObjects
 
         private void GetAllBeatMoves(Piece piece, List<Piece> beatedPieces, int sourceRow, int sourceColumn, int targetRow, int targetColumn, ref List<Move> allMoves)
         {
-            allMoves.Add(new Move(piece, new Piece(targetRow, targetColumn, piece.Color, piece.Color == PieceColor.White ? targetRow == Size - 1 : targetRow == 0), beatedPieces));
-            if (CanBeatPiece(piece, targetRow - 1, targetColumn - 1))
+            Piece newPiece = new Piece(targetRow, targetColumn, piece.Color, piece.Color == PieceColor.White ? targetRow == Size - 1 : targetRow == 0);
+            allMoves.Add(new Move(piece, newPiece, beatedPieces));
+            if (CanBeatPiece(newPiece, targetRow - 1, targetColumn - 1))
             {
                 Piece beatedPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == targetRow - 1 && p.Column == targetColumn - 1);
                 if (beatedPieces.Where(p => p.Row == beatedPiece.Row && p.Column == beatedPiece.Column && p.Color == beatedPiece.Color).Count() == 0)
                 {
-                    beatedPieces.Add(beatedPiece);
-                    GetAllBeatMoves(piece, beatedPieces, targetRow, targetColumn, targetRow - 2, targetColumn - 2, ref allMoves);
+                    List<Piece> newBeatedPieces = new List<Piece>(beatedPieces);
+                    newBeatedPieces.Add(beatedPiece);
+                    GetAllBeatMoves(piece, newBeatedPieces, targetRow, targetColumn, targetRow - 2, targetColumn - 2, ref allMoves);
                 }
             }
-            if (CanBeatPiece(piece, targetRow + 1, targetColumn - 1))
+            if (CanBeatPiece(newPiece, targetRow + 1, targetColumn - 1))
             {
                 Piece beatedPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == targetRow + 1 && p.Column == targetColumn - 1);
                 if (beatedPieces.Where(p => p.Row == beatedPiece.Row && p.Column == beatedPiece.Column && p.Color == beatedPiece.Color).Count() == 0)
                 {
-                    beatedPieces.Add(beatedPiece);
-                    GetAllBeatMoves(piece, beatedPieces, targetRow, targetColumn, targetRow + 2, targetColumn - 2, ref allMoves);
+                    List<Piece> newBeatedPieces = new List<Piece>(beatedPieces);
+                    newBeatedPieces.Add(beatedPiece);
+                    GetAllBeatMoves(piece, newBeatedPieces, targetRow, targetColumn, targetRow + 2, targetColumn - 2, ref allMoves);
                 }
             }
-            if (CanBeatPiece(piece, targetRow - 1, targetColumn + 1))
+            if (CanBeatPiece(newPiece, targetRow - 1, targetColumn + 1))
             {
                 Piece beatedPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == targetRow - 1 && p.Column == targetColumn + 1);
                 if (beatedPieces.Where(p => p.Row == beatedPiece.Row && p.Column == beatedPiece.Column && p.Color == beatedPiece.Color).Count() == 0)
                 {
-                    beatedPieces.Add(beatedPiece);
-                    GetAllBeatMoves(piece, beatedPieces, targetRow, targetColumn, targetRow - 2, targetColumn + 2, ref allMoves);
+                    List<Piece> newBeatedPieces = new List<Piece>(beatedPieces);
+                    newBeatedPieces.Add(beatedPiece);
+                    GetAllBeatMoves(piece, newBeatedPieces, targetRow, targetColumn, targetRow - 2, targetColumn + 2, ref allMoves);
                 }
             }
-            if (CanBeatPiece(piece, targetRow + 1, targetColumn + 1))
+            if (CanBeatPiece(newPiece, targetRow + 1, targetColumn + 1))
             {
                 Piece beatedPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == targetRow + 1 && p.Column == targetColumn + 1);
                 if (beatedPieces.Where(p => p.Row == beatedPiece.Row && p.Column == beatedPiece.Column && p.Color == beatedPiece.Color).Count() == 0)
                 {
-                    beatedPieces.Add(beatedPiece);
-                    GetAllBeatMoves(piece, beatedPieces, targetRow, targetColumn, targetRow + 2, targetColumn + 2, ref allMoves);
+                    List<Piece> newBeatedPieces = new List<Piece>(beatedPieces);
+                    newBeatedPieces.Add(beatedPiece);
+                    GetAllBeatMoves(piece, newBeatedPieces, targetRow, targetColumn, targetRow + 2, targetColumn + 2, ref allMoves);
                 }
             }
         }
