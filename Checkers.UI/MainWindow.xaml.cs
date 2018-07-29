@@ -38,7 +38,7 @@ namespace Checkers.UI
             BoardViewControl.DataContext = BboardViewModelObject;
         }
 
-        private async void BoardViewControl_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private async void BoardViewControl_MouseDown(object sender, MouseButtonEventArgs e)
         {
             try
             {
@@ -46,7 +46,13 @@ namespace Checkers.UI
             }
             catch (NotAvailableMoveException exception)
             {
-                await this.ShowMessageAsync("REMIS", $"Gra zakończona remisem gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie może już wykonywać ruchów");
+                await this.ShowMessageAsync("Remis", $"Gra zakończona remisem gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie może już wykonywać ruchów.");
+                BboardViewModelObject.StartNewGame();
+            }
+            catch(NoAvailablePiecesException exception)
+            {
+                BboardViewModelObject.RefreshBoard();
+                await this.ShowMessageAsync("Koniec gry", $"Gra zakończony. Gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie ma już pionków.");
                 BboardViewModelObject.StartNewGame();
             }
         }

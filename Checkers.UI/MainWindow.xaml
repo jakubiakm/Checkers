@@ -10,6 +10,6 @@
             <ColumnDefinition Width="700"></ColumnDefinition>
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
-        <Views:BoardView Grid.Column="0" x:Name = "BoardViewControl" MouseDoubleClick="BoardViewControl_MouseDoubleClick"  Loaded ="BoardViewControl_Loaded"/>
+        <Views:BoardView Grid.Column="0" x:Name = "BoardViewControl" MouseDown="BoardViewControl_MouseDown"  Loaded ="BoardViewControl_Loaded"/>
     </Grid>
 </Controls:MetroWindow>
