@@ -12,9 +12,9 @@ namespace Checkers.Logic.GameObjects
 
         public Piece NewPiece { get; set; }
 
-        public List<Piece> BeatedPieces { get; set; }
+        public List<BeatedPiece> BeatedPieces { get; set; }
 
-        public Move(Piece oldPiece, Piece newPiece, List<Piece> beatedPieces)
+        public Move(Piece oldPiece, Piece newPiece, List<BeatedPiece> beatedPieces)
         {
             OldPiece = oldPiece;
             NewPiece = newPiece;

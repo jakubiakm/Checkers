@@ -39,7 +39,7 @@ namespace Checkers.Logic.GameObjects
             History = new List<CheckersBoard>();
         }
 
-        public void MakeMove(PieceColor color)
+        public Move MakeMove(PieceColor color)
         {
             History.Add(Board.DeepClone());
             switch(color)
@@ -55,6 +55,7 @@ namespace Checkers.Logic.GameObjects
                 throw new NoAvailablePiecesException(PieceColor.Black);
             if (Board.PiecesOnBoard.Where(p => p.Color == PieceColor.White).Count() == 0)
                 throw new NoAvailablePiecesException(PieceColor.White);
+            return LastMove;
         }
     }
 }

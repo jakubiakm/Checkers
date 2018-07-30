@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="Exceptions\NoAvailablePiecesException.cs" />
     <Compile Include="Exceptions\NotAvailableMoveException.cs" />
+    <Compile Include="GameObjects\BeatedPiece.cs" />
     <Compile Include="GameObjects\CheckersBoard.cs" />
     <Compile Include="Engines\IEngine.cs" />
     <Compile Include="Engines\RandomEngine.cs" />

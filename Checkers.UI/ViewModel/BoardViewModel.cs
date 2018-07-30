@@ -8,34 +8,71 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 
 namespace Checkers.UI.ViewModel
 {
     public class BoardViewModel
     {
-        public ObservableCollection<Model.CanvasElement> BoardCanvasElements { get; } = new ObservableCollection<Model.CanvasElement>();
+        public BoardViewModel(MainWindow window)
+        {
+            Window = window;
+        }
+
+        public MainWindow Window { get; set; }
+
+        public ObservableCollection<CanvasElement> BoardCanvasElements { get; } = new ObservableCollection<CanvasElement>();
 
         public Game Game { get; private set; }
 
+        public bool AnimationCompleted { get; private set; } = true;
+
+        private Move lastMove = null;
+
         int turn = 0;
+
+        double skipSize = 0;
 
         public void StartNewGame()
         {
-            Game = new Game(new RandomEngine(PieceColor.White), new RandomEngine(PieceColor.Black));
-            RefreshBoard();
+            Game = new Game(new RandomEngine(PieceColor.White), new RandomEngine(PieceColor.Black), 10, new List<Piece>()
+            {
+                new Piece(1,1, PieceColor.White, true),
+                new Piece(3,3, PieceColor.Black, false),
+                new Piece(2,4, PieceColor.Black, false),
+                new Piece(2,6, PieceColor.Black, false),
+                new Piece(2,8, PieceColor.Black, false),
+                new Piece(4,8, PieceColor.Black, false),
+                new Piece(8,2, PieceColor.Black, false),
+                new Piece(8,4, PieceColor.Black, false),
+                new Piece(6,6, PieceColor.Black, false),
+new Piece(0,0, PieceColor.Black, false)
+
+            });
+            skipSize = 700 / Game.Board.Size;
+            DrawNewGame();
         }
 
         public void NextMove()
         {
-            if (turn++ % 2 == 0)
-                Game.MakeMove(PieceColor.White);
-            else
-                Game.MakeMove(PieceColor.Black);
-            RefreshBoard();
+            if (AnimationCompleted)
+            {
+                Move move;
+                if (turn++ % 2 == 0)
+                    move = Game.MakeMove(PieceColor.White);
+                else
+                    move = Game.MakeMove(PieceColor.Black);
+
+
+                DrawNextMove(move);
+
+                lastMove = move;
+            }
         }
 
-        public void RefreshBoard()
+        private void DrawNewGame()
         {
             BoardCanvasElements.Clear();
             int skipSize = 700 / Game.Board.Size;
@@ -49,37 +86,12 @@ namespace Checkers.UI.ViewModel
                         Row = skipSize * j,
                         Column = skipSize * i,
                         Geometry = new RectangleGeometry { Rect = new System.Windows.Rect(0, 0, skipSize, skipSize) },
-                        Fill = index++ % 2 == 1 ? Brushes.CadetBlue : Brushes.AntiqueWhite
+                        Fill = index++ % 2 == 1 ? Brushes.CadetBlue : Brushes.AntiqueWhite,
+                        X = Game.Board.Size - 1 - j,
+                        Y = i
                     });
                 }
                 index++;
-            }
-            if (Game.LastMove != null)
-            {
-                BoardCanvasElements.Add(new Model.CanvasElement
-                {
-                    Row = skipSize * (Game.Board.Size - 1 - Game.LastMove.OldPiece.Row),
-                    Column = skipSize * Game.LastMove.OldPiece.Column,
-                    Geometry = new RectangleGeometry { Rect = new System.Windows.Rect(0, 0, skipSize, skipSize) },
-                    Fill = Brushes.GreenYellow
-                });
-                BoardCanvasElements.Add(new Model.CanvasElement
-                {
-                    Row = skipSize * (Game.Board.Size - 1 - Game.LastMove.NewPiece.Row),
-                    Column = skipSize * Game.LastMove.NewPiece.Column,
-                    Geometry = new RectangleGeometry { Rect = new System.Windows.Rect(0, 0, skipSize, skipSize) },
-                    Fill = Brushes.GreenYellow
-                });
-                foreach (var piece in Game.LastMove?.BeatedPieces ?? new List<Logic.GameObjects.Piece>())
-                {
-                    BoardCanvasElements.Add(new Model.CanvasElement
-                    {
-                        Row = skipSize * (Game.Board.Size - 1 - piece.Row),
-                        Column = skipSize * piece.Column,
-                        Geometry = new RectangleGeometry { Rect = new System.Windows.Rect(0, 0, skipSize, skipSize) },
-                        Fill = Brushes.Crimson
-                    });
-                }
             }
             foreach (var elem in Game.Board.PiecesOnBoard)
             {
@@ -88,7 +100,9 @@ namespace Checkers.UI.ViewModel
                     Row = skipSize * (Game.Board.Size - 1 - elem.Row) + skipSize / 2,
                     Column = skipSize * elem.Column + skipSize / 2,
                     Geometry = new EllipseGeometry { RadiusX = skipSize / 3, RadiusY = skipSize / 3 },
-                    Fill = elem.Color == PieceColor.Black ? Brushes.Black : Brushes.White
+                    Fill = elem.Color == PieceColor.Black ? Brushes.Black : Brushes.White,
+                    X = elem.Row,
+                    Y = elem.Column
                 });
                 if (elem.IsKing)
                 {
@@ -97,10 +111,156 @@ namespace Checkers.UI.ViewModel
                         Row = skipSize * (Game.Board.Size - 1 - elem.Row) + skipSize / 2,
                         Column = skipSize * elem.Column + skipSize / 2,
                         Geometry = new EllipseGeometry { RadiusX = skipSize / 4, RadiusY = skipSize / 4 },
-                        Stroke = elem.Color == PieceColor.Black ? Brushes.White : Brushes.Black
+                        Stroke = elem.Color == PieceColor.Black ? Brushes.White : Brushes.Black,
+                        X = elem.Row,
+                        Y = elem.Column
                     });
                 }
             }
+        }
+
+        void DrawNextMove(Move move)
+        {
+            RemoveLastMoveTargets(move);
+            DrawMoveTargets(move);
+            AnimateMovement(move);
+        }
+
+        private void RemoveLastMoveTargets(Move move)
+        {
+            if (lastMove != null)
+            {
+                foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == lastMove.OldPiece.Row && e.Y == lastMove.OldPiece.Column).ToList())
+                {
+                    elem.Fill = Brushes.CadetBlue;
+                }
+                foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == lastMove.NewPiece.Row && e.Y == lastMove.NewPiece.Column).ToList())
+                {
+                    elem.Fill = Brushes.CadetBlue;
+                }
+                foreach (var piece in lastMove?.BeatedPieces ?? new List<BeatedPiece>())
+                {
+                    foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == piece.Row && e.Y == piece.Column).ToList())
+                    {
+                        elem.Fill = Brushes.CadetBlue;
+                    }
+                }
+            }
+        }
+
+        private void DrawMoveTargets(Move move)
+        {
+            foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == move.OldPiece.Row && e.Y == move.OldPiece.Column).ToList())
+            {
+                elem.Fill = Brushes.GreenYellow;
+            }
+            foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == move.NewPiece.Row && e.Y == move.NewPiece.Column).ToList())
+            {
+                elem.Fill = Brushes.GreenYellow;
+            }
+            foreach (var piece in Game.LastMove?.BeatedPieces ?? new List<BeatedPiece>())
+            {
+                foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == piece.Row && e.Y == piece.Column).ToList())
+                {
+                    elem.Fill = Brushes.Crimson;
+                }
+            }
+        }
+
+        private void DrawMoveMovement(Move move, CanvasElement canvasElem)
+        {
+            foreach (var piece in move.BeatedPieces ?? new List<BeatedPiece>())
+            {
+                foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is EllipseGeometry && e.X == piece.Row && e.Y == piece.Column).ToList())
+                {
+                    BoardCanvasElements.Remove(elem);
+                }
+            }
+
+            canvasElem.Row = skipSize * (Game.Board.Size - 1 - move.NewPiece.Row) + skipSize / 2;
+            canvasElem.Column = skipSize * move.NewPiece.Column + skipSize / 2;
+            canvasElem.X = move.NewPiece.Row;
+            canvasElem.Y = move.NewPiece.Column;
+
+            if (move.NewPiece.IsKing && !move.OldPiece.IsKing)
+            {
+                BoardCanvasElements.Add(new Model.CanvasElement
+                {
+                    Row = skipSize * (Game.Board.Size - 1 - move.NewPiece.Row) + skipSize / 2,
+                    Column = skipSize * move.NewPiece.Column + skipSize / 2,
+                    Geometry = new EllipseGeometry { RadiusX = skipSize / 4, RadiusY = skipSize / 4 },
+                    Stroke = move.NewPiece.Color == PieceColor.Black ? Brushes.White : Brushes.Black,
+                    X = move.NewPiece.Row,
+                    Y = move.NewPiece.Column
+                });
+            }
+        }
+
+        private void AnimateMovement(Move move)
+        {
+            foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is EllipseGeometry && e.X == move.OldPiece.Row && e.Y == move.OldPiece.Column).ToList())
+            {
+                var x = elem.Geometry;
+                if (Window.FindName("MyAnimatedEllipseGeometry") != null)
+                    Window.UnregisterName("MyAnimatedEllipseGeometry");
+                Window.RegisterName("MyAnimatedEllipseGeometry", x);
+
+                PathGeometry animationPath = new PathGeometry();
+                Point position = new Point(move.OldPiece.Column, move.OldPiece.Row);
+                PathFigure pFigure = new PathFigure();
+                pFigure.StartPoint = new Point(0, 0);
+                PolyLineSegment lineSegment = new PolyLineSegment();
+                double xDiff, yDiff;
+                foreach (var beatPositionPiece in move.BeatedPieces?.Skip(1) ?? new List<BeatedPiece>())
+                {
+                    xDiff = ((skipSize * beatPositionPiece.BeatPieceColumn + skipSize / 2) - (skipSize * position.X + skipSize / 2));
+                    yDiff = (skipSize * (Game.Board.Size - 1 - beatPositionPiece.BeatPieceRow) + skipSize / 2) - (skipSize * (Game.Board.Size - 1 - position.Y) + skipSize / 2);
+                    if (lineSegment.Points.Count > 0)
+                        lineSegment.Points.Add(new Point(lineSegment.Points.Last().X + xDiff, lineSegment.Points.Last().Y + yDiff));
+                    else
+                        lineSegment.Points.Add(new Point(xDiff, yDiff));
+                    position = new Point(beatPositionPiece.BeatPieceColumn, beatPositionPiece.BeatPieceRow);
+                }
+                xDiff = (skipSize * move.NewPiece.Column + skipSize / 2) - (skipSize * position.X + skipSize / 2);
+                yDiff = (skipSize * (Game.Board.Size - 1 - move.NewPiece.Row) + skipSize / 2) - (skipSize * (Game.Board.Size - 1 - position.Y) + skipSize / 2);
+                if (lineSegment.Points.Count > 0)
+                    lineSegment.Points.Add(new Point(lineSegment.Points.Last().X + xDiff, lineSegment.Points.Last().Y + yDiff));
+                else
+                    lineSegment.Points.Add(new Point(xDiff, yDiff));
+                pFigure.Segments.Add(lineSegment);
+                animationPath.Figures.Add(pFigure);
+                animationPath.Freeze();
+
+
+                PointAnimationUsingPath myPointAnimation = new PointAnimationUsingPath();
+                myPointAnimation.Duration = TimeSpan.FromSeconds(0.3 * ((move.BeatedPieces?.Count()) ?? 1));
+                myPointAnimation.FillBehavior = FillBehavior.Stop;
+                myPointAnimation.PathGeometry = animationPath;
+
+                AnimationCompleted = false;
+                myPointAnimation.Completed += delegate
+                {
+                    DrawMoveMovement(move, elem);
+                    AnimationCompleted = true;
+                };
+
+                // Set the animation to target the Center property
+                // of the object named "MyAnimatedEllipseGeometry."
+                Storyboard.SetTargetName(myPointAnimation, "MyAnimatedEllipseGeometry");
+                Storyboard.SetTargetProperty(
+                    myPointAnimation, new PropertyPath(EllipseGeometry.CenterProperty));
+
+                // Create a storyboard to apply the animation.
+                Storyboard ellipseStoryboard = new Storyboard();
+                ellipseStoryboard.Children.Add(myPointAnimation);
+                ellipseStoryboard.Begin(Window);
+                elem.Geometry = x;
+            }
+        }
+
+        private void MyPointAnimation_Completed(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
         }
     }
 }

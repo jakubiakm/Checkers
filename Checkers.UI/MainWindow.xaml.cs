@@ -13,6 +13,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -24,37 +25,48 @@ namespace Checkers.UI
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
-
         public MainWindow()
         {
             InitializeComponent();
+            BoardViewModelObject = new BoardViewModel(this);
         }
 
-        BoardViewModel BboardViewModelObject = new BoardViewModel();
+        Canvas BoardCanvas { get; set; }
+
+        BoardViewModel BoardViewModelObject;
 
         public void BoardViewControl_Loaded(object sender, RoutedEventArgs e)
         {
-            BboardViewModelObject.StartNewGame();
-            BoardViewControl.DataContext = BboardViewModelObject;
+            BoardViewModelObject.StartNewGame();
+            BoardViewControl.DataContext = BoardViewModelObject;
+            BoardCanvas = UiHelper.FindChild<Canvas>(BoardViewControl, "BoardCanvas");
+            BoardCanvas.MouseDown += BoardCanvas_MouseDown;
         }
 
-        private async void BoardViewControl_MouseDown(object sender, MouseButtonEventArgs e)
+        private async void BoardCanvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            try
+            IInputElement clickedElement = Mouse.DirectlyOver;
+            if (clickedElement is Path)
             {
-                BboardViewModelObject.NextMove();
+
+                try
+                {
+                    BoardViewModelObject.NextMove();
+                }
+                catch (NotAvailableMoveException exception)
+                {
+                    await this.ShowMessageAsync("Remis", $"Gra zakończona remisem gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie może już wykonywać ruchów.");
+                    BoardViewModelObject.StartNewGame();
+                }
+                catch (NoAvailablePiecesException exception)
+                {
+                    await this.ShowMessageAsync("Koniec gry", $"Gra zakończony. Gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie ma już pionków.");
+                    BoardViewModelObject.StartNewGame();
+                }
+
             }
-            catch (NotAvailableMoveException exception)
-            {
-                await this.ShowMessageAsync("Remis", $"Gra zakończona remisem gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie może już wykonywać ruchów.");
-                BboardViewModelObject.StartNewGame();
-            }
-            catch(NoAvailablePiecesException exception)
-            {
-                BboardViewModelObject.RefreshBoard();
-                await this.ShowMessageAsync("Koniec gry", $"Gra zakończony. Gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie ma już pionków.");
-                BboardViewModelObject.StartNewGame();
-            }
+
+
         }
     }
 }

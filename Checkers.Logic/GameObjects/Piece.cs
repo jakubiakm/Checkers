@@ -16,7 +16,7 @@ namespace Checkers.Logic.GameObjects
 
         public bool IsKing { get; set; }
 
-        public PieceColor Color { get; private set; }
+        public PieceColor Color { get; internal set; }
 
         public Piece(int row, int column, PieceColor color, bool isKing)
         {

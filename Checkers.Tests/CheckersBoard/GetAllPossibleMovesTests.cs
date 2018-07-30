@@ -81,7 +81,7 @@ namespace Checkers.Tests
                 new Piece(6,6, PieceColor.Black, false)
             });
             var moves = board.GetAllPossibleMoves(PieceColor.White);
-            Assert.IsTrue(moves.Where(m => m.BeatedPieces?.Count == 8).Count() > 0);
+            Assert.IsTrue(moves.Where(m => m.BeatedPieces?.Count == 8).Count() > 0 && moves.Where(m => m.BeatedPieces.Last().Row == 4 || m.BeatedPieces.Last().Column == 8).Count() == 0);
         }
 
         [Test]

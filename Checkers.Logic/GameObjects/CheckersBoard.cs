@@ -68,8 +68,8 @@ namespace Checkers.Logic.GameObjects
         public Move MakeMove(Move move)
         {
             PiecesOnBoard[PiecesOnBoard.FindIndex(p => p.Row == move.OldPiece.Row && p.Column == move.OldPiece.Column)] = move.NewPiece;
-            foreach (var piece in move.BeatedPieces ?? new List<Piece>())
-                PiecesOnBoard.Remove(piece);
+            foreach (var piece in move.BeatedPieces ?? new List<BeatedPiece>())
+                PiecesOnBoard.RemoveAll(p => p.Color == piece.Color && p.Column == piece.Column && p.Row == piece.Row && p.IsKing == piece.IsKing);
             return move;
         }
 
@@ -109,8 +109,9 @@ namespace Checkers.Logic.GameObjects
             for (int ind = 1; ind < Size; ind++)
                 if (CanBeatPiece(piece, piece.Row - ind, piece.Column - ind))
                 {
-                    Piece beatedPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == piece.Row - ind && p.Column == piece.Column - ind);
-                    GetAllKingBeatMoves(piece, new List<Piece>() { beatedPiece }, piece.Row, piece.Column, piece.Row - ind - 1, piece.Column - ind - 1, ref possibleMoves);
+                    var tempPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == piece.Row - ind && p.Column == piece.Column - ind);
+                    BeatedPiece beatedPiece = new BeatedPiece(tempPiece.Row, tempPiece.Column, tempPiece.Color, tempPiece.IsKing, piece.Row, piece.Column);
+                    GetAllKingBeatMoves(piece, new List<BeatedPiece>() { beatedPiece }, piece.Row, piece.Column, piece.Row - ind - 1, piece.Column - ind - 1, ref possibleMoves);
                 }
                 else
                 {
@@ -120,8 +121,9 @@ namespace Checkers.Logic.GameObjects
             for (int ind = 1; ind < Size; ind++)
                 if (CanBeatPiece(piece, piece.Row + ind, piece.Column - ind))
                 {
-                    Piece beatedPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == piece.Row + ind && p.Column == piece.Column - ind);
-                    GetAllKingBeatMoves(piece, new List<Piece>() { beatedPiece }, piece.Row, piece.Column, piece.Row + ind + 1, piece.Column - ind - 1, ref possibleMoves);
+                    Piece tempPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == piece.Row + ind && p.Column == piece.Column - ind);
+                    BeatedPiece beatedPiece = new BeatedPiece(tempPiece.Row, tempPiece.Column, tempPiece.Color, tempPiece.IsKing, piece.Row, piece.Column);
+                    GetAllKingBeatMoves(piece, new List<BeatedPiece>() { beatedPiece }, piece.Row, piece.Column, piece.Row + ind + 1, piece.Column - ind - 1, ref possibleMoves);
                 }
                 else
                 {
@@ -131,8 +133,9 @@ namespace Checkers.Logic.GameObjects
             for (int ind = 1; ind < Size; ind++)
                 if (CanBeatPiece(piece, piece.Row - ind, piece.Column + ind))
                 {
-                    Piece beatedPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == piece.Row - ind && p.Column == piece.Column + ind);
-                    GetAllKingBeatMoves(piece, new List<Piece>() { beatedPiece }, piece.Row, piece.Column, piece.Row - ind - 1, piece.Column + ind + 1, ref possibleMoves);
+                    Piece tempPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == piece.Row - ind && p.Column == piece.Column + ind);
+                    BeatedPiece beatedPiece = new BeatedPiece(tempPiece.Row, tempPiece.Column, tempPiece.Color, tempPiece.IsKing, piece.Row, piece.Column);
+                    GetAllKingBeatMoves(piece, new List<BeatedPiece>() { beatedPiece }, piece.Row, piece.Column, piece.Row - ind - 1, piece.Column + ind + 1, ref possibleMoves);
                 }
                 else
                 {
@@ -142,8 +145,9 @@ namespace Checkers.Logic.GameObjects
             for (int ind = 1; ind < Size; ind++)
                 if (CanBeatPiece(piece, piece.Row + ind, piece.Column + ind))
                 {
-                    Piece beatedPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == piece.Row + ind && p.Column == piece.Column + ind);
-                    GetAllKingBeatMoves(piece, new List<Piece>() { beatedPiece }, piece.Row, piece.Column, piece.Row + ind + 1, piece.Column + ind + 1, ref possibleMoves);
+                    Piece tempPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == piece.Row + ind && p.Column == piece.Column + ind);
+                    BeatedPiece beatedPiece = new BeatedPiece(tempPiece.Row, tempPiece.Column, tempPiece.Color, tempPiece.IsKing, piece.Row, piece.Column);
+                    GetAllKingBeatMoves(piece, new List<BeatedPiece>() { beatedPiece }, piece.Row, piece.Column, piece.Row + ind + 1, piece.Column + ind + 1, ref possibleMoves);
                 }
                 else
                 {
@@ -175,23 +179,27 @@ namespace Checkers.Logic.GameObjects
             //próba bicia w czterech różnych kierunkach
             if (CanBeatPiece(piece, piece.Row - 1, piece.Column - 1))
             {
-                Piece beatedPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == piece.Row - 1 && p.Column == piece.Column - 1);
-                GetAllBeatMoves(piece, new List<Piece>() { beatedPiece }, piece.Row, piece.Column, piece.Row - 2, piece.Column - 2, ref possibleMoves);
+                Piece tempPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == piece.Row - 1 && p.Column == piece.Column - 1);
+                BeatedPiece beatedPiece = new BeatedPiece(tempPiece.Row, tempPiece.Column, tempPiece.Color, tempPiece.IsKing, piece.Row, piece.Column);
+                GetAllBeatMoves(piece, new List<BeatedPiece>() { beatedPiece }, piece.Row, piece.Column, piece.Row - 2, piece.Column - 2, ref possibleMoves);
             }
             if (CanBeatPiece(piece, piece.Row + 1, piece.Column - 1))
             {
-                Piece beatedPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == piece.Row + 1 && p.Column == piece.Column - 1);
-                GetAllBeatMoves(piece, new List<Piece>() { beatedPiece }, piece.Row, piece.Column, piece.Row + 2, piece.Column - 2, ref possibleMoves);
+                Piece tempPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == piece.Row + 1 && p.Column == piece.Column - 1);
+                BeatedPiece beatedPiece = new BeatedPiece(tempPiece.Row, tempPiece.Column, tempPiece.Color, tempPiece.IsKing, piece.Row, piece.Column);
+                GetAllBeatMoves(piece, new List<BeatedPiece>() { beatedPiece }, piece.Row, piece.Column, piece.Row + 2, piece.Column - 2, ref possibleMoves);
             }
             if (CanBeatPiece(piece, piece.Row - 1, piece.Column + 1))
             {
-                Piece beatedPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == piece.Row - 1 && p.Column == piece.Column + 1);
-                GetAllBeatMoves(piece, new List<Piece>() { beatedPiece }, piece.Row, piece.Column, piece.Row - 2, piece.Column + 2, ref possibleMoves);
+                Piece tempPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == piece.Row - 1 && p.Column == piece.Column + 1);
+                BeatedPiece beatedPiece = new BeatedPiece(tempPiece.Row, tempPiece.Column, tempPiece.Color, tempPiece.IsKing, piece.Row, piece.Column);
+                GetAllBeatMoves(piece, new List<BeatedPiece>() { beatedPiece }, piece.Row, piece.Column, piece.Row - 2, piece.Column + 2, ref possibleMoves);
             }
             if (CanBeatPiece(piece, piece.Row + 1, piece.Column + 1))
             {
-                Piece beatedPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == piece.Row + 1 && p.Column == piece.Column + 1);
-                GetAllBeatMoves(piece, new List<Piece>() { beatedPiece }, piece.Row, piece.Column, piece.Row + 2, piece.Column + 2, ref possibleMoves);
+                Piece tempPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == piece.Row + 1 && p.Column == piece.Column + 1);
+                BeatedPiece beatedPiece = new BeatedPiece(tempPiece.Row, tempPiece.Column, tempPiece.Color, tempPiece.IsKing, piece.Row, piece.Column);
+                GetAllBeatMoves(piece, new List<BeatedPiece>() { beatedPiece }, piece.Row, piece.Column, piece.Row + 2, piece.Column + 2, ref possibleMoves);
             }
             return possibleMoves;
         }
@@ -218,53 +226,57 @@ namespace Checkers.Logic.GameObjects
             return false;
         }
 
-        private void GetAllBeatMoves(Piece piece, List<Piece> beatedPieces, int sourceRow, int sourceColumn, int targetRow, int targetColumn, ref List<Move> allMoves)
+        private void GetAllBeatMoves(Piece piece, List<BeatedPiece> beatedPieces, int sourceRow, int sourceColumn, int targetRow, int targetColumn, ref List<Move> allMoves)
         {
             Piece newPiece = new Piece(targetRow, targetColumn, piece.Color, piece.IsKing);
             allMoves.Add(new Move(piece, newPiece, beatedPieces));
             if (CanBeatPiece(newPiece, targetRow - 1, targetColumn - 1))
             {
-                Piece beatedPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == targetRow - 1 && p.Column == targetColumn - 1);
+                Piece tempPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == targetRow - 1 && p.Column == targetColumn - 1);
+                BeatedPiece beatedPiece = new BeatedPiece(tempPiece.Row, tempPiece.Column, tempPiece.Color, tempPiece.IsKing, targetRow, targetColumn);
                 if (beatedPieces.Where(p => p.Row == beatedPiece.Row && p.Column == beatedPiece.Column && p.Color == beatedPiece.Color).Count() == 0)
                 {
-                    List<Piece> newBeatedPieces = new List<Piece>(beatedPieces);
+                    List<BeatedPiece> newBeatedPieces = new List<BeatedPiece>(beatedPieces);
                     newBeatedPieces.Add(beatedPiece);
                     GetAllBeatMoves(piece, newBeatedPieces, targetRow, targetColumn, targetRow - 2, targetColumn - 2, ref allMoves);
                 }
             }
             if (CanBeatPiece(newPiece, targetRow + 1, targetColumn - 1))
             {
-                Piece beatedPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == targetRow + 1 && p.Column == targetColumn - 1);
+                Piece tempPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == targetRow + 1 && p.Column == targetColumn - 1);
+                BeatedPiece beatedPiece = new BeatedPiece(tempPiece.Row, tempPiece.Column, tempPiece.Color, tempPiece.IsKing, targetRow, targetColumn);
                 if (beatedPieces.Where(p => p.Row == beatedPiece.Row && p.Column == beatedPiece.Column && p.Color == beatedPiece.Color).Count() == 0)
                 {
-                    List<Piece> newBeatedPieces = new List<Piece>(beatedPieces);
+                    List<BeatedPiece> newBeatedPieces = new List<BeatedPiece>(beatedPieces);
                     newBeatedPieces.Add(beatedPiece);
                     GetAllBeatMoves(piece, newBeatedPieces, targetRow, targetColumn, targetRow + 2, targetColumn - 2, ref allMoves);
                 }
             }
             if (CanBeatPiece(newPiece, targetRow - 1, targetColumn + 1))
             {
-                Piece beatedPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == targetRow - 1 && p.Column == targetColumn + 1);
+                Piece tempPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == targetRow - 1 && p.Column == targetColumn + 1);
+                BeatedPiece beatedPiece = new BeatedPiece(tempPiece.Row, tempPiece.Column, tempPiece.Color, tempPiece.IsKing, targetRow, targetColumn);
                 if (beatedPieces.Where(p => p.Row == beatedPiece.Row && p.Column == beatedPiece.Column && p.Color == beatedPiece.Color).Count() == 0)
                 {
-                    List<Piece> newBeatedPieces = new List<Piece>(beatedPieces);
+                    List<BeatedPiece> newBeatedPieces = new List<BeatedPiece>(beatedPieces);
                     newBeatedPieces.Add(beatedPiece);
                     GetAllBeatMoves(piece, newBeatedPieces, targetRow, targetColumn, targetRow - 2, targetColumn + 2, ref allMoves);
                 }
             }
             if (CanBeatPiece(newPiece, targetRow + 1, targetColumn + 1))
             {
-                Piece beatedPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == targetRow + 1 && p.Column == targetColumn + 1);
+                Piece tempPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == targetRow + 1 && p.Column == targetColumn + 1);
+                BeatedPiece beatedPiece = new BeatedPiece(tempPiece.Row, tempPiece.Column, tempPiece.Color, tempPiece.IsKing, targetRow, targetColumn);
                 if (beatedPieces.Where(p => p.Row == beatedPiece.Row && p.Column == beatedPiece.Column && p.Color == beatedPiece.Color).Count() == 0)
                 {
-                    List<Piece> newBeatedPieces = new List<Piece>(beatedPieces);
+                    List<BeatedPiece> newBeatedPieces = new List<BeatedPiece>(beatedPieces);
                     newBeatedPieces.Add(beatedPiece);
                     GetAllBeatMoves(piece, newBeatedPieces, targetRow, targetColumn, targetRow + 2, targetColumn + 2, ref allMoves);
                 }
             }
         }
 
-        private void GetAllKingBeatMoves(Piece piece, List<Piece> beatedPieces, int sourceRow, int sourceColumn, int targetRow, int targetColumn, ref List<Move> allMoves)
+        private void GetAllKingBeatMoves(Piece piece, List<BeatedPiece> beatedPieces, int sourceRow, int sourceColumn, int targetRow, int targetColumn, ref List<Move> allMoves)
         {
             Piece newPiece = new Piece(targetRow, targetColumn, piece.Color, piece.IsKing);
             allMoves.Add(new Move(piece, newPiece, beatedPieces));
@@ -272,22 +284,22 @@ namespace Checkers.Logic.GameObjects
             {
                 if (targetRow - sourceRow > 0 && targetColumn - sourceColumn > 0)
                     if (CanMoveToPosition(targetRow + ind, targetColumn + ind))
-                        GetAllKingBeatMoves(piece, new List<Piece>(beatedPieces), targetRow, targetColumn, targetRow + ind, targetColumn + ind, ref allMoves);
+                        GetAllKingBeatMoves(piece, new List<BeatedPiece>(beatedPieces), targetRow, targetColumn, targetRow + ind, targetColumn + ind, ref allMoves);
                     else
                         break;
                 if (targetRow - sourceRow > 0 && targetColumn - sourceColumn < 0)
                     if (CanMoveToPosition(targetRow + ind, targetColumn - ind))
-                        GetAllKingBeatMoves(piece, new List<Piece>(beatedPieces), targetRow, targetColumn, targetRow + ind, targetColumn - ind, ref allMoves);
+                        GetAllKingBeatMoves(piece, new List<BeatedPiece>(beatedPieces), targetRow, targetColumn, targetRow + ind, targetColumn - ind, ref allMoves);
                     else
                         break;
                 if (targetRow - sourceRow < 0 && targetColumn - sourceColumn > 0)
                     if (CanMoveToPosition(targetRow - ind, targetColumn + ind))
-                        GetAllKingBeatMoves(piece, new List<Piece>(beatedPieces), targetRow, targetColumn, targetRow - ind, targetColumn + ind, ref allMoves);
+                        GetAllKingBeatMoves(piece, new List<BeatedPiece>(beatedPieces), targetRow, targetColumn, targetRow - ind, targetColumn + ind, ref allMoves);
                     else
                         break;
                 if (targetRow - sourceRow < 0 && targetColumn - sourceColumn < 0)
                     if (CanMoveToPosition(targetRow - ind, targetColumn - ind))
-                        GetAllKingBeatMoves(piece, new List<Piece>(beatedPieces), targetRow, targetColumn, targetRow - ind, targetColumn - ind, ref allMoves);
+                        GetAllKingBeatMoves(piece, new List<BeatedPiece>(beatedPieces), targetRow, targetColumn, targetRow - ind, targetColumn - ind, ref allMoves);
                     else
                         break;
             }
@@ -295,10 +307,11 @@ namespace Checkers.Logic.GameObjects
                 for (int ind = 1; ind < Size; ind++)
                     if (CanBeatPiece(newPiece, targetRow - ind, targetColumn - ind))
                     {
-                        Piece beatedPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == targetRow - ind && p.Column == targetColumn - ind);
+                        Piece tempPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == targetRow - ind && p.Column == targetColumn - ind);
+                        BeatedPiece beatedPiece = new BeatedPiece(tempPiece.Row, tempPiece.Column, tempPiece.Color, tempPiece.IsKing, targetRow, targetColumn);
                         if (beatedPieces.Where(p => p.Row == beatedPiece.Row && p.Column == beatedPiece.Column && p.Color == beatedPiece.Color).Count() == 0)
                         {
-                            List<Piece> newBeatedPieces = new List<Piece>(beatedPieces);
+                            List<BeatedPiece> newBeatedPieces = new List<BeatedPiece>(beatedPieces);
                             newBeatedPieces.Add(beatedPiece);
                             GetAllKingBeatMoves(piece, newBeatedPieces, targetRow, targetColumn, targetRow - ind - 1, targetColumn - ind - 1, ref allMoves);
                         }
@@ -312,10 +325,11 @@ namespace Checkers.Logic.GameObjects
                 for (int ind = 1; ind < Size; ind++)
                     if (CanBeatPiece(newPiece, targetRow + ind, targetColumn - ind))
                     {
-                        Piece beatedPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == targetRow + ind && p.Column == targetColumn - ind);
+                        Piece tempPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == targetRow + ind && p.Column == targetColumn - ind);
+                        BeatedPiece beatedPiece = new BeatedPiece(tempPiece.Row, tempPiece.Column, tempPiece.Color, tempPiece.IsKing, targetRow, targetColumn);
                         if (beatedPieces.Where(p => p.Row == beatedPiece.Row && p.Column == beatedPiece.Column && p.Color == beatedPiece.Color).Count() == 0)
                         {
-                            List<Piece> newBeatedPieces = new List<Piece>(beatedPieces);
+                            List<BeatedPiece> newBeatedPieces = new List<BeatedPiece>(beatedPieces);
                             newBeatedPieces.Add(beatedPiece);
                             GetAllKingBeatMoves(piece, newBeatedPieces, targetRow, targetColumn, targetRow + ind + 1, targetColumn - ind - 1, ref allMoves);
                         }
@@ -329,10 +343,11 @@ namespace Checkers.Logic.GameObjects
                 for (int ind = 1; ind < Size; ind++)
                     if (CanBeatPiece(newPiece, targetRow - ind, targetColumn + ind))
                     {
-                        Piece beatedPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == targetRow - ind && p.Column == targetColumn + ind);
+                        Piece tempPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == targetRow - ind && p.Column == targetColumn + ind);
+                        BeatedPiece beatedPiece = new BeatedPiece(tempPiece.Row, tempPiece.Column, tempPiece.Color, tempPiece.IsKing, targetRow, targetColumn);
                         if (beatedPieces.Where(p => p.Row == beatedPiece.Row && p.Column == beatedPiece.Column && p.Color == beatedPiece.Color).Count() == 0)
                         {
-                            List<Piece> newBeatedPieces = new List<Piece>(beatedPieces);
+                            List<BeatedPiece> newBeatedPieces = new List<BeatedPiece>(beatedPieces);
                             newBeatedPieces.Add(beatedPiece);
                             GetAllKingBeatMoves(piece, newBeatedPieces, targetRow, targetColumn, targetRow - ind - 1, targetColumn + ind + 1, ref allMoves);
                         }
@@ -346,10 +361,11 @@ namespace Checkers.Logic.GameObjects
                 for (int ind = 1; ind < Size; ind++)
                     if (CanBeatPiece(newPiece, targetRow + ind, targetColumn + ind))
                     {
-                        Piece beatedPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == targetRow + ind && p.Column == targetColumn + ind);
+                        Piece tempPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == targetRow + ind && p.Column == targetColumn + ind);
+                        BeatedPiece beatedPiece = new BeatedPiece(tempPiece.Row, tempPiece.Column, tempPiece.Color, tempPiece.IsKing, targetRow, targetColumn);
                         if (beatedPieces.Where(p => p.Row == beatedPiece.Row && p.Column == beatedPiece.Column && p.Color == beatedPiece.Color).Count() == 0)
                         {
-                            List<Piece> newBeatedPieces = new List<Piece>(beatedPieces);
+                            List<BeatedPiece> newBeatedPieces = new List<BeatedPiece>(beatedPieces);
                             newBeatedPieces.Add(beatedPiece);
                             GetAllKingBeatMoves(piece, newBeatedPieces, targetRow, targetColumn, targetRow + ind + 1, targetColumn + ind + 1, ref allMoves);
                         }

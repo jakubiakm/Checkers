@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:Checkers.UI.Model"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
+    <Grid Name="grid">
         <ItemsControl ItemsSource="{Binding BoardCanvasElements}">
             <ItemsControl.Resources>
                 <DataTemplate DataType="{x:Type local:CanvasElement}">
@@ -15,7 +15,7 @@
             </ItemsControl.Resources>
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <Canvas Name="BoardCanvas" />
+                    <Canvas x:Name="BoardCanvas" />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemContainerStyle>
