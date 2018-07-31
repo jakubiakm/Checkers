@@ -21,8 +21,6 @@ namespace Checkers.Logic.GameObjects
 
         public IEngine BlackPlayerEngine { get; private set; }
 
-        public Move LastMove { get; private set; }
-
         public Game(IEngine whiteEngine, IEngine blackEngine, int boardSize = 10, int numberOfWhitePieces = 20, int numberOfBlackPieces = 20)
         {
             WhitePlayerEngine = whiteEngine;
@@ -45,17 +43,17 @@ namespace Checkers.Logic.GameObjects
             switch(color)
             {
                 case PieceColor.White:
-                    LastMove = Board.MakeMove(WhitePlayerEngine.MakeMove(Board));
+                    Board.LastMove = Board.MakeMove(WhitePlayerEngine.MakeMove(Board));
                     break;
                 case PieceColor.Black:
-                    LastMove = Board.MakeMove(BlackPlayerEngine.MakeMove(Board));
+                    Board.LastMove = Board.MakeMove(BlackPlayerEngine.MakeMove(Board));
                     break;
             }
             if (Board.PiecesOnBoard.Where(p => p.Color == PieceColor.Black).Count() == 0)
-                throw new NoAvailablePiecesException(PieceColor.Black, LastMove);
+                throw new NoAvailablePiecesException(PieceColor.Black, Board.LastMove);
             if (Board.PiecesOnBoard.Where(p => p.Color == PieceColor.White).Count() == 0)
-                throw new NoAvailablePiecesException(PieceColor.White, LastMove);
-            return LastMove;
+                throw new NoAvailablePiecesException(PieceColor.White, Board.LastMove);
+            return Board.LastMove;
         }
     }
 }

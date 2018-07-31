@@ -15,6 +15,8 @@ namespace Checkers.Logic.GameObjects
 
         public List<Piece> PiecesOnBoard { get; private set; }
 
+        public Move LastMove { get; set; }
+
         public CheckersBoard(int size, List<Piece> pieces)
         {
             Size = size;

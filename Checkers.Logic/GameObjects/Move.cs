@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Checkers.Logic.GameObjects
 {
+    [Serializable]
     public class Move
     {
         public Piece OldPiece { get; set; }

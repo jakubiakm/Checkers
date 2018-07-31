@@ -37,21 +37,9 @@ namespace Checkers.UI.ViewModel
 
         public void StartNewGame()
         {
-            Game = new Game(new RandomEngine(PieceColor.White), new RandomEngine(PieceColor.Black), 10, new List<Piece>()
-            {
-                new Piece(1,1, PieceColor.White, true),
-                new Piece(3,3, PieceColor.Black, false),
-                new Piece(2,4, PieceColor.Black, false),
-                new Piece(2,6, PieceColor.Black, false),
-                new Piece(2,8, PieceColor.Black, false),
-                new Piece(4,8, PieceColor.Black, false),
-                new Piece(8,2, PieceColor.Black, false),
-                new Piece(8,4, PieceColor.Black, false),
-                new Piece(6,6, PieceColor.Black, false)
-
-            });
+            Game = new Game(new RandomEngine(PieceColor.White), new RandomEngine(PieceColor.Black));
             skipSize = 700 / Game.Board.Size;
-            DrawNewGame();
+            DrawCurrentBoard();
         }
 
         public Move NextMove()
@@ -69,8 +57,7 @@ namespace Checkers.UI.ViewModel
             }
             return null;
         }
-
-        private void DrawNewGame()
+        public void DrawCurrentBoard()
         {
             BoardCanvasElements.Clear();
             int skipSize = 700 / Game.Board.Size;
@@ -91,7 +78,92 @@ namespace Checkers.UI.ViewModel
                 }
                 index++;
             }
+            if (Game.Board.LastMove != null)
+            {
+                foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == Game.Board.LastMove.OldPiece.Row && e.Y == Game.Board.LastMove.OldPiece.Column).ToList())
+                {
+                    elem.Fill = Brushes.GreenYellow;
+                }
+                foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == Game.Board.LastMove.NewPiece.Row && e.Y == Game.Board.LastMove.NewPiece.Column).ToList())
+                {
+                    elem.Fill = Brushes.GreenYellow;
+                }
+                foreach (var piece in Game.Board.LastMove?.BeatedPieces ?? new List<BeatedPiece>())
+                {
+                    foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == piece.Row && e.Y == piece.Column).ToList())
+                    {
+                        elem.Fill = Brushes.Crimson;
+                    }
+                }
+            }
             foreach (var elem in Game.Board.PiecesOnBoard)
+            {
+                BoardCanvasElements.Add(new Model.CanvasElement
+                {
+                    Row = skipSize * (Game.Board.Size - 1 - elem.Row) + skipSize / 2,
+                    Column = skipSize * elem.Column + skipSize / 2,
+                    Geometry = new EllipseGeometry { RadiusX = skipSize / 3, RadiusY = skipSize / 3 },
+                    Fill = elem.Color == PieceColor.Black ? Brushes.Black : Brushes.White,
+                    X = elem.Row,
+                    Y = elem.Column
+                });
+                if (elem.IsKing)
+                {
+                    BoardCanvasElements.Add(new Model.CanvasElement
+                    {
+                        Row = skipSize * (Game.Board.Size - 1 - elem.Row) + skipSize / 2,
+                        Column = skipSize * elem.Column + skipSize / 2,
+                        Geometry = new EllipseGeometry { RadiusX = skipSize / 4, RadiusY = skipSize / 4 },
+                        Stroke = elem.Color == PieceColor.Black ? Brushes.White : Brushes.Black,
+                        X = elem.Row,
+                        Y = elem.Column
+                    });
+                }
+            }
+        }
+
+        public void DrawHistoryBoard(int moveNumber)
+        {
+            if(moveNumber == Game.History.Count)
+            {
+                DrawCurrentBoard();
+                return;
+            }
+            BoardCanvasElements.Clear();
+            int skipSize = 700 / Game.Board.Size;
+            int index = 0;
+            for (int i = 0; i != Game.Board.Size; i++)
+            {
+                for (int j = 0; j != Game.Board.Size; j++)
+                {
+                    BoardCanvasElements.Add(new Model.CanvasElement
+                    {
+                        Row = skipSize * j,
+                        Column = skipSize * i,
+                        Geometry = new RectangleGeometry { Rect = new System.Windows.Rect(0, 0, skipSize, skipSize) },
+                        Fill = index++ % 2 == 1 ? Brushes.CadetBlue : Brushes.AntiqueWhite,
+                        X = Game.Board.Size - 1 - j,
+                        Y = i
+                    });
+                }
+                index++;
+            }
+            foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == Game.History[moveNumber].LastMove.OldPiece.Row && e.Y == Game.History[moveNumber].LastMove.OldPiece.Column).ToList())
+            {
+                elem.Fill = Brushes.GreenYellow;
+            }
+            foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == Game.History[moveNumber].LastMove.NewPiece.Row && e.Y == Game.History[moveNumber].LastMove.NewPiece.Column).ToList())
+            {
+                elem.Fill = Brushes.GreenYellow;
+            }
+            foreach (var piece in Game.History[moveNumber].LastMove?.BeatedPieces ?? new List<BeatedPiece>())
+            {
+                foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == piece.Row && e.Y == piece.Column).ToList())
+                {
+                    elem.Fill = Brushes.Crimson;
+                }
+            }
+            foreach (var elem in Game.History[moveNumber].PiecesOnBoard)
             {
                 BoardCanvasElements.Add(new Model.CanvasElement
                 {
@@ -158,7 +230,7 @@ namespace Checkers.UI.ViewModel
             {
                 elem.Fill = Brushes.GreenYellow;
             }
-            foreach (var piece in Game.LastMove?.BeatedPieces ?? new List<BeatedPiece>())
+            foreach (var piece in Game.Board.LastMove?.BeatedPieces ?? new List<BeatedPiece>())
             {
                 foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == piece.Row && e.Y == piece.Column).ToList())
                 {

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Checkers.Logic.GameObjects
 {
+    [Serializable]
     public class BeatedPiece : Piece
     {
         public BeatedPiece(int row, int column, PieceColor color, bool isKing, int beatRow, int beatColumn) : base(row, column, color, isKing)

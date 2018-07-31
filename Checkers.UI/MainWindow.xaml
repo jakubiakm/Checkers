@@ -11,5 +11,6 @@
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
         <Views:BoardView Grid.Column="0" x:Name = "BoardViewControl" Loaded ="BoardViewControl_Loaded"/>
+        <Views:HistoryView Grid.Column="1" x:Name="HistoryViewModelControl" Loaded="HistoryViewControl_Loaded"/>
     </Grid>
 </Controls:MetroWindow>
