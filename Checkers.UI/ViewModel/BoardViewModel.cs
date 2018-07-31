@@ -47,15 +47,14 @@ namespace Checkers.UI.ViewModel
                 new Piece(4,8, PieceColor.Black, false),
                 new Piece(8,2, PieceColor.Black, false),
                 new Piece(8,4, PieceColor.Black, false),
-                new Piece(6,6, PieceColor.Black, false),
-new Piece(0,0, PieceColor.Black, false)
+                new Piece(6,6, PieceColor.Black, false)
 
             });
             skipSize = 700 / Game.Board.Size;
             DrawNewGame();
         }
 
-        public void NextMove()
+        public Move NextMove()
         {
             if (AnimationCompleted)
             {
@@ -65,11 +64,10 @@ new Piece(0,0, PieceColor.Black, false)
                 else
                     move = Game.MakeMove(PieceColor.Black);
 
-
-                DrawNextMove(move);
-
-                lastMove = move;
+               
+                return move;
             }
+            return null;
         }
 
         private void DrawNewGame()
@@ -119,11 +117,13 @@ new Piece(0,0, PieceColor.Black, false)
             }
         }
 
-        void DrawNextMove(Move move)
+        public void DrawNextMove(Move move)
         {
             RemoveLastMoveTargets(move);
             DrawMoveTargets(move);
             AnimateMovement(move);
+
+            lastMove = move;
         }
 
         private void RemoveLastMoveTargets(Move move)
@@ -230,10 +230,10 @@ new Piece(0,0, PieceColor.Black, false)
                 pFigure.Segments.Add(lineSegment);
                 animationPath.Figures.Add(pFigure);
                 animationPath.Freeze();
-
+                
 
                 PointAnimationUsingPath myPointAnimation = new PointAnimationUsingPath();
-                myPointAnimation.Duration = TimeSpan.FromSeconds(0.3 * ((move.BeatedPieces?.Count()) ?? 1));
+                myPointAnimation.Duration = TimeSpan.FromSeconds(1 * ((move.BeatedPieces?.Count()) ?? 1));
                 myPointAnimation.FillBehavior = FillBehavior.Stop;
                 myPointAnimation.PathGeometry = animationPath;
 

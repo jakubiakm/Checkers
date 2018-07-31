@@ -52,9 +52,9 @@ namespace Checkers.Logic.GameObjects
                     break;
             }
             if (Board.PiecesOnBoard.Where(p => p.Color == PieceColor.Black).Count() == 0)
-                throw new NoAvailablePiecesException(PieceColor.Black);
+                throw new NoAvailablePiecesException(PieceColor.Black, LastMove);
             if (Board.PiecesOnBoard.Where(p => p.Color == PieceColor.White).Count() == 0)
-                throw new NoAvailablePiecesException(PieceColor.White);
+                throw new NoAvailablePiecesException(PieceColor.White, LastMove);
             return LastMove;
         }
     }

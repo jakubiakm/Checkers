@@ -51,7 +51,8 @@ namespace Checkers.UI
 
                 try
                 {
-                    BoardViewModelObject.NextMove();
+                    var move = BoardViewModelObject.NextMove();
+                    BoardViewModelObject.DrawNextMove(move);
                 }
                 catch (NotAvailableMoveException exception)
                 {
@@ -60,6 +61,7 @@ namespace Checkers.UI
                 }
                 catch (NoAvailablePiecesException exception)
                 {
+                    BoardViewModelObject.DrawNextMove(exception.LastMove);
                     await this.ShowMessageAsync("Koniec gry", $"Gra zakończony. Gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie ma już pionków.");
                     BoardViewModelObject.StartNewGame();
                 }
