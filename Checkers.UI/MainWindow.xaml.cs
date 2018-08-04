@@ -1,5 +1,6 @@
 ﻿using Checkers.Logic.Enums;
 using Checkers.Logic.Exceptions;
+using Checkers.Logic.GameObjects;
 using Checkers.UI.ViewModel;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
@@ -236,8 +237,8 @@ namespace Checkers.UI
                 if (pathElem.Data is RectangleGeometry || pathElem.Data is EllipseGeometry)
                 {
                     var pos = BoardViewModelObject.BoardCanvasElements.SingleOrDefault(es => es.Geometry == pathElem.Data);
-                    var position = GetCheckersPositionNumber(10, pos.X, pos.Y);
-                    if (pathElem.Fill == Brushes.AntiqueWhite)
+                    var position = Piece.ToPosition(pos.X, pos.Y, 10);
+                    if (position == -1)
                     {
                         PositionLabel.Content = " ";
                     }
@@ -251,14 +252,6 @@ namespace Checkers.UI
             {
                 PositionLabel.Content = "?";
             }
-
-
-
-        }
-
-        private int GetCheckersPositionNumber(int size, int row, int column)
-        {
-            return size / 2 * (size - row - 1) + ((row % 2 == 0) ? 1 : 0) + (column + 1) / 2;
         }
     }
 }

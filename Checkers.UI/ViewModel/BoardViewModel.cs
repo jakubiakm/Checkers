@@ -43,14 +43,7 @@ namespace Checkers.UI.ViewModel
         public void StartNewGame()
         {
             CurrentPlayer = PieceColor.White;
-            Game = new Game(new RandomEngine(PieceColor.White), new HumanEngine(PieceColor.Black), 10, new List<Piece>()
-            {
-                new Piece(9,5, PieceColor.White, true),
-                new Piece(8,4, PieceColor.Black, true),
-                new Piece(6,4, PieceColor.Black, true),
-                new Piece(8,6, PieceColor.Black, true),
-                new Piece(6,6, PieceColor.Black, true)
-            });
+            Game = new Game(new HumanEngine(PieceColor.White), new HumanEngine(PieceColor.Black));
             WhiteIsHumnan = Game.WhitePlayerEngine is HumanEngine;
             BlackIsHuman = Game.BlackPlayerEngine is HumanEngine;
             skipSize = 700 / Game.Board.Size;

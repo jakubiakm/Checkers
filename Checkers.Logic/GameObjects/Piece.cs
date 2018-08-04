@@ -25,6 +25,7 @@ namespace Checkers.Logic.GameObjects
             set
             {
                 _row = value;
+                _position = ToPosition(_row, _column);
             }
         }
 
@@ -37,6 +38,7 @@ namespace Checkers.Logic.GameObjects
             set
             {
                 _column = value;
+                _position = ToPosition(_row, _column);
             }
         }
 
@@ -49,6 +51,8 @@ namespace Checkers.Logic.GameObjects
             set
             {
                 _position = value;
+                _row = ToRow(value);
+                _column = ToColumn(value);
             }
         }
 
@@ -74,6 +78,26 @@ namespace Checkers.Logic.GameObjects
         public override string ToString()
         {
             return $"[({Row},{Column}),King:{IsKing},{Color}]";
+        }
+
+        public static int ToPosition(int row, int column, int size = 10)
+        {
+            if ((column % 2 == 0 && row % 2 == 1) || (row % 2 == 0 && column % 2 == 1))
+                return -1;
+            else
+                return size / 2 * (size - row - 1) + ((row % 2 == 0) ? 1 : 0) + (column + 1) / 2;
+        }
+
+        public static int ToRow(int position, int size = 10)
+        {
+            int div = size / 2;
+            return size - 1 - (position - 1) / div;
+        }
+
+        public static int ToColumn(int position, int size = 10)
+        {
+            int div = size / 2;
+            return 2 * ((position - 1) % div) + (ToRow(position) % 2 == 1 ? 1 : 0);
         }
     }
 }

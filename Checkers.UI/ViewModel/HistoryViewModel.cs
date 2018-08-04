@@ -23,8 +23,8 @@ namespace Checkers.UI.ViewModel
         
         public void AddHistoryItem(int size, Move move)
         {
-            int fromNumber = GetCheckersPositionNumber(size, move.OldPiece.Row, move.OldPiece.Column);
-            int toNumber = GetCheckersPositionNumber(size, move.NewPiece.Row, move.NewPiece.Column);
+            int fromNumber = move.OldPiece.Position;
+            int toNumber = move.NewPiece.Position;
 
 
             if (move.BeatedPieces == null)
@@ -34,16 +34,11 @@ namespace Checkers.UI.ViewModel
                 string numberString = "";
                 foreach(var piece in move.BeatedPieces)
                 {
-                    numberString += $"{GetCheckersPositionNumber(size, piece.BeatPieceRow, piece.BeatPieceColumn)}x";
+                    numberString += $"{Piece.ToPosition(piece.BeatPieceRow, piece.BeatPieceColumn, size)}x";
                 }
-                numberString += GetCheckersPositionNumber(size, move.NewPiece.Row, move.NewPiece.Column);
+                numberString += move.NewPiece.Position;
                 History.Add(new History() { HistoryItem = $"  {History.Count + 1}.\t{numberString}" });
             }
-        }
-
-        private int GetCheckersPositionNumber(int size, int row, int column)
-        {
-            return size / 2 * (size - row - 1) + ((row % 2 == 0) ? 1 : 0) + (column + 1) / 2;
         }
     }
 }
