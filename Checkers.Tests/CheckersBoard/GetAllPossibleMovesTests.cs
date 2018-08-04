@@ -161,6 +161,21 @@ namespace Checkers.Tests
             var moves = board.GetAllPossibleMoves(PieceColor.White);
             Assert.IsTrue(moves.Where(m => m.BeatedPieces?.Count == 4).Count() > 0);
         }
+
+        [Test]
+        public void Test10()
+        {
+            CheckersBoard board = new CheckersBoard(10, new List<Piece>()
+            {
+                new Piece(9,5, PieceColor.White, true),
+                new Piece(8,4, PieceColor.Black, true),
+                new Piece(6,4, PieceColor.Black, true),
+                new Piece(8,6, PieceColor.Black, true),
+                new Piece(6,6, PieceColor.Black, true)
+            });
+            var moves = board.GetAllPossibleMoves(PieceColor.White);
+            Assert.IsTrue(moves.Where(m => m.BeatedPieces?.Count == 4).Count() > 0);
+        }
     }
 }
 

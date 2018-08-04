@@ -3,14 +3,22 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"  
         xmlns:Views = "clr-namespace:Checkers.UI.Views"
-        Title="Warcaby" Height="733" Width="925" WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
+        Title="Warcaby" Height="733" Width="925" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" MouseMove="MetroWindow_MouseMove"
         >
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="700"></ColumnDefinition>
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
-        <Views:BoardView Grid.Column="0" x:Name = "BoardViewControl" Loaded ="BoardViewControl_Loaded"/>
-        <Views:HistoryView Grid.Column="1" x:Name="HistoryViewModelControl" Loaded="HistoryViewControl_Loaded"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <Views:BoardView Grid.Column="0" Grid.RowSpan="2" x:Name = "BoardViewControl" Loaded ="BoardViewControl_Loaded"/>
+        <Views:HistoryView  Grid.Column="1" x:Name="HistoryViewModelControl" Loaded="HistoryViewControl_Loaded"/>
+        <StackPanel Margin="20,0,0,0" Orientation="Horizontal" Grid.Column="1" Grid.Row="1">
+            <Label FontSize="26" >POZYCJA</Label>
+            <Label Name="PositionLabel" Margin="20,0,0,10" FontSize="26" FontWeight="Bold">?</Label>
+        </StackPanel>
     </Grid>
 </Controls:MetroWindow>

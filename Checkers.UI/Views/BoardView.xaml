@@ -10,7 +10,7 @@
         <ItemsControl ItemsSource="{Binding BoardCanvasElements}">
             <ItemsControl.Resources>
                 <DataTemplate DataType="{x:Type local:CanvasElement}">
-                    <Path Data="{Binding Geometry}" Stroke="{Binding Stroke}" Fill="{Binding Fill}"/>
+                    <Path Data="{Binding Geometry}" Stroke="{Binding Stroke}" Fill="{Binding Fill}" StrokeThickness="{Binding Thickness}"/>
                 </DataTemplate>
             </ItemsControl.Resources>
             <ItemsControl.ItemsPanel>

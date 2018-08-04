@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Shapes;
 
 namespace Checkers.UI.ViewModel
 {
@@ -20,6 +21,12 @@ namespace Checkers.UI.ViewModel
         {
             Window = window;
         }
+
+        public bool WhiteIsHumnan { get; set; }
+
+        public bool BlackIsHuman { get; set; }
+
+        public PieceColor CurrentPlayer { get; set; }
 
         public MainWindow Window { get; set; }
 
@@ -31,32 +38,63 @@ namespace Checkers.UI.ViewModel
 
         private Move lastMove = null;
 
-        int turn = 0;
-
         double skipSize = 0;
 
         public void StartNewGame()
         {
-            Game = new Game(new RandomEngine(PieceColor.White), new RandomEngine(PieceColor.Black));
+            CurrentPlayer = PieceColor.White;
+            Game = new Game(new RandomEngine(PieceColor.White), new HumanEngine(PieceColor.Black), 10, new List<Piece>()
+            {
+                new Piece(9,5, PieceColor.White, true),
+                new Piece(8,4, PieceColor.Black, true),
+                new Piece(6,4, PieceColor.Black, true),
+                new Piece(8,6, PieceColor.Black, true),
+                new Piece(6,6, PieceColor.Black, true)
+            });
+            WhiteIsHumnan = Game.WhitePlayerEngine is HumanEngine;
+            BlackIsHuman = Game.BlackPlayerEngine is HumanEngine;
             skipSize = 700 / Game.Board.Size;
             DrawCurrentBoard();
         }
 
-        public Move NextMove()
+        public Move NextMove(List<Path> humanMoves = null)
         {
             if (AnimationCompleted)
             {
+                if (humanMoves != null && CurrentPlayer == PieceColor.White && WhiteIsHumnan)
+                {
+                    ((HumanEngine)Game.WhitePlayerEngine).HumanMove = ConvertPathListToPieceList(humanMoves);
+                }
+
+                if (humanMoves != null && CurrentPlayer == PieceColor.Black && BlackIsHuman)
+                {
+                    ((HumanEngine)Game.BlackPlayerEngine).HumanMove = ConvertPathListToPieceList(humanMoves);
+                }
+
                 Move move;
-                if (turn++ % 2 == 0)
+                if (CurrentPlayer == PieceColor.White)
                     move = Game.MakeMove(PieceColor.White);
                 else
                     move = Game.MakeMove(PieceColor.Black);
 
-               
+                CurrentPlayer = CurrentPlayer == PieceColor.Black ? PieceColor.White : PieceColor.Black;
+
                 return move;
             }
             return null;
         }
+
+        private List<Piece> ConvertPathListToPieceList(List<Path> paths)
+        {
+            List<Piece> ret = new List<Piece>();
+            foreach (var path in paths)
+            {
+                var elem = BoardCanvasElements.SingleOrDefault(e => e.Geometry == path.Data);
+                ret.Add(new Piece(elem.X, elem.Y, PieceColor.White, false));
+            }
+            return ret;
+        }
+
         public void DrawCurrentBoard()
         {
             BoardCanvasElements.Clear();
@@ -71,7 +109,7 @@ namespace Checkers.UI.ViewModel
                         Row = skipSize * j,
                         Column = skipSize * i,
                         Geometry = new RectangleGeometry { Rect = new System.Windows.Rect(0, 0, skipSize, skipSize) },
-                        Fill = index++ % 2 == 1 ? Brushes.CadetBlue : Brushes.AntiqueWhite,
+                        Fill = index++ % 2 == 1 ? Brushes.Peru : Brushes.AntiqueWhite,
                         X = Game.Board.Size - 1 - j,
                         Y = i
                     });
@@ -82,11 +120,11 @@ namespace Checkers.UI.ViewModel
             {
                 foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == Game.Board.LastMove.OldPiece.Row && e.Y == Game.Board.LastMove.OldPiece.Column).ToList())
                 {
-                    elem.Fill = Brushes.GreenYellow;
+                    elem.Fill =  Brushes.DarkOrange;
                 }
                 foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == Game.Board.LastMove.NewPiece.Row && e.Y == Game.Board.LastMove.NewPiece.Column).ToList())
                 {
-                    elem.Fill = Brushes.GreenYellow;
+                    elem.Fill =  Brushes.DarkOrange;
                 }
                 foreach (var piece in Game.Board.LastMove?.BeatedPieces ?? new List<BeatedPiece>())
                 {
@@ -105,7 +143,8 @@ namespace Checkers.UI.ViewModel
                     Geometry = new EllipseGeometry { RadiusX = skipSize / 3, RadiusY = skipSize / 3 },
                     Fill = elem.Color == PieceColor.Black ? Brushes.Black : Brushes.White,
                     X = elem.Row,
-                    Y = elem.Column
+                    Y = elem.Column,
+                    Color = elem.Color
                 });
                 if (elem.IsKing)
                 {
@@ -115,8 +154,10 @@ namespace Checkers.UI.ViewModel
                         Column = skipSize * elem.Column + skipSize / 2,
                         Geometry = new EllipseGeometry { RadiusX = skipSize / 4, RadiusY = skipSize / 4 },
                         Stroke = elem.Color == PieceColor.Black ? Brushes.White : Brushes.Black,
+                        Thickness = 2,
                         X = elem.Row,
-                        Y = elem.Column
+                        Y = elem.Column,
+                        Color = elem.Color
                     });
                 }
             }
@@ -124,7 +165,7 @@ namespace Checkers.UI.ViewModel
 
         public void DrawHistoryBoard(int moveNumber)
         {
-            if(moveNumber == Game.History.Count)
+            if (moveNumber == Game.History.Count)
             {
                 DrawCurrentBoard();
                 return;
@@ -141,7 +182,7 @@ namespace Checkers.UI.ViewModel
                         Row = skipSize * j,
                         Column = skipSize * i,
                         Geometry = new RectangleGeometry { Rect = new System.Windows.Rect(0, 0, skipSize, skipSize) },
-                        Fill = index++ % 2 == 1 ? Brushes.CadetBlue : Brushes.AntiqueWhite,
+                        Fill = index++ % 2 == 1 ? Brushes.Peru : Brushes.AntiqueWhite,
                         X = Game.Board.Size - 1 - j,
                         Y = i
                     });
@@ -150,11 +191,11 @@ namespace Checkers.UI.ViewModel
             }
             foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == Game.History[moveNumber].LastMove.OldPiece.Row && e.Y == Game.History[moveNumber].LastMove.OldPiece.Column).ToList())
             {
-                elem.Fill = Brushes.GreenYellow;
+                elem.Fill =  Brushes.DarkOrange;
             }
             foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == Game.History[moveNumber].LastMove.NewPiece.Row && e.Y == Game.History[moveNumber].LastMove.NewPiece.Column).ToList())
             {
-                elem.Fill = Brushes.GreenYellow;
+                elem.Fill =  Brushes.DarkOrange;
             }
             foreach (var piece in Game.History[moveNumber].LastMove?.BeatedPieces ?? new List<BeatedPiece>())
             {
@@ -182,6 +223,7 @@ namespace Checkers.UI.ViewModel
                         Column = skipSize * elem.Column + skipSize / 2,
                         Geometry = new EllipseGeometry { RadiusX = skipSize / 4, RadiusY = skipSize / 4 },
                         Stroke = elem.Color == PieceColor.Black ? Brushes.White : Brushes.Black,
+                        Thickness = 2,
                         X = elem.Row,
                         Y = elem.Column
                     });
@@ -204,17 +246,17 @@ namespace Checkers.UI.ViewModel
             {
                 foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == lastMove.OldPiece.Row && e.Y == lastMove.OldPiece.Column).ToList())
                 {
-                    elem.Fill = Brushes.CadetBlue;
+                    elem.Fill = Brushes.Peru;
                 }
                 foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == lastMove.NewPiece.Row && e.Y == lastMove.NewPiece.Column).ToList())
                 {
-                    elem.Fill = Brushes.CadetBlue;
+                    elem.Fill = Brushes.Peru;
                 }
                 foreach (var piece in lastMove?.BeatedPieces ?? new List<BeatedPiece>())
                 {
                     foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == piece.Row && e.Y == piece.Column).ToList())
                     {
-                        elem.Fill = Brushes.CadetBlue;
+                        elem.Fill = Brushes.Peru;
                     }
                 }
             }
@@ -224,11 +266,11 @@ namespace Checkers.UI.ViewModel
         {
             foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == move.OldPiece.Row && e.Y == move.OldPiece.Column).ToList())
             {
-                elem.Fill = Brushes.GreenYellow;
+                elem.Fill =  Brushes.DarkOrange;
             }
             foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == move.NewPiece.Row && e.Y == move.NewPiece.Column).ToList())
             {
-                elem.Fill = Brushes.GreenYellow;
+                elem.Fill =  Brushes.DarkOrange;
             }
             foreach (var piece in Game.Board.LastMove?.BeatedPieces ?? new List<BeatedPiece>())
             {
@@ -261,6 +303,7 @@ namespace Checkers.UI.ViewModel
                     Row = skipSize * (Game.Board.Size - 1 - move.NewPiece.Row) + skipSize / 2,
                     Column = skipSize * move.NewPiece.Column + skipSize / 2,
                     Geometry = new EllipseGeometry { RadiusX = skipSize / 4, RadiusY = skipSize / 4 },
+                    Thickness = 2,
                     Stroke = move.NewPiece.Color == PieceColor.Black ? Brushes.White : Brushes.Black,
                     X = move.NewPiece.Row,
                     Y = move.NewPiece.Column
@@ -302,10 +345,10 @@ namespace Checkers.UI.ViewModel
                 pFigure.Segments.Add(lineSegment);
                 animationPath.Figures.Add(pFigure);
                 animationPath.Freeze();
-                
+
 
                 PointAnimationUsingPath myPointAnimation = new PointAnimationUsingPath();
-                myPointAnimation.Duration = TimeSpan.FromSeconds(1 * ((move.BeatedPieces?.Count()) ?? 1));
+                myPointAnimation.Duration = TimeSpan.FromSeconds(0.33 * ((move.BeatedPieces?.Count()) ?? 1));
                 myPointAnimation.FillBehavior = FillBehavior.Stop;
                 myPointAnimation.PathGeometry = animationPath;
 

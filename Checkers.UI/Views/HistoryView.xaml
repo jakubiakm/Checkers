@@ -8,7 +8,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-        <ListView Name="HistoryListView" ItemsSource="{Binding History}" mah:ScrollViewerHelper.IsHorizontalScrollWheelEnabled="True">
+        <ListView Name="HistoryListView" ItemsSource="{Binding History}" mah:ScrollViewerHelper.IsHorizontalScrollWheelEnabled="True" BorderThickness="0" >
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Label Content= "{Binding HistoryItem}" />

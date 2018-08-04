@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Checkers.Logic.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -20,6 +21,8 @@ namespace Checkers.UI.Model
         private double column;
 
         private Brush fill;
+
+        public double Thickness { get; set; }
 
         public double Row
         {
@@ -86,6 +89,8 @@ namespace Checkers.UI.Model
         public int X { get; set; }
 
         public int Y { get; set; }
+
+        public PieceColor Color { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

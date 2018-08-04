@@ -11,8 +11,6 @@ namespace Checkers.UI.ViewModel
 {
     public class HistoryViewModel
     {
-        private int moveNumbers = 0;
-
         public HistoryViewModel()
         {
         }
@@ -22,7 +20,7 @@ namespace Checkers.UI.ViewModel
             get;
             set;
         } = new ObservableCollection<History>();
-
+        
         public void AddHistoryItem(int size, Move move)
         {
             int fromNumber = GetCheckersPositionNumber(size, move.OldPiece.Row, move.OldPiece.Column);
@@ -30,7 +28,7 @@ namespace Checkers.UI.ViewModel
 
 
             if (move.BeatedPieces == null)
-                History.Add(new History() { HistoryItem = $"  {++moveNumbers}.\t{fromNumber}-{toNumber}" });
+                History.Add(new History() { HistoryItem = $"  {History.Count + 1}.\t{fromNumber}-{toNumber}" });
             else
             {
                 string numberString = "";
@@ -39,7 +37,7 @@ namespace Checkers.UI.ViewModel
                     numberString += $"{GetCheckersPositionNumber(size, piece.BeatPieceRow, piece.BeatPieceColumn)}x";
                 }
                 numberString += GetCheckersPositionNumber(size, move.NewPiece.Row, move.NewPiece.Column);
-                History.Add(new History() { HistoryItem = $"  {++moveNumbers}.\t{numberString}" });
+                History.Add(new History() { HistoryItem = $"  {History.Count + 1}.\t{numberString}" });
             }
         }
 

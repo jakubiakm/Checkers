@@ -40,8 +40,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Engines\HumanEngine.cs" />
     <Compile Include="Exceptions\NoAvailablePiecesException.cs" />
     <Compile Include="Exceptions\NotAvailableMoveException.cs" />
+    <Compile Include="Exceptions\WrongMoveException.cs" />
     <Compile Include="GameObjects\BeatedPiece.cs" />
     <Compile Include="GameObjects\CheckersBoard.cs" />
     <Compile Include="Engines\IEngine.cs" />
