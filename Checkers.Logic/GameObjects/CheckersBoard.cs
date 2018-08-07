@@ -27,34 +27,14 @@ namespace Checkers.Logic.GameObjects
         {
             PiecesOnBoard = new List<Piece>();
             Size = size;
-            int row = 0;
-            int column = 0;
             if (size * size / 2 < numberOfWhitePieces + numberOfBlackPieces)
                 throw new ArgumentException("Pionki nie mieszczą się na planszy");
             if (size % 2 == 1)
                 throw new ArgumentException("Rozmiar planszy musi być liczbą parzystą");
             while (numberOfWhitePieces-- > 0)
-            {
-                if (column >= size)
-                {
-                    row++;
-                    column = row % 2 == 0 ? 0 : 1;
-                }
-                PiecesOnBoard.Add(new Piece(row, column, PieceColor.White, false));
-                column += 2;
-            }
-            row = size - 1;
-            column = size - 1;
+                PiecesOnBoard.Add(new Piece((size * size / 2) - numberOfWhitePieces, PieceColor.White, false));
             while (numberOfBlackPieces-- > 0)
-            {
-                if (column < 0)
-                {
-                    row--;
-                    column = row % 2 == 0 ? size - 2 : size - 1;
-                }
-                PiecesOnBoard.Add(new Piece(row, column, PieceColor.Black, false));
-                column -= 2;
-            }
+                PiecesOnBoard.Add(new Piece(numberOfBlackPieces + 1, PieceColor.Black, false));
         }
 
         public List<Move> GetAllPossibleMoves(PieceColor color)
@@ -211,7 +191,7 @@ namespace Checkers.Logic.GameObjects
             return
                 row >= 0 && row < Size && column >= 0 && column < Size &&
                 PiecesOnBoard
-                .Where(p => p.Row != sourceMovePiece.Row || p.Column != sourceMovePiece.Column) //bijący pionek nie powinien być branyc pod uwagę
+                .Where(p => p.Position != sourceMovePiece.Position) //bijący pionek nie powinien być branyc pod uwagę
                 .Count(p => p.Row == row && p.Column == column) == 0;
         }
 
@@ -225,10 +205,10 @@ namespace Checkers.Logic.GameObjects
                 return false;
             //sprawdzenie czy jest przeciwny pionek na pozycji i czy po biciu można postawić pionka na następnym polu
             if (PiecesOnBoard
-                .Where(p => p.Row != sourceMovePiece.Row || p.Column != sourceMovePiece.Column) //bijący pionek nie powinien być branyc pod uwagę
+                .Where(p => p.Position != sourceMovePiece.Position) //bijący pionek nie powinien być branyc pod uwagę
                 .Count(p => p.Row == row && p.Column == column && p.Color != piece.Color) > 0 &&
                 !PiecesOnBoard
-                .Where(p => p.Row != sourceMovePiece.Row || p.Column != sourceMovePiece.Column) //bijący pionek nie powinien być branyc pod uwagę
+                .Where(p => p.Position != sourceMovePiece.Position) //bijący pionek nie powinien być branyc pod uwagę
                 .Any(p => p.Row == rowAfterBeat && p.Column == columnAfterBeat))
                 return true;
             return false;
@@ -317,7 +297,7 @@ namespace Checkers.Logic.GameObjects
                     {
                         Piece tempPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == targetRow - ind && p.Column == targetColumn - ind);
                         BeatedPiece beatedPiece = new BeatedPiece(tempPiece.Row, tempPiece.Column, tempPiece.Color, tempPiece.IsKing, targetRow, targetColumn);
-                        if (beatedPieces.Where(p => p.Row == beatedPiece.Row && p.Column == beatedPiece.Column && p.Color == beatedPiece.Color).Count() == 0)
+                        if (beatedPieces.Where(p => p.Position == beatedPiece.Position && p.Color == beatedPiece.Color).Count() == 0)
                         {
                             List<BeatedPiece> newBeatedPieces = new List<BeatedPiece>(beatedPieces);
                             newBeatedPieces.Add(beatedPiece);
@@ -329,7 +309,7 @@ namespace Checkers.Logic.GameObjects
                     }
                     else
                     {
-                        if (/*!beatedPieces.Any(p => p.Row == targetRow - ind && p.Column == targetColumn - ind) && */!CanMoveToPosition(targetRow - ind, targetColumn - ind, piece))
+                        if (!CanMoveToPosition(targetRow - ind, targetColumn - ind, piece))
                             break;
                     }
             if (!(targetRow - sourceRow < 0 && targetColumn - sourceColumn > 0))
@@ -338,7 +318,7 @@ namespace Checkers.Logic.GameObjects
                     {
                         Piece tempPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == targetRow + ind && p.Column == targetColumn - ind);
                         BeatedPiece beatedPiece = new BeatedPiece(tempPiece.Row, tempPiece.Column, tempPiece.Color, tempPiece.IsKing, targetRow, targetColumn);
-                        if (beatedPieces.Where(p => p.Row == beatedPiece.Row && p.Column == beatedPiece.Column && p.Color == beatedPiece.Color).Count() == 0)
+                        if (beatedPieces.Where(p => p.Position == beatedPiece.Position && p.Color == beatedPiece.Color).Count() == 0)
                         {
                             List<BeatedPiece> newBeatedPieces = new List<BeatedPiece>(beatedPieces);
                             newBeatedPieces.Add(beatedPiece);
@@ -350,7 +330,7 @@ namespace Checkers.Logic.GameObjects
                     }
                     else
                     {
-                        if (/*!beatedPieces.Any(p => p.Row == targetRow + ind && p.Column == targetColumn - ind) && */!CanMoveToPosition(targetRow + ind, targetColumn - ind, piece))
+                        if (!CanMoveToPosition(targetRow + ind, targetColumn - ind, piece))
                             break;
                     }
             if (!(targetRow - sourceRow > 0 && targetColumn - sourceColumn < 0))
@@ -359,7 +339,7 @@ namespace Checkers.Logic.GameObjects
                     {
                         Piece tempPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == targetRow - ind && p.Column == targetColumn + ind);
                         BeatedPiece beatedPiece = new BeatedPiece(tempPiece.Row, tempPiece.Column, tempPiece.Color, tempPiece.IsKing, targetRow, targetColumn);
-                        if (beatedPieces.Where(p => p.Row == beatedPiece.Row && p.Column == beatedPiece.Column && p.Color == beatedPiece.Color).Count() == 0)
+                        if (beatedPieces.Where(p => p.Position == beatedPiece.Position && p.Color == beatedPiece.Color).Count() == 0)
                         {
                             List<BeatedPiece> newBeatedPieces = new List<BeatedPiece>(beatedPieces);
                             newBeatedPieces.Add(beatedPiece);
@@ -371,7 +351,7 @@ namespace Checkers.Logic.GameObjects
                     }
                     else
                     {
-                        if (/*!beatedPieces.Any(p => p.Row == targetRow - ind && p.Column == targetColumn + ind) && */!CanMoveToPosition(targetRow - ind, targetColumn + ind, piece))
+                        if (!CanMoveToPosition(targetRow - ind, targetColumn + ind, piece))
                             break;
                     }
             if (!(targetRow - sourceRow < 0 && targetColumn - sourceColumn < 0))
@@ -380,7 +360,7 @@ namespace Checkers.Logic.GameObjects
                     {
                         Piece tempPiece = PiecesOnBoard.SingleOrDefault(p => p.Row == targetRow + ind && p.Column == targetColumn + ind);
                         BeatedPiece beatedPiece = new BeatedPiece(tempPiece.Row, tempPiece.Column, tempPiece.Color, tempPiece.IsKing, targetRow, targetColumn);
-                        if (beatedPieces.Where(p => p.Row == beatedPiece.Row && p.Column == beatedPiece.Column && p.Color == beatedPiece.Color).Count() == 0)
+                        if (beatedPieces.Where(p => p.Position == beatedPiece.Position && p.Color == beatedPiece.Color).Count() == 0)
                         {
                             List<BeatedPiece> newBeatedPieces = new List<BeatedPiece>(beatedPieces);
                             newBeatedPieces.Add(beatedPiece);
@@ -392,7 +372,7 @@ namespace Checkers.Logic.GameObjects
                     }
                     else
                     {
-                        if (/*!beatedPieces.Any(p => p.Row == targetRow + ind && p.Column == targetColumn + ind) && */!CanMoveToPosition(targetRow + ind, targetColumn + ind, piece))
+                        if (!CanMoveToPosition(targetRow + ind, targetColumn + ind, piece))
                             break;
                     }
         }

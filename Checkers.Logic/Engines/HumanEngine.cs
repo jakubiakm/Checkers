@@ -34,7 +34,7 @@ namespace Checkers.Logic.Engines
             int beatedPawns = allPossibleMoves[0].BeatedPieces?.Count ?? 1;
             if(HumanMove.Count == 1 + beatedPawns)
             {
-                var possibleMoves = allPossibleMoves.Where(m => m.OldPiece.Row == HumanMove[0].Row && m.OldPiece.Column == HumanMove[0].Column && m.NewPiece.Row == HumanMove.Last().Row && m.NewPiece.Column == HumanMove.Last().Column).ToList();
+                var possibleMoves = allPossibleMoves.Where(m => m.OldPiece.Position == HumanMove[0].Position && m.NewPiece.Position == HumanMove.Last().Position).ToList();
                 HumanMove.Remove(HumanMove.First());
                 HumanMove.Remove(HumanMove.Last());
                 for (int i = 0; i < HumanMove.Count; i++)
@@ -54,8 +54,8 @@ namespace Checkers.Logic.Engines
 
         private string GetPossibility(Move move)
         {
-            int fromNumber = GetCheckersPositionNumber(10, move.OldPiece.Row, move.OldPiece.Column);
-            int toNumber = GetCheckersPositionNumber(10, move.NewPiece.Row, move.NewPiece.Column);
+            int fromNumber = move.OldPiece.Position;
+            int toNumber = move.NewPiece.Position;
 
             if (move.BeatedPieces == null)
                 return $"({fromNumber}-{toNumber})";
@@ -64,17 +64,12 @@ namespace Checkers.Logic.Engines
                 string numberString = "(";
                 foreach (var piece in move.BeatedPieces)
                 {
-                    numberString += $"{GetCheckersPositionNumber(10, piece.BeatPieceRow, piece.BeatPieceColumn)}x";
+                    numberString += $"{Piece.ToPosition(piece.BeatPieceRow, piece.BeatPieceColumn, 10)}x";
                 }
-                numberString += GetCheckersPositionNumber(10, move.NewPiece.Row, move.NewPiece.Column);
+                numberString += move.NewPiece.Position;
                 numberString += ")";
                 return numberString;
             }
-        }
-
-        private int GetCheckersPositionNumber(int size, int row, int column)
-        {
-            return size / 2 * (size - row - 1) + ((row % 2 == 0) ? 1 : 0) + (column + 1) / 2;
         }
     }
 }
