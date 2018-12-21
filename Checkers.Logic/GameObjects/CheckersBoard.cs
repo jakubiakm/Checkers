@@ -55,6 +55,31 @@ namespace Checkers.Logic.GameObjects
             return move;
         }
 
+        public int[] GetBoardArray()
+        {
+            int[] array = new int[Size * Size];
+            foreach (var piece in PiecesOnBoard)
+            {
+                if (piece.Color == PieceColor.White && !piece.IsKing)
+                {
+                    array[piece.Position] = 1;
+                }
+                if (piece.Color == PieceColor.White && piece.IsKing)
+                {
+                    array[piece.Position] = 2;
+                }
+                if (piece.Color == PieceColor.Black && !piece.IsKing)
+                {
+                    array[piece.Position] = 3;
+                }
+                if (piece.Color == PieceColor.Black && piece.IsKing)
+                {
+                    array[piece.Position] = 4;
+                }
+            }
+            return array;
+        }
+
         private List<Move> GetKingPossibleMoves(Piece piece)
         {
             List<Move> possibleMoves = new List<Move>();

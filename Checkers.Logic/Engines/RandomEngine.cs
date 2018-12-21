@@ -19,9 +19,6 @@ namespace Checkers.Logic.Engines
             Color = color;
         }
 
-        [DllImport(@"D:\Users\syntaximus\Documents\GitHub\Checkers\x64\Debug\Checkers.Cuda.dll", CharSet = CharSet.Ansi, SetLastError = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern float GetExecutionTime();
-
         public Move MakeMove(CheckersBoard currentBoard)
         {
             Random random = new Random();
@@ -30,7 +27,6 @@ namespace Checkers.Logic.Engines
             if (count == 0)
                 throw new NotAvailableMoveException(Color);
             int elemIndex = random.Next(count);
-            var w = GetExecutionTime();
             return allPossibleMoves[elemIndex];
         }
     }

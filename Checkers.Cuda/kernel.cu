@@ -7,6 +7,8 @@
 #include <cuda.h>
 //#include <cutil.h>		// timers
 
+
+
 // cuda kernel (internal)
 __global__ void some_calculations(float *a, unsigned int N, unsigned int M)
 {
@@ -49,7 +51,29 @@ extern "C" { float __declspec(dllexport) sExecutionTime = -1; }
 // variable wrapper function
 extern "C" float __declspec(dllexport) __stdcall GetExecutionTime()
 {
-	return 123;
+	return sExecutionTime;
+}
+
+extern "C" int __declspec(dllexport) __stdcall MakeMoveCpu
+(
+	int size,
+	int player, //0 - czrny, 1 - bia造
+	int* board, //0 - puste, 1 - bia造 pion, 2 - bia豉 dama, 3 - czarny pion, 4 - czarna dama
+	int* possibleMoves
+)
+{
+	return possibleMoves[0];
+}
+
+extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
+(
+	int boardSize,
+	int player, //0 - czrny, 1 - bia造
+	int* board, //0 - puste, 1 - bia造 pion, 2 - bia豉 dama, 3 - czarny pion, 4 - czarna dama
+	int* possibleMoves
+)
+{
+	return possibleMoves[0];
 }
 
 // cuda wrapper function
@@ -112,3 +136,4 @@ extern "C" void __declspec(dllexport) __stdcall SomeCalculationsCPU
 	//cutStopTimer(timer);
 	//sExecutionTime = cutGetTimerValue(timer);
 }
+
