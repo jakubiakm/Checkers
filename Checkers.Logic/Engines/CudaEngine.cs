@@ -20,7 +20,7 @@ namespace Checkers.Logic.Engines
         }
 
         [DllImport(@"D:\Users\syntaximus\Documents\GitHub\Checkers\x64\Debug\Checkers.Cuda.dll", CharSet = CharSet.Ansi, SetLastError = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int MakeMoveCpu(int size, int player, int[] board, int[] possibleMoves);
+        public static extern int MakeMoveGpu(int size, int player, int[] board, int[] possibleMoves);
 
         public Move MakeMove(CheckersBoard currentBoard)
         {
@@ -29,7 +29,7 @@ namespace Checkers.Logic.Engines
             int count = allPossibleMoves.Count;
             if (count == 0)
                 throw new NotAvailableMoveException(Color);
-            int elemIndex = MakeMoveCpu(currentBoard.Size, (int)Color, currentBoard.GetBoardArray(), GetPossibleMovesArray(allPossibleMoves));
+            int elemIndex = MakeMoveGpu(currentBoard.Size, (int)Color, currentBoard.GetBoardArray(), GetPossibleMovesArray(allPossibleMoves));
             return allPossibleMoves[elemIndex];
         }
 

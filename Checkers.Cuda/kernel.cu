@@ -10,6 +10,11 @@
 #include "Move.h"
 
 
+__global__ void PredictNextMove(Board *board, Move* startingMoves)
+{
+
+}
+
 // cuda kernel (internal)
 __global__ void some_calculations(float *a, unsigned int N, unsigned int M)
 {
@@ -44,15 +49,6 @@ int checkCUDAError(const char *msg)
 		return err;
 	}
 	return 0; // cudaSuccess
-}
-
-// external variable example
-extern "C" { float __declspec(dllexport) sExecutionTime = -1; }
-
-// variable wrapper function
-extern "C" float __declspec(dllexport) __stdcall GetExecutionTime()
-{
-	return sExecutionTime;
 }
 
 extern "C" int __declspec(dllexport) __stdcall MakeMoveCpu
@@ -112,67 +108,52 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 			beatedPieces
 		);
 	}
-	return possibleMovesCount - 1;
-}
 
-// cuda wrapper function
-extern "C" int __declspec(dllexport) __stdcall SomeCalculationsCU
-(
-	float *a_h,							// pointer to input array
-	const unsigned int N,				// input array size
-	const unsigned int M,				// kernel M parameter
-	const int cuBlockSize = 512,		// kernel block size (max 512)
-	const int showErrors = 1			// show CUDA errors in console window
-)
-{
 	int tmp = PRINT_ERRORS;
-	PRINT_ERRORS = showErrors;
+	int cuerr;
+	int blockSize = 1024;      // The launch configurator returned block size 
+	int gridSize = 1024;       // The actual grid size needed, based on input size 
 
-	float *a_d;							// pointer to device array
-	size_t size = N * sizeof(float);
-	int cuerr = 0;						// no errors
-	unsigned int timer = 0;
+	Move *moves_d;
+	Board *board_d;
 
-	cudaMalloc((void**)&a_d, size);		// allocate array on device    
-	cudaMemcpy(a_d, a_h, size, cudaMemcpyHostToDevice);
+	cudaMalloc((void**)&moves_d, possibleMovesCount * sizeof(Move));
+	cudaMalloc((void**)&board_d, sizeof(Board));
+	cudaMemcpy(moves_d, moves, possibleMovesCount * sizeof(Move), cudaMemcpyHostToDevice);
+	cudaMemcpy(board_d, &startBoard, sizeof(Board), cudaMemcpyHostToDevice);
 
-	int n_blocks = N / cuBlockSize + (N % cuBlockSize == 0 ? 0 : 1);
+	//alokalcja dynamicznych tablic w klasach
+	int* hostData;
+	cudaMalloc((void**)&hostData, sizeof(int)*startBoard.Size);
+	cudaMemcpy(hostData, startBoard.Pieces, sizeof(int)*startBoard.Size, cudaMemcpyHostToDevice);
+	cudaMemcpy(&(board_d->Pieces), &hostData, sizeof(int *), cudaMemcpyHostToDevice);
+
+	//alokalcja dynamicznych tablic w klasach
+	for (int i = 0; i < possibleMovesCount; i++)
+	{
+		int* hostData;
+		cudaMalloc((void**)&hostData, sizeof(int)*moves[i].BeatedPiecesCount);
+		cudaMemcpy(hostData, moves[i].BeatedPieces, sizeof(int)*moves[i].BeatedPiecesCount, cudaMemcpyHostToDevice);
+		cudaMemcpy(&(moves_d[i].BeatedPieces), &hostData, sizeof(int *), cudaMemcpyHostToDevice);
+	}
 
 	//cutCreateTimer(&timer);			    // from cutil.h
 	//cutStartTimer(timer);
-	some_calculations << <n_blocks, cuBlockSize >> > (a_d, N, M);	// kernel invocation
+	PredictNextMove << <gridSize, blockSize >> > (board_d, moves_d);	// kernel invocation
 	cudaThreadSynchronize();			// by default kernel runs in parallel with CPU code
 	//cutStopTimer(timer);
 
 	cuerr = checkCUDAError("cuda kernel");
 
-	cudaMemcpy(a_h, a_d, size, cudaMemcpyDeviceToHost);
+	//cudaMemcpy(a_h, a_d, size, cudaMemcpyDeviceToHost);
 	if (!cuerr) cuerr = checkCUDAError("cuda memcpy");
 
 	//sExecutionTime = cutGetTimerValue(timer);
 
-	cudaFree(a_d);
+	cudaFree(moves_d);
 	if (!cuerr) cuerr = checkCUDAError("cuda free");
 
 	PRINT_ERRORS = tmp;
-	return cuerr;
-}
 
-// cpu version for comparison
-extern "C" void __declspec(dllexport) __stdcall SomeCalculationsCPU
-(
-	float *a_h,
-	const unsigned int N,
-	const unsigned int M
-)
-{
-	unsigned int timer = 0;
-	//cutCreateTimer(&timer);
-	//cutStartTimer(timer);
-	for (unsigned int i = 0; i < N; i++)
-		for (unsigned int j = 0; j < M; j++)
-			*(a_h + i) = *(a_h + i) * *(a_h + i) * 0.1 - *(a_h + i) - 10;
-	//cutStopTimer(timer);
-	//sExecutionTime = cutGetTimerValue(timer);
+	return possibleMovesCount - 1;
 }
-

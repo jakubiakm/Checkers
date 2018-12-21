@@ -12,5 +12,5 @@ Board::Board(int size, int* pieces)
 
 Board::~Board()
 {
-	delete[]Pieces;
+	//delete[]Pieces;
 }
