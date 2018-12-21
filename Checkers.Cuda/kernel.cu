@@ -6,7 +6,8 @@
 #include <stdlib.h>
 #include <cuda.h>
 //#include <cutil.h>		// timers
-
+#include "board.h"
+#include "Move.h"
 
 
 // cuda kernel (internal)
@@ -56,13 +57,32 @@ extern "C" float __declspec(dllexport) __stdcall GetExecutionTime()
 
 extern "C" int __declspec(dllexport) __stdcall MakeMoveCpu
 (
-	int size,
+	int boardSize,
 	int player, //0 - czrny, 1 - bia³y
 	int* board, //0 - puste, 1 - bia³y pion, 2 - bia³a dama, 3 - czarny pion, 4 - czarna dama
 	int* possibleMoves
 )
 {
-	return possibleMoves[0];
+	Board startBoard = Board(boardSize, board);
+	int possibleMovesCount = possibleMoves[0];
+	int ind = 1;
+	Move* moves = new Move[possibleMovesCount];
+	for (int i = 0; i != possibleMovesCount; i++)
+	{
+		int beatedPiecesCount = possibleMoves[ind++];
+		int *beatedPieces = new int[beatedPiecesCount];
+		for (int j = 0; j != beatedPiecesCount; j++)
+		{
+			beatedPieces[j] = possibleMoves[ind++];
+		}
+		moves[i] = Move(
+			possibleMoves[ind++],
+			possibleMoves[ind++],
+			beatedPiecesCount,
+			beatedPieces
+		);
+	}
+	return possibleMovesCount - 1;
 }
 
 extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
@@ -73,7 +93,26 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 	int* possibleMoves
 )
 {
-	return possibleMoves[0];
+	Board startBoard = Board(boardSize, board);
+	int possibleMovesCount = possibleMoves[0];
+	int ind = 1;
+	Move* moves = new Move[possibleMovesCount];
+	for (int i = 0; i != possibleMovesCount; i++)
+	{
+		int beatedPiecesCount = possibleMoves[ind++];
+		int *beatedPieces = new int[beatedPiecesCount];
+		for (int j = 0; j != beatedPiecesCount; j++)
+		{
+			beatedPieces[j] = possibleMoves[ind++];
+		}
+		moves[i] = Move(
+			possibleMoves[ind++],
+			possibleMoves[ind++],
+			beatedPiecesCount,
+			beatedPieces
+		);
+	}
+	return possibleMovesCount - 1;
 }
 
 // cuda wrapper function

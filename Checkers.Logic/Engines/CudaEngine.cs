@@ -39,11 +39,12 @@ namespace Checkers.Logic.Engines
             possibleMoves.Add(allPossibleMoves.Count);
             foreach (var move in allPossibleMoves)
             {
-                possibleMoves.Add(move.BeatedPieces.Count);
-                for (int i = 0; i != move.BeatedPieces.Count; i++)
+                possibleMoves.Add(move.BeatedPieces?.Count ?? 0);
+                for (int i = 0; i != (move.BeatedPieces?.Count ?? 0); i++)
                 {
                     possibleMoves.Add(move.BeatedPieces[i].Position);
                 }
+                possibleMoves.Add(move.OldPiece.Position);
                 possibleMoves.Add(move.NewPiece.Position);
             }
             return possibleMoves.ToArray();
