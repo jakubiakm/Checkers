@@ -9,33 +9,13 @@
 #include <thrust/host_vector.h>
 #include <thrust/device_vector.h>
 
+#include "Move.cuh"
+
 #define cConst 2
 
 int N = 0;
 
-class Move
-{
-public:
-	int beatedPiecesCount;
-	int *beatedPieces;
-	int oldPosition;
-	int newPosition;
-	__device__ __host__ Move();
-	__device__ __host__ Move(int oldPosition, int newPosition, int beatedPiecesCount, int *beatedPieces);
-	__device__ __host__ ~Move();
-};
 
-__device__ __host__ Move::Move(int oldPosition, int newPosition, int beatedPiecesCount, int *beatedPieces) : oldPosition(oldPosition), newPosition(newPosition), beatedPiecesCount(beatedPiecesCount), beatedPieces(beatedPieces)
-{
-}
-
-__device__ __host__ Move::Move()
-{
-}
-
-__device__ __host__ Move::~Move()
-{
-}
 enum Player
 {
 	White, Black
