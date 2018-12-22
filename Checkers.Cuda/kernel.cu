@@ -10,92 +10,12 @@
 #include <thrust/device_vector.h>
 
 #include "Move.cuh"
+#include "Board.cuh"
+#include "MCTS.cuh"
 
 #define cConst 2
 
 int N = 0;
-
-
-enum Player
-{
-	White, Black
-};
-class Board
-{
-public:
-	int size;
-	int* pieces;
-	Player player;
-	__device__ __host__ Board(int size, int* _pieces, Player player) : size(size), player(player)
-	{
-		pieces = new int[size * size];
-		for (int i = 0; i != size * size; i++)
-		{
-			pieces[i] = _pieces[i];
-		}
-	}
-	__device__ __host__ Board();
-	__device__ __host__ ~Board();
-	__device__ __host__ Move* Board::get_possible_moves(int &moves_count);
-	__device__ __host__ Board Board::get_board_after_move(Move move);
-};
-
-__device__ __host__ Board::Board()
-{
-
-}
-
-__device__ __host__ Board::~Board()
-{
-	//delete[]Pieces;
-}
-
-__device__ __host__ Move* Board::get_possible_moves(int &moves_count)
-{
-	moves_count = 0;
-	Move* possibleMoves = new Move[100];
-	return possibleMoves;
-}
-
-__device__ __host__ Board Board::get_board_after_move(Move move)
-{
-	int *_pieces = new int[size * size];
-	for (int i = 0; i != size * size; i++)
-	{
-		_pieces[i] = pieces[i];
-	}
-	for (int i = 0; i != move.beatedPiecesCount; i++)
-	{
-		_pieces[move.beatedPieces[i]] = 0;
-	}
-	_pieces[move.newPosition] = _pieces[move.oldPosition];
-	_pieces[move.oldPosition] = 0;
-	return Board(size, _pieces, player == Player::White ? Player::Black : Player::White);
-}
-
-class MCTS
-{
-public:
-	Player player;
-	int wins;
-	int simulationsCount;
-	bool visitedInCurrentIteration;
-	Board board;
-	MCTS *parent;
-	std::vector<MCTS *> children;
-	MCTS(MCTS *parent, Board board);
-	void add_child(MCTS *child);
-};
-
-MCTS::MCTS(MCTS *parent, Board board) : parent(parent), board(board), wins(0), simulationsCount(0), visitedInCurrentIteration(false)
-{
-}
-
-void MCTS::add_child(MCTS * child)
-{
-	children.push_back(child);
-}
-
 
 MCTS* GenerateRoot(Board startBoard, int movesCount, Move* possibleMoves)
 {

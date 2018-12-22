@@ -82,6 +82,8 @@
     <CudaCompile Include="kernel.cu" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Board.cuh" />
+    <ClInclude Include="MCTS.cuh" />
     <ClInclude Include="Move.cuh" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
