@@ -5,12 +5,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cuda.h>
+#include <math.h> 
+#include <vector>
 //#include <cutil.h>		// timers
 #include "board.h"
 #include "Move.h"
 #include "MCTS.h"
 
+#define cConst 2
 
+int N = 0;
+
+std::vector<Move> GetPossibleMoves(int player, Board board)
+{
+	std::vector<Move> possibleMoves;
+	return possibleMoves;
+}
 
 Board GetBoardAfterMove(Board board, Move move)
 {
@@ -39,6 +49,55 @@ MCTS* GenerateRoot(Board startBoard, int player, int movesCount, Move* possibleM
 	return root;
 }
 
+MCTS* SelectNode(MCTS *parent)
+{
+	MCTS *leafNode = parent;
+	while (leafNode->children.size() != 0)
+	{
+		int max = 0;
+		int ind;
+		for (int i = 0; i != leafNode->children.size(); i++)
+		{
+			if (leafNode->children[i]->simulationsCount == 0)
+			{
+				ind = i;
+				break;
+			}
+			if (leafNode->children[i]->wins / leafNode->children[i]->simulationsCount + cConst * sqrt(log(N) / leafNode->children[i]->simulationsCount) > max)
+			{
+				max = leafNode->children[i]->wins / leafNode->children[i]->simulationsCount + cConst * sqrt(log(N) / leafNode->children[i]->simulationsCount);
+				ind = i;
+			}
+		}
+		leafNode = leafNode->children[ind];
+	}
+	if (leafNode->simulationsCount == 0)
+	{
+		return leafNode;
+	}
+	else
+	{
+		auto moves = GetPossibleMoves(leafNode->player, leafNode->board);
+		if (moves.size() == 0)
+			return NULL;
+		for (int i = 0; i != moves.size(); i++)
+		{
+			leafNode->add_child(new MCTS(leafNode, GetBoardAfterMove(leafNode->board, moves[i]), (leafNode->player + 1) % 2));
+		}
+
+		return leafNode->children[0];
+	}
+}
+
+void BackpropagateSimulations(MCTS *leaf)
+{
+	N++;
+	while (leaf != NULL)
+	{
+		leaf->simulationsCount++;
+		leaf = leaf->parent;
+	}
+}
 
 __global__ void PredictNextMove(Board *board, Move* startingMoves)
 {
@@ -140,7 +199,15 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 	}
 
 	MCTS* root = GenerateRoot(startBoard, player, possibleMovesCount, moves);
-
+	std::vector<MCTS*> rolloutVector;
+	for (int i = 0; i != 1000; i++)
+	{
+		MCTS* node = SelectNode(root);
+		if (node == NULL || node->visitedInCurrentIteration)
+			break;
+		BackpropagateSimulations(node);
+		rolloutVector.push_back(node);
+	}
 	int tmp = PRINT_ERRORS;
 	int cuerr;
 	int blockSize = 1024;      // The launch configurator returned block size 

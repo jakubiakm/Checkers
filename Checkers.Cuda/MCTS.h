@@ -8,6 +8,7 @@ public:
 	int player;
 	int wins;
 	int simulationsCount;
+	bool visitedInCurrentIteration;
 	Board board;
 	MCTS *parent;
 	std::vector<MCTS *> children;
