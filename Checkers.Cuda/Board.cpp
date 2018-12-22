@@ -1,6 +1,9 @@
 #include "Board.h"
 
+Board::Board()
+{
 
+}
 
 Board::Board(int size, int* pieces)
 {

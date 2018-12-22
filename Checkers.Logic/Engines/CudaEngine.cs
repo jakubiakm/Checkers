@@ -29,7 +29,7 @@ namespace Checkers.Logic.Engines
             int count = allPossibleMoves.Count;
             if (count == 0)
                 throw new NotAvailableMoveException(Color);
-            int elemIndex = MakeMoveGpu(currentBoard.Size, (int)Color, currentBoard.GetBoardArray(), GetPossibleMovesArray(allPossibleMoves));
+            int elemIndex = MakeMoveGpu(currentBoard.Size, Color == PieceColor.White ? 0 : 1, currentBoard.GetBoardArray(), GetPossibleMovesArray(allPossibleMoves));
             return allPossibleMoves[elemIndex];
         }
 

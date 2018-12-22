@@ -8,6 +8,36 @@
 //#include <cutil.h>		// timers
 #include "board.h"
 #include "Move.h"
+#include "MCTS.h"
+
+
+
+Board GetBoardAfterMove(Board board, Move move)
+{
+	int *pieces = new int[board.Size * board.Size];
+	for (int i = 0; i != board.Size * board.Size; i++)
+	{
+		pieces[i] = board.Pieces[i];
+	}
+	for (int i = 0; i != move.BeatedPiecesCount; i++)
+	{
+		pieces[move.BeatedPieces[i]] = 0;
+	}
+	pieces[move.NewPosition] = pieces[move.OldPosition];
+	pieces[move.OldPosition] = 0;
+	return Board(board.Size, pieces);
+}
+
+MCTS* GenerateRoot(Board startBoard, int player, int movesCount, Move* possibleMoves)
+{
+	MCTS* root = new MCTS(NULL, startBoard, player);
+	for (int i = 0; i != movesCount; i++)
+	{
+		MCTS* child = new MCTS(root, GetBoardAfterMove(startBoard, possibleMoves[i]), (player + 1) % 2);
+		root->add_child(child);
+	}
+	return root;
+}
 
 
 __global__ void PredictNextMove(Board *board, Move* startingMoves)
@@ -84,7 +114,7 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveCpu
 extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 (
 	int boardSize,
-	int player, //0 - czrny, 1 - bia³y
+	int player, //0 - bia³y, 1 - czarny
 	int* board, //0 - puste, 1 - bia³y pion, 2 - bia³a dama, 3 - czarny pion, 4 - czarna dama
 	int* possibleMoves
 )
@@ -108,6 +138,8 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 			beatedPieces
 		);
 	}
+
+	MCTS* root = GenerateRoot(startBoard, player, possibleMovesCount, moves);
 
 	int tmp = PRINT_ERRORS;
 	int cuerr;
