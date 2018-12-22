@@ -5,12 +5,11 @@ Board::Board()
 
 }
 
-Board::Board(int size, int* pieces)
+Board::Board(int size, int* pieces) : size(size)
 {
-	Size = size;
-	Pieces = new int[size * size];
-	for (int i = 0; i != Size * Size; i++)
-		Pieces[i] = pieces[i];
+	Board::pieces = new int[size * size];
+	for (int i = 0; i != size * size; i++)
+		Board::pieces[i] = pieces[i];
 }
 
 Board::~Board()

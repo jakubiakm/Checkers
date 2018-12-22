@@ -16,7 +16,7 @@
 
 int N = 0;
 
-std::vector<Move> GetPossibleMoves(int player, Board board)
+std::vector<Move> GetPossibleMoves(Player player, Board board)
 {
 	std::vector<Move> possibleMoves;
 	return possibleMoves;
@@ -24,26 +24,26 @@ std::vector<Move> GetPossibleMoves(int player, Board board)
 
 Board GetBoardAfterMove(Board board, Move move)
 {
-	int *pieces = new int[board.Size * board.Size];
-	for (int i = 0; i != board.Size * board.Size; i++)
+	int *pieces = new int[board.size * board.size];
+	for (int i = 0; i != board.size * board.size; i++)
 	{
-		pieces[i] = board.Pieces[i];
+		pieces[i] = board.pieces[i];
 	}
-	for (int i = 0; i != move.BeatedPiecesCount; i++)
+	for (int i = 0; i != move.beatedPiecesCount; i++)
 	{
-		pieces[move.BeatedPieces[i]] = 0;
+		pieces[move.beatedPieces[i]] = 0;
 	}
-	pieces[move.NewPosition] = pieces[move.OldPosition];
-	pieces[move.OldPosition] = 0;
-	return Board(board.Size, pieces);
+	pieces[move.newPosition] = pieces[move.oldPosition];
+	pieces[move.oldPosition] = 0;
+	return Board(board.size, pieces);
 }
 
-MCTS* GenerateRoot(Board startBoard, int player, int movesCount, Move* possibleMoves)
+MCTS* GenerateRoot(Board startBoard, Player player, int movesCount, Move* possibleMoves)
 {
 	MCTS* root = new MCTS(NULL, startBoard, player);
 	for (int i = 0; i != movesCount; i++)
 	{
-		MCTS* child = new MCTS(root, GetBoardAfterMove(startBoard, possibleMoves[i]), (player + 1) % 2);
+		MCTS* child = new MCTS(root, GetBoardAfterMove(startBoard, possibleMoves[i]), player == Player::Black ? Player::White : Player::Black);
 		root->add_child(child);
 	}
 	return root;
@@ -77,12 +77,14 @@ MCTS* SelectNode(MCTS *parent)
 	}
 	else
 	{
+		if (leafNode->visitedInCurrentIteration)
+			return NULL;
 		auto moves = GetPossibleMoves(leafNode->player, leafNode->board);
 		if (moves.size() == 0)
 			return NULL;
 		for (int i = 0; i != moves.size(); i++)
 		{
-			leafNode->add_child(new MCTS(leafNode, GetBoardAfterMove(leafNode->board, moves[i]), (leafNode->player + 1) % 2));
+			leafNode->add_child(new MCTS(leafNode, GetBoardAfterMove(leafNode->board, moves[i]), leafNode->player == Player::Black ? Player::White : Player::Black));
 		}
 
 		return leafNode->children[0];
@@ -143,7 +145,7 @@ int checkCUDAError(const char *msg)
 extern "C" int __declspec(dllexport) __stdcall MakeMoveCpu
 (
 	int boardSize,
-	int player, //0 - czrny, 1 - bia造
+	Player _player, //0 - czrny, 1 - bia造
 	int* board, //0 - puste, 1 - bia造 pion, 2 - bia豉 dama, 3 - czarny pion, 4 - czarna dama
 	int* possibleMoves
 )
@@ -173,11 +175,12 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveCpu
 extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 (
 	int boardSize,
-	int player, //0 - bia造, 1 - czarny
+	int _player, //0 - bia造, 1 - czarny
 	int* board, //0 - puste, 1 - bia造 pion, 2 - bia豉 dama, 3 - czarny pion, 4 - czarna dama
 	int* possibleMoves
 )
 {
+	Player player = _player == 0 ? Player::White : Player::Black;
 	Board startBoard = Board(boardSize, board);
 	int possibleMovesCount = possibleMoves[0];
 	int ind = 1;
@@ -200,7 +203,13 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 
 	MCTS* root = GenerateRoot(startBoard, player, possibleMovesCount, moves);
 	std::vector<MCTS*> rolloutVector;
-	for (int i = 0; i != 1000; i++)
+
+	int tmp = PRINT_ERRORS;
+	int cuerr;
+	int blockSize = 1024;      // The launch configurator returned block size 
+	int gridSize = 1024;       // The actual grid size needed, based on input size 
+
+	for (int i = 0; i != blockSize * gridSize; i++)
 	{
 		MCTS* node = SelectNode(root);
 		if (node == NULL || node->visitedInCurrentIteration)
@@ -208,10 +217,6 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 		BackpropagateSimulations(node);
 		rolloutVector.push_back(node);
 	}
-	int tmp = PRINT_ERRORS;
-	int cuerr;
-	int blockSize = 1024;      // The launch configurator returned block size 
-	int gridSize = 1024;       // The actual grid size needed, based on input size 
 
 	Move *moves_d;
 	Board *board_d;
@@ -223,17 +228,17 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 
 	//alokalcja dynamicznych tablic w klasach
 	int* hostData;
-	cudaMalloc((void**)&hostData, sizeof(int)*startBoard.Size);
-	cudaMemcpy(hostData, startBoard.Pieces, sizeof(int)*startBoard.Size, cudaMemcpyHostToDevice);
-	cudaMemcpy(&(board_d->Pieces), &hostData, sizeof(int *), cudaMemcpyHostToDevice);
+	cudaMalloc((void**)&hostData, sizeof(int)*startBoard.size);
+	cudaMemcpy(hostData, startBoard.pieces, sizeof(int)*startBoard.size, cudaMemcpyHostToDevice);
+	cudaMemcpy(&(board_d->pieces), &hostData, sizeof(int *), cudaMemcpyHostToDevice);
 
 	//alokalcja dynamicznych tablic w klasach
 	for (int i = 0; i < possibleMovesCount; i++)
 	{
 		int* hostData;
-		cudaMalloc((void**)&hostData, sizeof(int)*moves[i].BeatedPiecesCount);
-		cudaMemcpy(hostData, moves[i].BeatedPieces, sizeof(int)*moves[i].BeatedPiecesCount, cudaMemcpyHostToDevice);
-		cudaMemcpy(&(moves_d[i].BeatedPieces), &hostData, sizeof(int *), cudaMemcpyHostToDevice);
+		cudaMalloc((void**)&hostData, sizeof(int)*moves[i].beatedPiecesCount);
+		cudaMemcpy(hostData, moves[i].beatedPieces, sizeof(int)*moves[i].beatedPiecesCount, cudaMemcpyHostToDevice);
+		cudaMemcpy(&(moves_d[i].beatedPieces), &hostData, sizeof(int *), cudaMemcpyHostToDevice);
 	}
 
 	//cutCreateTimer(&timer);			    // from cutil.h

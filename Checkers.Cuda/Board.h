@@ -1,9 +1,13 @@
 #pragma once
+enum Player
+{
+	White, Black
+};
 class Board
 {
 public:
-	int Size;
-	int* Pieces;
+	int size;
+	int* pieces;
 	Board(int size, int* pieces);
 	Board();
 	~Board();

@@ -5,14 +5,14 @@
 class MCTS
 {
 public:
-	int player;
+	Player player;
 	int wins;
 	int simulationsCount;
 	bool visitedInCurrentIteration;
 	Board board;
 	MCTS *parent;
 	std::vector<MCTS *> children;
-	MCTS(MCTS *parent, Board board, int player);
+	MCTS(MCTS *parent, Board board, Player player);
 	void add_child(MCTS *child);
 };
 

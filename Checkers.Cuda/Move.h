@@ -2,12 +2,12 @@
 class Move
 {
 public:
-	int BeatedPiecesCount;
-	int *BeatedPieces;
-	int OldPosition;
-	int NewPosition;
+	int beatedPiecesCount;
+	int *beatedPieces;
+	int oldPosition;
+	int newPosition;
 	Move();
-	Move(int oldPositiion, int newPosition, int beatedPiecesCount, int *beatedPieces);
+	Move(int oldPosition, int newPosition, int beatedPiecesCount, int *beatedPieces);
 	~Move();
 };
 
