@@ -1,7 +1,7 @@
 #include "MCTS.h"
 
 
-MCTS::MCTS(MCTS *parent, Board board, Player player) : parent(parent), board(board), player(player), wins(0), simulationsCount(0), visitedInCurrentIteration(false)
+MCTS::MCTS(MCTS *parent, Board board) : parent(parent), board(board), wins(0), simulationsCount(0), visitedInCurrentIteration(false)
 {
 }
 

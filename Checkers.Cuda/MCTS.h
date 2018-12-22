@@ -12,7 +12,7 @@ public:
 	Board board;
 	MCTS *parent;
 	std::vector<MCTS *> children;
-	MCTS(MCTS *parent, Board board, Player player);
+	MCTS(MCTS *parent, Board board);
 	void add_child(MCTS *child);
 };
 

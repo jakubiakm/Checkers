@@ -16,12 +16,6 @@
 
 int N = 0;
 
-std::vector<Move> GetPossibleMoves(Player player, Board board)
-{
-	std::vector<Move> possibleMoves;
-	return possibleMoves;
-}
-
 Board GetBoardAfterMove(Board board, Move move)
 {
 	int *pieces = new int[board.size * board.size];
@@ -35,15 +29,15 @@ Board GetBoardAfterMove(Board board, Move move)
 	}
 	pieces[move.newPosition] = pieces[move.oldPosition];
 	pieces[move.oldPosition] = 0;
-	return Board(board.size, pieces);
+	return Board(board.size, pieces, board.player == Player::White ? Player::Black : Player::White);
 }
 
-MCTS* GenerateRoot(Board startBoard, Player player, int movesCount, Move* possibleMoves)
+MCTS* GenerateRoot(Board startBoard, int movesCount, Move* possibleMoves)
 {
-	MCTS* root = new MCTS(NULL, startBoard, player);
+	MCTS* root = new MCTS(NULL, startBoard);
 	for (int i = 0; i != movesCount; i++)
 	{
-		MCTS* child = new MCTS(root, GetBoardAfterMove(startBoard, possibleMoves[i]), player == Player::Black ? Player::White : Player::Black);
+		MCTS* child = new MCTS(root, GetBoardAfterMove(startBoard, possibleMoves[i]));
 		root->add_child(child);
 	}
 	return root;
@@ -79,12 +73,12 @@ MCTS* SelectNode(MCTS *parent)
 	{
 		if (leafNode->visitedInCurrentIteration)
 			return NULL;
-		auto moves = GetPossibleMoves(leafNode->player, leafNode->board);
+		auto moves = leafNode->board.get_possible_moves();
 		if (moves.size() == 0)
 			return NULL;
 		for (int i = 0; i != moves.size(); i++)
 		{
-			leafNode->add_child(new MCTS(leafNode, GetBoardAfterMove(leafNode->board, moves[i]), leafNode->player == Player::Black ? Player::White : Player::Black));
+			leafNode->add_child(new MCTS(leafNode, GetBoardAfterMove(leafNode->board, moves[i])));
 		}
 
 		return leafNode->children[0];
@@ -145,12 +139,12 @@ int checkCUDAError(const char *msg)
 extern "C" int __declspec(dllexport) __stdcall MakeMoveCpu
 (
 	int boardSize,
-	Player _player, //0 - czrny, 1 - bia³y
+	int _player, //0 - bia³y, 1 - czarny
 	int* board, //0 - puste, 1 - bia³y pion, 2 - bia³a dama, 3 - czarny pion, 4 - czarna dama
 	int* possibleMoves
 )
 {
-	Board startBoard = Board(boardSize, board);
+	Board startBoard = Board(boardSize, board, _player == 0 ? Player::White : Player::Black);
 	int possibleMovesCount = possibleMoves[0];
 	int ind = 1;
 	Move* moves = new Move[possibleMovesCount];
@@ -181,7 +175,7 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 )
 {
 	Player player = _player == 0 ? Player::White : Player::Black;
-	Board startBoard = Board(boardSize, board);
+	Board startBoard = Board(boardSize, board, player);
 	int possibleMovesCount = possibleMoves[0];
 	int ind = 1;
 	Move* moves = new Move[possibleMovesCount];
@@ -201,7 +195,7 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 		);
 	}
 
-	MCTS* root = GenerateRoot(startBoard, player, possibleMovesCount, moves);
+	MCTS* root = GenerateRoot(startBoard, possibleMovesCount, moves);
 	std::vector<MCTS*> rolloutVector;
 
 	int tmp = PRINT_ERRORS;
@@ -241,18 +235,12 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 		cudaMemcpy(&(moves_d[i].beatedPieces), &hostData, sizeof(int *), cudaMemcpyHostToDevice);
 	}
 
-	//cutCreateTimer(&timer);			    // from cutil.h
-	//cutStartTimer(timer);
 	PredictNextMove << <gridSize, blockSize >> > (board_d, moves_d);	// kernel invocation
 	cudaThreadSynchronize();			// by default kernel runs in parallel with CPU code
-	//cutStopTimer(timer);
-
+	
 	cuerr = checkCUDAError("cuda kernel");
 
-	//cudaMemcpy(a_h, a_d, size, cudaMemcpyDeviceToHost);
 	if (!cuerr) cuerr = checkCUDAError("cuda memcpy");
-
-	//sExecutionTime = cutGetTimerValue(timer);
 
 	cudaFree(moves_d);
 	if (!cuerr) cuerr = checkCUDAError("cuda free");
