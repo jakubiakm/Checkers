@@ -211,6 +211,13 @@ namespace Checkers.Logic.GameObjects
             return possibleMoves;
         }
 
+        /// <summary>
+        /// Funkcja sprawdzająca, czy można się ruszyć na daną pozycję na planszy
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="column"></param>
+        /// <param name="sourceMovePiece"></param>
+        /// <returns></returns>
         private bool CanMoveToPosition(int row, int column, Piece sourceMovePiece)
         {
             return

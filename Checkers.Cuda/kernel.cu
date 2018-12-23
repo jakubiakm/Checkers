@@ -51,9 +51,11 @@ __host__ Move* GetPossibleMovesFromInputParameters(int number_of_moves, int* pos
 		{
 			beated_pieces[j] = possible_moves_array[ind++];
 		}
+		int old_position = possible_moves_array[ind++];
+		int new_position = possible_moves_array[ind++];
 		moves_to_fill[i] = Move(
-			possible_moves_array[ind++],
-			possible_moves_array[ind++],
+			old_position,
+			new_position,
 			beated_pieces_count,
 			beated_pieces
 		);
@@ -71,7 +73,7 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 {
 	Player player = current_player == 0 ? Player::WHITE : Player::BLACK;	//gracz dla którego wybierany jest optymalny ruch
 	int
-		number_of_mcts_iterations = 2500,									//liczba iteracji wykonana przez algorytm MCTS
+		number_of_mcts_iterations = 250,									//liczba iteracji wykonana przez algorytm MCTS
 		possible_moves_count = possible_moves[0],							//liczba mo¿liwych ruchów spoœród których wybierany jest najlepszy
 		block_size = 1024,													//rozmiar gridu z którego gpu ma korzystaæ
 		grid_size = 1024,													//rozmiar bloku z którego gpu ma korzystaæ 
@@ -106,7 +108,6 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 		{
 			boards_to_rollout[i] = rollout_vector[i]->board;
 		}
-
 		CUDA_CALL(cudaMalloc((void**)&boards_d, rollout_vector.size() * sizeof(Board)));
 		CUDA_CALL(cudaMalloc((void**)&results_d, rollout_vector.size() * sizeof(int)));
 		CUDA_CALL(cudaMemset(boards_d, 0, rollout_vector.size() * sizeof(int)));
@@ -121,7 +122,6 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 			CUDA_CALL(cudaMemcpy(&(boards_d[i].pieces), &hostData, sizeof(int*), cudaMemcpyHostToDevice));
 		}
 
-		CUDA_CALL(cudaDeviceSynchronize());
 		RolloutGames << <grid_size, block_size >> > (boards_d, results_d, rollout_vector.size());
 		CUDA_CALL(cudaDeviceSynchronize());
 		CUDA_CALL(cudaGetLastError());
