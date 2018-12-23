@@ -1,4 +1,3 @@
-
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 
@@ -9,77 +8,10 @@
 #include <thrust/host_vector.h>
 #include <thrust/device_vector.h>
 
-#include "Move.cuh"
-#include "Board.cuh"
-#include "MCTS.cuh"
-
-#define cConst 2
-
-int N = 0;
-
-MCTS* GenerateRoot(Board startBoard, int movesCount, Move* possibleMoves)
-{
-	MCTS* root = new MCTS(NULL, startBoard);
-	for (int i = 0; i != movesCount; i++)
-	{
-		MCTS* child = new MCTS(root, startBoard.get_board_after_move(possibleMoves[i]));
-		root->add_child(child);
-	}
-	return root;
-}
-
-MCTS* SelectNode(MCTS *parent)
-{
-	MCTS *leafNode = parent;
-	while (leafNode->children.size() != 0)
-	{
-		int max = 0;
-		int ind;
-		for (int i = 0; i != leafNode->children.size(); i++)
-		{
-			if (leafNode->children[i]->simulationsCount == 0)
-			{
-				ind = i;
-				break;
-			}
-			if (leafNode->children[i]->wins / leafNode->children[i]->simulationsCount + cConst * sqrt(log(N) / leafNode->children[i]->simulationsCount) > max)
-			{
-				max = leafNode->children[i]->wins / leafNode->children[i]->simulationsCount + cConst * sqrt(log(N) / leafNode->children[i]->simulationsCount);
-				ind = i;
-			}
-		}
-		leafNode = leafNode->children[ind];
-	}
-	if (leafNode->simulationsCount == 0)
-	{
-		return leafNode;
-	}
-	else
-	{
-		int moves_count = 0;
-		if (leafNode->visitedInCurrentIteration)
-			return NULL;
-		auto moves = leafNode->board.get_possible_moves(moves_count);
-		if (moves_count == 0)
-			return NULL;
-		for (int i = 0; i != moves_count; i++)
-		{
-			leafNode->add_child(new MCTS(leafNode, leafNode->board.get_board_after_move(moves[i])));
-		}
-
-		return leafNode->children[0];
-	}
-}
-
-void BackpropagateSimulations(MCTS *leaf)
-{
-	N++;
-	while (leaf != NULL)
-	{
-		leaf->simulationsCount++;
-		leaf = leaf->parent;
-	}
-}
+#include "move.cuh"
+#include "board.cuh"
+#include "mctsnode.h"
+#include "mcts.h"
 
 __device__ int RolloutBoard(Board board)
 {
@@ -113,36 +45,6 @@ int checkCUDAError(const char *msg)
 	return 0; // cudaSuccess
 }
 
-extern "C" int __declspec(dllexport) __stdcall MakeMoveCpu
-(
-	int boardSize,
-	int _player, //0 - bia³y, 1 - czarny
-	int* board, //0 - puste, 1 - bia³y pion, 2 - bia³a dama, 3 - czarny pion, 4 - czarna dama
-	int* possibleMoves
-)
-{
-	Board startBoard = Board(boardSize, board, _player == 0 ? Player::White : Player::Black);
-	int possibleMovesCount = possibleMoves[0];
-	int ind = 1;
-	Move* moves = new Move[possibleMovesCount];
-	for (int i = 0; i != possibleMovesCount; i++)
-	{
-		int beatedPiecesCount = possibleMoves[ind++];
-		int *beatedPieces = new int[beatedPiecesCount];
-		for (int j = 0; j != beatedPiecesCount; j++)
-		{
-			beatedPieces[j] = possibleMoves[ind++];
-		}
-		moves[i] = Move(
-			possibleMoves[ind++],
-			possibleMoves[ind++],
-			beatedPiecesCount,
-			beatedPieces
-		);
-	}
-	return possibleMovesCount - 1;
-}
-
 extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 (
 	int boardSize,
@@ -151,7 +53,8 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 	int* possibleMoves
 )
 {
-	Player player = _player == 0 ? Player::White : Player::Black;
+	Mcts mcts_algorithm = Mcts();
+	Player player = _player == 0 ? Player::WHITE : Player::BLACK;
 	Board startBoard = Board(boardSize, board, player);
 	int possibleMovesCount = possibleMoves[0];
 	int ind = 1;
@@ -172,8 +75,8 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 		);
 	}
 
-	MCTS* root = GenerateRoot(startBoard, possibleMovesCount, moves);
-	std::vector<MCTS*> rolloutVector;
+	MctsNode* root = mcts_algorithm.GenerateRoot(startBoard, possibleMovesCount, moves);
+	std::vector<MctsNode*> rolloutVector;
 
 	int tmp = PRINT_ERRORS;
 	int cuerr;
@@ -182,10 +85,10 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 
 	for (int i = 0; i != blockSize * gridSize; i++)
 	{
-		MCTS* node = SelectNode(root);
-		if (node == NULL || node->visitedInCurrentIteration)
+		MctsNode* node = mcts_algorithm.SelectNode(root);
+		if (node == NULL || node->visited_in_current_iteration)
 			break;
-		BackpropagateSimulations(node);
+		mcts_algorithm.BackpropagateSimulations(node);
 		rolloutVector.push_back(node);
 	}
 

@@ -57,6 +57,7 @@
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
       <CudaRuntime>Static</CudaRuntime>
+      <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -79,12 +80,19 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <CudaCompile Include="board.cu" />
     <CudaCompile Include="kernel.cu" />
+    <CudaCompile Include="move.cu" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Board.cuh" />
-    <ClInclude Include="MCTS.cuh" />
-    <ClInclude Include="Move.cuh" />
+    <ClInclude Include="board.cuh" />
+    <ClInclude Include="mcts.h" />
+    <ClInclude Include="mctsnode.h" />
+    <ClInclude Include="move.cuh" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="mcts.cpp" />
+    <ClCompile Include="mctsnode.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
