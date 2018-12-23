@@ -17,6 +17,7 @@ public:
 	int size;
 	int* pieces;
 	Player player;
+
 	__device__ __host__ Board(int size, int* _pieces, Player player);
 	__device__ __host__ Board();
 	__device__ __host__ ~Board();

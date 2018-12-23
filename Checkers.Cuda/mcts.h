@@ -5,8 +5,10 @@
 class Mcts
 {
 public:
+	MctsNode* root;
+
 	Mcts();
-	MctsNode* GenerateRoot(Board startBoard, int movesCount, Move* possibleMoves);
+	void GenerateRoot(Board startBoard, int movesCount, Move* possibleMoves);
 	MctsNode* SelectNode(MctsNode *parent);
 	void BackpropagateSimulations(MctsNode *leaf);
 private:

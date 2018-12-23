@@ -6,15 +6,15 @@ Mcts::Mcts() : number_of_total_simulations(0)
 }
 
 
-MctsNode* Mcts::GenerateRoot(Board startBoard, int movesCount, Move* possibleMoves)
+void Mcts::GenerateRoot(Board startBoard, int movesCount, Move* possibleMoves)
 {
-	MctsNode* root = new MctsNode(NULL, startBoard);
+	MctsNode* root = new MctsNode(0, startBoard);
 	for (int i = 0; i != movesCount; i++)
 	{
 		MctsNode* child = new MctsNode(root, startBoard.GetBoardAfterMove(possibleMoves[i]));
 		root->AddChild(child);
 	}
-	return root;
+	Mcts::root = root;
 }
 
 MctsNode* Mcts::SelectNode(MctsNode *parent)
@@ -47,10 +47,10 @@ MctsNode* Mcts::SelectNode(MctsNode *parent)
 	{
 		int moves_count = 0;
 		if (leafNode->visited_in_current_iteration)
-			return NULL;
+			return 0;
 		auto moves = leafNode->board.GetPossibleMoves(moves_count);
 		if (moves_count == 0)
-			return NULL;
+			return 0;
 		for (int i = 0; i != moves_count; i++)
 		{
 			leafNode->AddChild(new MctsNode(leafNode, leafNode->board.GetBoardAfterMove(moves[i])));
@@ -63,7 +63,7 @@ MctsNode* Mcts::SelectNode(MctsNode *parent)
 void Mcts::BackpropagateSimulations(MctsNode *leaf)
 {
 	number_of_total_simulations++;
-	while (leaf != NULL)
+	while (leaf != 0)
 	{
 		leaf->simulations_count++;
 		leaf = leaf->parent;

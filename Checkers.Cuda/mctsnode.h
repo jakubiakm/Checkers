@@ -12,6 +12,7 @@ public:
 	Board board;
 	MctsNode *parent;
 	std::vector<MctsNode *> children;
+
 	MctsNode(MctsNode *parent, Board board);
 	void AddChild(MctsNode * child);
 };
