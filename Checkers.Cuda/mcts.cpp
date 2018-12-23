@@ -24,19 +24,24 @@ MctsNode* Mcts::SelectNode(MctsNode *parent)
 	{
 		int max = 0;
 		int ind;
+		bool visited = false;
 		for (int i = 0; i != leafNode->children.size(); i++)
 		{
 			if (leafNode->children[i]->simulations_count == 0)
 			{
 				ind = i;
+				visited = true;
 				break;
 			}
 			if (leafNode->children[i]->wins / leafNode->children[i]->simulations_count + UCT_CONSTANT * sqrt(log(number_of_total_simulations) / leafNode->children[i]->simulations_count) > max)
 			{
 				max = leafNode->children[i]->wins / leafNode->children[i]->simulations_count + UCT_CONSTANT * sqrt(log(number_of_total_simulations) / leafNode->children[i]->simulations_count);
 				ind = i;
+				visited = true;
 			}
 		}
+		if (!visited)
+			return 0;
 		leafNode = leafNode->children[ind];
 	}
 	if (leafNode->simulations_count == 0)
@@ -67,5 +72,19 @@ void Mcts::BackpropagateSimulations(MctsNode *leaf)
 	{
 		leaf->simulations_count++;
 		leaf = leaf->parent;
+	}
+}
+
+void Mcts::BackpropagateResults(std::vector<MctsNode*> vector, int *results)
+{
+	for (int i = 0; i != vector.size(); i++)
+	{
+		MctsNode *leaf = vector[i];
+		while (leaf != 0)
+		{
+			leaf->wins += results[i];
+			leaf->visited_in_current_iteration = 0;
+			leaf = leaf->parent;
+		}
 	}
 }

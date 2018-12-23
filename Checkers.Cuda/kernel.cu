@@ -69,61 +69,66 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 	int* possible_moves
 )
 {
-	Player player = current_player == 0 ? Player::WHITE : Player::BLACK;		//gracz dla którego wybierany jest optymalny ruch
+	Player player = current_player == 0 ? Player::WHITE : Player::BLACK;	//gracz dla którego wybierany jest optymalny ruch
 	int
-		possible_moves_count = possible_moves[0],								//liczba mo¿liwych ruchów spoœród których wybierany jest najlepszy
-		block_size = 1024,														//rozmiar gridu z którego gpu ma korzystaæ
-		grid_size = 1024,														//rozmiar bloku z którego gpu ma korzystaæ 
-		*results_d,																//wskaŸnik na pamiêæ w GPU przechowuj¹cy wyniki symulacji w danej iteracji
-		*results;																//wskaŸnik na pamiêæ w CPU przechowuj¹cy wyniki symulacji w danej iteracji
+		number_of_mcts_iterations = 2500,									//liczba iteracji wykonana przez algorytm MCTS
+		possible_moves_count = possible_moves[0],							//liczba mo¿liwych ruchów spoœród których wybierany jest najlepszy
+		block_size = 1024,													//rozmiar gridu z którego gpu ma korzystaæ
+		grid_size = 1024,													//rozmiar bloku z którego gpu ma korzystaæ 
+		*results_d,															//wskaŸnik na pamiêæ w GPU przechowuj¹cy wyniki symulacji w danej iteracji
+		*results;															//wskaŸnik na pamiêæ w CPU przechowuj¹cy wyniki symulacji w danej iteracji
 	Board
-		start_board = Board(board_size, board, player),							//pocz¹tkowy stan planszy
-		*boards_d,																//wskaŸnik na pamiêæ w GPU przechowuj¹cy plansze do symulacji
-		*boards_to_rollout;														//wskaŸnik na pamiêæ w CPU przechowuj¹cy plansze do symulacji
-	Move *moves;																//lista mo¿liwych do wykonania ruchów
-	std::vector<MctsNode*> rollout_vector;										//wektor przechowuj¹cy elementy, dla których powinna zostaæ wykonana symulacja dla GPU
-	Mcts mcts_algorithm = Mcts();												//algorytm wybieraj¹cy optymalny ruch
+		start_board = Board(board_size, board, player),						//pocz¹tkowy stan planszy
+		*boards_d,															//wskaŸnik na pamiêæ w GPU przechowuj¹cy plansze do symulacji
+		*boards_to_rollout;													//wskaŸnik na pamiêæ w CPU przechowuj¹cy plansze do symulacji
+	Move *moves;															//lista mo¿liwych do wykonania ruchów
+	std::vector<MctsNode*> rollout_vector;									//wektor przechowuj¹cy elementy, dla których powinna zostaæ wykonana symulacja dla GPU
+	Mcts mcts_algorithm = Mcts();											//algorytm wybieraj¹cy optymalny ruch
 
 	moves = GetPossibleMovesFromInputParameters(possible_moves_count, possible_moves);
 	mcts_algorithm.GenerateRoot(start_board, possible_moves_count, moves);
-
-	for (int i = 0; i != block_size * grid_size; i++)
+	
+	while (number_of_mcts_iterations--)
 	{
-		MctsNode* node = mcts_algorithm.SelectNode(mcts_algorithm.root);
-		if (node == 0 || node->visited_in_current_iteration)
-			break;
-		mcts_algorithm.BackpropagateSimulations(node);
-		rollout_vector.push_back(node);
+		for (int i = 0; i != block_size * grid_size; i++)
+		{
+			MctsNode* node = mcts_algorithm.SelectNode(mcts_algorithm.root);
+			if (node == 0 || node->visited_in_current_iteration)
+				break;
+			mcts_algorithm.BackpropagateSimulations(node);
+			rollout_vector.push_back(node);
+		}
+
+		results = new int[rollout_vector.size()];
+		boards_to_rollout = new Board[rollout_vector.size()];
+
+		for (int i = 0; i != rollout_vector.size(); i++)
+		{
+			boards_to_rollout[i] = rollout_vector[i]->board;
+		}
+
+		CUDA_CALL(cudaMalloc((void**)&boards_d, rollout_vector.size() * sizeof(Board)));
+		CUDA_CALL(cudaMalloc((void**)&results_d, rollout_vector.size() * sizeof(int)));
+		CUDA_CALL(cudaMemset(boards_d, 0, rollout_vector.size() * sizeof(int)));
+		CUDA_CALL(cudaMemcpy(boards_d, boards_to_rollout, rollout_vector.size() * sizeof(Board), cudaMemcpyHostToDevice));
+
+		//alokalcja dynamicznych tablic w klasach
+		for (int i = 0; i < rollout_vector.size(); i++)
+		{
+			int* hostData;
+			CUDA_CALL(cudaMalloc((void**)&hostData, sizeof(int) * boards_to_rollout[i].size));
+			CUDA_CALL(cudaMemcpy(hostData, boards_to_rollout[i].pieces, sizeof(int) * boards_to_rollout[i].size, cudaMemcpyHostToDevice));
+			CUDA_CALL(cudaMemcpy(&(boards_d[i].pieces), &hostData, sizeof(int*), cudaMemcpyHostToDevice));
+		}
+
+		CUDA_CALL(cudaDeviceSynchronize());
+		RolloutGames << <grid_size, block_size >> > (boards_d, results_d, rollout_vector.size());
+		CUDA_CALL(cudaDeviceSynchronize());
+		CUDA_CALL(cudaGetLastError());
+		CUDA_CALL(cudaMemcpy(results, results_d, sizeof(int) * rollout_vector.size(), cudaMemcpyDeviceToHost));
+		CUDA_CALL(cudaFree(boards_d));
+		CUDA_CALL(cudaFree(results_d));
+		mcts_algorithm.BackpropagateResults(rollout_vector, results);
 	}
-
-	results = new int[rollout_vector.size()];
-	boards_to_rollout = new Board[rollout_vector.size()];
-
-	for (int i = 0; i != rollout_vector.size(); i++)
-	{
-		boards_to_rollout[i] = rollout_vector[i]->board;
-	}
-
-	CUDA_CALL(cudaMalloc((void**)&boards_d, rollout_vector.size() * sizeof(Board)));
-	CUDA_CALL(cudaMalloc((void**)&results_d, rollout_vector.size() * sizeof(int)));
-	CUDA_CALL(cudaMemset(boards_d, 0, rollout_vector.size() * sizeof(int)));
-	CUDA_CALL(cudaMemcpy(boards_d, boards_to_rollout, rollout_vector.size() * sizeof(Board), cudaMemcpyHostToDevice));
-
-	//alokalcja dynamicznych tablic w klasach
-	for (int i = 0; i < rollout_vector.size(); i++)
-	{
-		int* hostData;
-		CUDA_CALL(cudaMalloc((void**)&hostData, sizeof(int) * boards_to_rollout[i].size));
-		CUDA_CALL(cudaMemcpy(hostData, boards_to_rollout[i].pieces, sizeof(int) * boards_to_rollout[i].size, cudaMemcpyHostToDevice));
-		CUDA_CALL(cudaMemcpy(&(boards_d[i].pieces), &hostData, sizeof(int*), cudaMemcpyHostToDevice));
-	}
-
-	RolloutGames<< <grid_size, block_size >> > (boards_d, results_d, rollout_vector.size());
-	CUDA_CALL(cudaGetLastError());
-	CUDA_CALL(cudaThreadSynchronize());
-	CUDA_CALL(cudaMemcpy(results, results_d, sizeof(int) * rollout_vector.size(), cudaMemcpyDeviceToHost));
-	CUDA_CALL(cudaFree(boards_d));
-	CUDA_CALL(cudaFree(results_d));
-	CUDA_CALL(cudaDeviceReset());
 	return possible_moves_count - 1;
 }
