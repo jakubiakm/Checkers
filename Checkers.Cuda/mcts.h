@@ -12,6 +12,7 @@ public:
 	MctsNode* SelectNode(MctsNode *parent);
 	void BackpropagateSimulations(MctsNode *leaf);
 	void BackpropagateResults(std::vector<MctsNode*> vector, int *results);
+	int GetBestMove();
 private:
 	int number_of_total_simulations;
 

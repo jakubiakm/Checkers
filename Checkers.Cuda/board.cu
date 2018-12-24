@@ -35,7 +35,9 @@ __device__ __host__ Move* Board::GetPossibleMoves(int &moves_count)
 		pawn_ind = 0,
 		king_ind = 0,
 		pawns_moves_count = 0,
-		kings_moves_count = 0;
+		kings_moves_count = 0,
+		maximal_beat_count = 0,
+		temp_size = 0;
 	for (int i = 0; i != Board::size * Board::size; i++)
 	{
 		if (Board::player == Player::BLACK)
@@ -79,6 +81,18 @@ __device__ __host__ Move* Board::GetPossibleMoves(int &moves_count)
 		{
 			possible_moves[moves_count++] = kings_moves[j];
 		}
+	}
+	for (int i = 0; i != moves_count; i++)
+	{
+		if (possible_moves[i].beated_pieces_count > maximal_beat_count)
+			maximal_beat_count = possible_moves[i].beated_pieces_count;
+	}
+	temp_size = moves_count;
+	moves_count = 0;
+	for (int i = 0; i != temp_size; i++)
+	{
+		if (possible_moves[i].beated_pieces_count == maximal_beat_count)
+			possible_moves[moves_count++] = possible_moves[i];
 	}
 	return possible_moves;
 }
@@ -259,7 +273,7 @@ __device__ __host__ void Board::GetAllBeatMoves(int piece_row, int piece_column,
 			{
 				new_beated_pieces[i] = beated_pieces[i];
 			}
-			new_beated_pieces[beated_pieces_length + 1] = beated_piece_position;
+			new_beated_pieces[beated_pieces_length] = beated_piece_position;
 			Board::GetAllBeatMoves(piece_row, piece_column, new_beated_pieces, beated_pieces_length + 1, target_row, target_column, target_row - 2, target_column - 2, all_moves, all_moves_length);
 		}
 	}
@@ -281,7 +295,7 @@ __device__ __host__ void Board::GetAllBeatMoves(int piece_row, int piece_column,
 			{
 				new_beated_pieces[i] = beated_pieces[i];
 			}
-			new_beated_pieces[beated_pieces_length + 1] = beated_piece_position;
+			new_beated_pieces[beated_pieces_length] = beated_piece_position;
 			Board::GetAllBeatMoves(piece_row, piece_column, new_beated_pieces, beated_pieces_length + 1, target_row, target_column, target_row + 2, target_column - 2, all_moves, all_moves_length);
 		}
 	}
@@ -303,7 +317,7 @@ __device__ __host__ void Board::GetAllBeatMoves(int piece_row, int piece_column,
 			{
 				new_beated_pieces[i] = beated_pieces[i];
 			}
-			new_beated_pieces[beated_pieces_length + 1] = beated_piece_position;
+			new_beated_pieces[beated_pieces_length] = beated_piece_position;
 			Board::GetAllBeatMoves(piece_row, piece_column, new_beated_pieces, beated_pieces_length + 1, target_row, target_column, target_row - 2, target_column + 2, all_moves, all_moves_length);
 		}
 	}
@@ -325,7 +339,7 @@ __device__ __host__ void Board::GetAllBeatMoves(int piece_row, int piece_column,
 			{
 				new_beated_pieces[i] = beated_pieces[i];
 			}
-			new_beated_pieces[beated_pieces_length + 1] = beated_piece_position;
+			new_beated_pieces[beated_pieces_length] = beated_piece_position;
 			Board::GetAllBeatMoves(piece_row, piece_column, new_beated_pieces, beated_pieces_length + 1, target_row, target_column, target_row + 2, target_column + 2, all_moves, all_moves_length);
 		}
 	}
@@ -344,7 +358,7 @@ __device__ __host__ void Board::GetAllKingBeatMoves(int piece_row, int piece_col
 				{
 					new_beated_pieces[i] = beated_pieces[i];
 				}
-				Board::GetAllKingBeatMoves(piece_row, piece_column, new_beated_pieces, beated_pieces_length, target_row, target_column, target_row + ind, target_column + ind, all_moves, all_moves_length);
+				Board::GetAllKingBeatMoves(piece_row, piece_column, new_beated_pieces, beated_pieces_length + 1, target_row, target_column, target_row + ind, target_column + ind, all_moves, all_moves_length);
 			}
 			else
 				break;
@@ -368,7 +382,7 @@ __device__ __host__ void Board::GetAllKingBeatMoves(int piece_row, int piece_col
 				{
 					new_beated_pieces[i] = beated_pieces[i];
 				}
-				Board::GetAllKingBeatMoves(piece_row, piece_column, new_beated_pieces, beated_pieces_length, target_row, target_column, target_row - ind, target_column + ind, all_moves, all_moves_length);
+				Board::GetAllKingBeatMoves(piece_row, piece_column, new_beated_pieces, beated_pieces_length + 1, target_row, target_column, target_row - ind, target_column + ind, all_moves, all_moves_length);
 			}
 			else
 				break;
@@ -380,7 +394,7 @@ __device__ __host__ void Board::GetAllKingBeatMoves(int piece_row, int piece_col
 				{
 					new_beated_pieces[i] = beated_pieces[i];
 				}
-				Board::GetAllKingBeatMoves(piece_row, piece_column, new_beated_pieces, beated_pieces_length, target_row, target_column, target_row - ind, target_column - ind, all_moves, all_moves_length);
+				Board::GetAllKingBeatMoves(piece_row, piece_column, new_beated_pieces, beated_pieces_length + 1, target_row, target_column, target_row - ind, target_column - ind, all_moves, all_moves_length);
 			}
 			else
 				break;
@@ -405,7 +419,7 @@ __device__ __host__ void Board::GetAllKingBeatMoves(int piece_row, int piece_col
 					{
 						new_beated_pieces[i] = beated_pieces[i];
 					}
-					new_beated_pieces[beated_pieces_length + 1] = beated_piece_position;
+					new_beated_pieces[beated_pieces_length] = beated_piece_position;
 					Board::GetAllKingBeatMoves(piece_row, piece_column, new_beated_pieces, beated_pieces_length + 1, target_row, target_column, target_row - ind - 1, target_column - ind - 1, all_moves, all_moves_length);
 				}
 				else
@@ -436,7 +450,7 @@ __device__ __host__ void Board::GetAllKingBeatMoves(int piece_row, int piece_col
 					{
 						new_beated_pieces[i] = beated_pieces[i];
 					}
-					new_beated_pieces[beated_pieces_length + 1] = beated_piece_position;
+					new_beated_pieces[beated_pieces_length] = beated_piece_position;
 					Board::GetAllKingBeatMoves(piece_row, piece_column, new_beated_pieces, beated_pieces_length + 1, target_row, target_column, target_row + ind + 1, target_column - ind - 1, all_moves, all_moves_length);
 				}
 				else
@@ -467,7 +481,7 @@ __device__ __host__ void Board::GetAllKingBeatMoves(int piece_row, int piece_col
 					{
 						new_beated_pieces[i] = beated_pieces[i];
 					}
-					new_beated_pieces[beated_pieces_length + 1] = beated_piece_position;
+					new_beated_pieces[beated_pieces_length] = beated_piece_position;
 					Board::GetAllKingBeatMoves(piece_row, piece_column, new_beated_pieces, beated_pieces_length + 1, target_row, target_column, target_row - ind - 1, target_column + ind + 1, all_moves, all_moves_length);
 				}
 				else
@@ -498,7 +512,7 @@ __device__ __host__ void Board::GetAllKingBeatMoves(int piece_row, int piece_col
 					{
 						new_beated_pieces[i] = beated_pieces[i];
 					}
-					new_beated_pieces[beated_pieces_length + 1] = beated_piece_position;
+					new_beated_pieces[beated_pieces_length] = beated_piece_position;
 					Board::GetAllKingBeatMoves(piece_row, piece_column, new_beated_pieces, beated_pieces_length + 1, target_row, target_column, target_row + ind + 1, target_column + ind + 1, all_moves, all_moves_length);
 				}
 				else

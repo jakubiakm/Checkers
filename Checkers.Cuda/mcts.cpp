@@ -22,11 +22,13 @@ MctsNode* Mcts::SelectNode(MctsNode *parent)
 	MctsNode *leafNode = parent;
 	while (leafNode->children.size() != 0)
 	{
-		int max = 0;
+		double max = 0;
 		int ind;
 		bool visited = false;
 		for (int i = 0; i != leafNode->children.size(); i++)
 		{
+			if (leafNode->children[i]->visited_in_current_iteration)
+				continue;
 			if (leafNode->children[i]->simulations_count == 0)
 			{
 				ind = i;
@@ -68,6 +70,7 @@ MctsNode* Mcts::SelectNode(MctsNode *parent)
 void Mcts::BackpropagateSimulations(MctsNode *leaf)
 {
 	number_of_total_simulations++;
+	leaf->visited_in_current_iteration = true;
 	while (leaf != 0)
 	{
 		leaf->simulations_count++;
@@ -87,4 +90,26 @@ void Mcts::BackpropagateResults(std::vector<MctsNode*> vector, int *results)
 			leaf = leaf->parent;
 		}
 	}
+}
+
+int Mcts::GetBestMove()
+{
+	double max = 0;
+	int ind = 0;
+	for (int i = 0; i != root->children.size(); i++)
+	{
+		if (root->children[i]->visited_in_current_iteration)
+			continue;
+		if (root->children[i]->simulations_count == 0)
+		{
+			ind = i;
+			break;
+		}
+		if (root->children[i]->wins / root->children[i]->simulations_count + UCT_CONSTANT * sqrt(log(number_of_total_simulations) / root->children[i]->simulations_count) > max)
+		{
+			max = root->children[i]->wins / root->children[i]->simulations_count + UCT_CONSTANT * sqrt(log(number_of_total_simulations) / root->children[i]->simulations_count);
+			ind = i;
+		}
+	}
+	return ind;
 }

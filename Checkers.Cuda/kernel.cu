@@ -73,7 +73,7 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 {
 	Player player = current_player == 0 ? Player::WHITE : Player::BLACK;	//gracz dla którego wybierany jest optymalny ruch
 	int
-		number_of_mcts_iterations = 250,									//liczba iteracji wykonana przez algorytm MCTS
+		number_of_mcts_iterations = 25,									//liczba iteracji wykonana przez algorytm MCTS
 		possible_moves_count = possible_moves[0],							//liczba mo¿liwych ruchów spoœród których wybierany jest najlepszy
 		block_size = 1024,													//rozmiar gridu z którego gpu ma korzystaæ
 		grid_size = 1024,													//rozmiar bloku z którego gpu ma korzystaæ 
@@ -92,6 +92,7 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 	
 	while (number_of_mcts_iterations--)
 	{
+		rollout_vector.clear();
 		for (int i = 0; i != block_size * grid_size; i++)
 		{
 			MctsNode* node = mcts_algorithm.SelectNode(mcts_algorithm.root);
@@ -130,5 +131,5 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 		CUDA_CALL(cudaFree(results_d));
 		mcts_algorithm.BackpropagateResults(rollout_vector, results);
 	}
-	return possible_moves_count - 1;
+	return mcts_algorithm.GetBestMove();
 }
