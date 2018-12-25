@@ -22,8 +22,9 @@ public:
 	__device__ __host__ Board();
 	__device__ __host__ ~Board();
 	__device__ __host__ Move* GetPossibleMoves(int &moves_count);
+	__device__ __host__ Move* GetPossibleMovesGpu(int &moves_count);
 	__device__ __host__ Board GetBoardAfterMove(Move move);
-	
+	__device__ __host__ Player Rollout();
 private:
 	__device__ __host__ Move* GetPawnPossibleMoves(int position, int &moves_count);
 	__device__ __host__ Move* GetKingPossibleMoves(int position, int &moves_count);
@@ -34,4 +35,5 @@ private:
 	__device__ __host__ int PositionToRow(int position);
 	__device__ __host__ int PositionToColumn(int position);
 	__device__ __host__ int ToPosition(int row, int column);
+	__device__ __host__ bool IsGameFinished();
 };

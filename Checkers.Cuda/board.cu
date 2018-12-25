@@ -1,5 +1,6 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
+#include <cstdlib>
 
 #include "Board.cuh"
 
@@ -20,6 +21,14 @@ __device__ __host__ Board::Board()
 __device__ __host__ Board::~Board()
 {
 
+}
+
+
+__device__ __host__ Move* Board::GetPossibleMovesGpu(int &moves_count)
+{
+	Move* moves = new Move[1];
+	moves[0] = Move(0, 0, 0, 0);
+	return moves;
 }
 
 __device__ __host__ Move* Board::GetPossibleMoves(int &moves_count)
@@ -110,6 +119,15 @@ __device__ __host__ Board Board::GetBoardAfterMove(Move move)
 	}
 	_pieces[move.new_position] = _pieces[move.old_position];
 	_pieces[move.old_position] = 0;
+	//zamiana na damkê
+	if (_pieces[move.new_position] == 1 && move.new_position >= 1 && move.new_position <= Board::size / 2)
+	{
+		_pieces[move.new_position] = 2;
+	}
+	if (_pieces[move.new_position] == 3 && move.new_position > Board::size * Board::size / 2 - Board::size / 2 && move.new_position <= Board::size * Board::size / 2)
+	{
+		_pieces[move.new_position] = 4;
+	}
 	return Board(size, _pieces, player == Player::WHITE ? Player::BLACK : Player::WHITE);
 }
 
@@ -358,7 +376,7 @@ __device__ __host__ void Board::GetAllKingBeatMoves(int piece_row, int piece_col
 				{
 					new_beated_pieces[i] = beated_pieces[i];
 				}
-				Board::GetAllKingBeatMoves(piece_row, piece_column, new_beated_pieces, beated_pieces_length + 1, target_row, target_column, target_row + ind, target_column + ind, all_moves, all_moves_length);
+				Board::GetAllKingBeatMoves(piece_row, piece_column, new_beated_pieces, beated_pieces_length, target_row, target_column, target_row + ind, target_column + ind, all_moves, all_moves_length);
 			}
 			else
 				break;
@@ -382,7 +400,7 @@ __device__ __host__ void Board::GetAllKingBeatMoves(int piece_row, int piece_col
 				{
 					new_beated_pieces[i] = beated_pieces[i];
 				}
-				Board::GetAllKingBeatMoves(piece_row, piece_column, new_beated_pieces, beated_pieces_length + 1, target_row, target_column, target_row - ind, target_column + ind, all_moves, all_moves_length);
+				Board::GetAllKingBeatMoves(piece_row, piece_column, new_beated_pieces, beated_pieces_length, target_row, target_column, target_row - ind, target_column + ind, all_moves, all_moves_length);
 			}
 			else
 				break;
@@ -394,7 +412,7 @@ __device__ __host__ void Board::GetAllKingBeatMoves(int piece_row, int piece_col
 				{
 					new_beated_pieces[i] = beated_pieces[i];
 				}
-				Board::GetAllKingBeatMoves(piece_row, piece_column, new_beated_pieces, beated_pieces_length + 1, target_row, target_column, target_row - ind, target_column - ind, all_moves, all_moves_length);
+				Board::GetAllKingBeatMoves(piece_row, piece_column, new_beated_pieces, beated_pieces_length, target_row, target_column, target_row - ind, target_column - ind, all_moves, all_moves_length);
 			}
 			else
 				break;
@@ -594,4 +612,49 @@ __device__ __host__ int Board::ToPosition(int row, int column)
 		return -1;
 	else
 		return size / 2 * (size - row - 1) + ((row % 2 == 0) ? 1 : 0) + (column + 1) / 2;
+}
+
+__device__ __host__ Player Board::Rollout()
+{
+	int 
+		moves_count = 0,
+		move_ind = 0;
+	Board current_board = *this;
+	while (1)
+	{
+		Move *possible_moves = current_board.GetPossibleMoves(moves_count);
+		if (moves_count == 0 || Board::IsGameFinished())
+			break;
+		move_ind = rand() % moves_count;
+		current_board = current_board.GetBoardAfterMove(possible_moves[move_ind]);
+	}
+	for (int i = 0; i != Board::size * Board::size; i++)
+	{
+		if (Board::pieces[i] == 1 || Board::pieces[i] == 2)
+			return Player::WHITE;
+		if (Board::pieces[i] == 3 || Board::pieces[i] == 4)
+			return Player::BLACK;
+	}
+	return Player::BLACK;
+}
+
+__device__ __host__ bool Board::IsGameFinished()
+{
+	int player_pieces = 0;
+	for (int i = 0; i != Board::size * Board::size; i++)
+	{
+		if (pieces[i] == 1 || pieces[i] == 2)
+		{
+			if (player_pieces == 2)
+				return false;
+			player_pieces = 1;
+		}
+		else if (pieces[i] == 3 || pieces[i] == 4)
+		{
+			if (player_pieces == 1)
+				return false;
+			player_pieces = 2;
+		}
+	}
+	return true;
 }

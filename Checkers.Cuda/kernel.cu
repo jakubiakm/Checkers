@@ -23,11 +23,6 @@ inline void GpuAssert(cudaError_t code, const char *file, int line, bool abort =
 	}
 }
 
-__device__ int RolloutBoard(Board board)
-{
-	return 1;
-}
-
 __global__ void RolloutGames(Board* rollout_boards, int* results, int size)
 {
 	const long numThreads = blockDim.x * gridDim.x;
@@ -35,7 +30,15 @@ __global__ void RolloutGames(Board* rollout_boards, int* results, int size)
 
 	for (long long ind = threadID; ind < size; ind += numThreads)
 	{
-		results[ind] = RolloutBoard(rollout_boards[ind]);
+		Board current_board = rollout_boards[ind];
+		while (1)
+		{
+			int moves_count = 0;
+			Move *possible_moves = current_board.GetPossibleMovesGpu(moves_count);
+			if (moves_count == 0)
+				break;
+			current_board = current_board.GetBoardAfterMove(possible_moves[0]);
+		}
 	}
 }
 
@@ -73,7 +76,7 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 {
 	Player player = current_player == 0 ? Player::WHITE : Player::BLACK;	//gracz dla którego wybierany jest optymalny ruch
 	int
-		number_of_mcts_iterations = 25,									//liczba iteracji wykonana przez algorytm MCTS
+		number_of_mcts_iterations = 25,										//liczba iteracji wykonana przez algorytm MCTS
 		possible_moves_count = possible_moves[0],							//liczba mo¿liwych ruchów spoœród których wybierany jest najlepszy
 		block_size = 1024,													//rozmiar gridu z którego gpu ma korzystaæ
 		grid_size = 1024,													//rozmiar bloku z którego gpu ma korzystaæ 
@@ -89,7 +92,7 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 
 	moves = GetPossibleMovesFromInputParameters(possible_moves_count, possible_moves);
 	mcts_algorithm.GenerateRoot(start_board, possible_moves_count, moves);
-	
+
 	while (number_of_mcts_iterations--)
 	{
 		rollout_vector.clear();
@@ -123,13 +126,20 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 			CUDA_CALL(cudaMemcpy(&(boards_d[i].pieces), &hostData, sizeof(int*), cudaMemcpyHostToDevice));
 		}
 
-		RolloutGames << <grid_size, block_size >> > (boards_d, results_d, rollout_vector.size());
+		RolloutGames << <1, 1 >> > (boards_d, results_d, rollout_vector.size());
 		CUDA_CALL(cudaDeviceSynchronize());
 		CUDA_CALL(cudaGetLastError());
 		CUDA_CALL(cudaMemcpy(results, results_d, sizeof(int) * rollout_vector.size(), cudaMemcpyDeviceToHost));
 		CUDA_CALL(cudaFree(boards_d));
 		CUDA_CALL(cudaFree(results_d));
 		mcts_algorithm.BackpropagateResults(rollout_vector, results);
+		for (int i = 0; i != rollout_vector.size(); i++)
+		{
+			Player player = rollout_vector[i]->board.Rollout();
+		}
 	}
-	return mcts_algorithm.GetBestMove();
+
+	int best_move = mcts_algorithm.GetBestMove();
+
+	return best_move;
 }
