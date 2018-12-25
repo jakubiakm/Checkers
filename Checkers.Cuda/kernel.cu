@@ -66,6 +66,16 @@ __host__ Move* GetPossibleMovesFromInputParameters(int number_of_moves, int* pos
 	return moves_to_fill;
 }
 
+__host__ void DeallocateMctsNode(MctsNode *node)
+{
+	for (int i = 0; i != node->children.size(); i++)
+	{
+		DeallocateMctsNode(node->children[i]);
+	}
+	//delete [] node->board.pieces;
+	delete node;
+}
+
 extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 (
 	int board_size,
@@ -133,6 +143,7 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 		CUDA_CALL(cudaFree(boards_d));
 		CUDA_CALL(cudaFree(results_d));
 		mcts_algorithm.BackpropagateResults(rollout_vector, results);
+
 		for (int i = 0; i != rollout_vector.size(); i++)
 		{
 			Player player = rollout_vector[i]->board.Rollout();
@@ -140,6 +151,7 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 	}
 
 	int best_move = mcts_algorithm.GetBestMove();
-
+	DeallocateMctsNode(mcts_algorithm.root);
 	return best_move;
 }
+

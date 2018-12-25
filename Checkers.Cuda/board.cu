@@ -35,7 +35,8 @@ __device__ __host__ Move* Board::GetPossibleMoves(int &moves_count)
 {
 	moves_count = 0;
 	Move
-		*possible_moves,
+		*possible_moves = new Move[1000],
+		*all_possible_moves = new Move[1000],
 		*kings_moves,
 		*pawns_moves;
 	int
@@ -72,37 +73,44 @@ __device__ __host__ Move* Board::GetPossibleMoves(int &moves_count)
 			}
 		}
 	}
-	possible_moves = new Move[1000];
 	for (int i = 0; i != pawn_ind; i++)
 	{
 		pawns_moves_count = 0;
 		pawns_moves = GetPawnPossibleMoves(pawn_positions[i], pawns_moves_count);
 		for (int j = 0; j != pawns_moves_count; j++)
 		{
-			possible_moves[moves_count++] = pawns_moves[j];
+			all_possible_moves[moves_count++] = pawns_moves[j];
 		}
+		delete[] pawns_moves;
 	}
-	for (int i = 0; i != pawn_ind; i++)
+	for (int i = 0; i != king_ind; i++)
 	{
 		kings_moves_count = 0;
 		kings_moves = GetKingPossibleMoves(king_positions[i], kings_moves_count);
 		for (int j = 0; j != kings_moves_count; j++)
 		{
-			possible_moves[moves_count++] = kings_moves[j];
+			all_possible_moves[moves_count++] = kings_moves[j];
 		}
+		delete[] kings_moves;
 	}
 	for (int i = 0; i != moves_count; i++)
 	{
-		if (possible_moves[i].beated_pieces_count > maximal_beat_count)
-			maximal_beat_count = possible_moves[i].beated_pieces_count;
+		if (all_possible_moves[i].beated_pieces_count > maximal_beat_count)
+			maximal_beat_count = all_possible_moves[i].beated_pieces_count;
 	}
 	temp_size = moves_count;
 	moves_count = 0;
 	for (int i = 0; i != temp_size; i++)
 	{
-		if (possible_moves[i].beated_pieces_count == maximal_beat_count)
-			possible_moves[moves_count++] = possible_moves[i];
+		if (all_possible_moves[i].beated_pieces_count == maximal_beat_count)
+			possible_moves[moves_count++] = all_possible_moves[i];
+		else
+			delete[] all_possible_moves[i].beated_pieces;
 	}
+
+	delete[] king_positions;
+	delete[] pawn_positions;
+	delete[] all_possible_moves;
 	return possible_moves;
 }
 
@@ -183,7 +191,7 @@ __device__ __host__ Move* Board::GetPawnPossibleMoves(int position, int &moves_c
 
 __device__ __host__ Move* Board::GetKingPossibleMoves(int position, int &moves_count)
 {
-	Move* possible_moves = new Move[100];
+	Move* possible_moves = new Move[10000];
 	int
 		piece_row = Board::PositionToRow(position),
 		piece_column = Board::PositionToColumn(position);
@@ -616,23 +624,31 @@ __device__ __host__ int Board::ToPosition(int row, int column)
 
 __device__ __host__ Player Board::Rollout()
 {
-	int 
+	int
 		moves_count = 0,
 		move_ind = 0;
 	Board current_board = *this;
 	while (1)
 	{
 		Move *possible_moves = current_board.GetPossibleMoves(moves_count);
-		if (moves_count == 0 || Board::IsGameFinished())
+		if (moves_count == 0 || current_board.IsGameFinished())
 			break;
 		move_ind = rand() % moves_count;
-		current_board = current_board.GetBoardAfterMove(possible_moves[move_ind]);
+		Board new_board = current_board.GetBoardAfterMove(possible_moves[move_ind]);
+		delete[] current_board.pieces;
+		current_board = new_board;
+		for (int i = 0; i != moves_count; i++)
+		{
+			if (possible_moves[i].beated_pieces_count > 0)
+				delete[] possible_moves[i].beated_pieces;
+		}
+		delete[] possible_moves;
 	}
 	for (int i = 0; i != Board::size * Board::size; i++)
 	{
-		if (Board::pieces[i] == 1 || Board::pieces[i] == 2)
+		if (current_board.pieces[i] == 1 || current_board.pieces[i] == 2)
 			return Player::WHITE;
-		if (Board::pieces[i] == 3 || Board::pieces[i] == 4)
+		if (current_board.pieces[i] == 3 || current_board.pieces[i] == 4)
 			return Player::BLACK;
 	}
 	return Player::BLACK;
@@ -649,7 +665,7 @@ __device__ __host__ bool Board::IsGameFinished()
 				return false;
 			player_pieces = 1;
 		}
-		else if (pieces[i] == 3 || pieces[i] == 4)
+		if (pieces[i] == 3 || pieces[i] == 4)
 		{
 			if (player_pieces == 1)
 				return false;
