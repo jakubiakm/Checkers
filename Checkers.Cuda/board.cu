@@ -630,8 +630,10 @@ __device__ __host__ Player Board::Rollout()
 	Board current_board = *this;
 	while (1)
 	{
+		if (current_board.IsGameFinished())
+			break;
 		Move *possible_moves = current_board.GetPossibleMoves(moves_count);
-		if (moves_count == 0 || current_board.IsGameFinished())
+		if (moves_count == 0)
 			break;
 		move_ind = rand() % moves_count;
 		Board new_board = current_board.GetBoardAfterMove(possible_moves[move_ind]);

@@ -144,10 +144,8 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 		CUDA_CALL(cudaFree(results_d));
 		mcts_algorithm.BackpropagateResults(rollout_vector, results);
 
-		for (int i = 0; i != rollout_vector.size(); i++)
-		{
-			Player player = rollout_vector[i]->board.Rollout();
-		}
+		delete[] results;
+		delete[] boards_to_rollout;
 	}
 
 	int best_move = mcts_algorithm.GetBestMove();
