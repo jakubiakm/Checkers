@@ -635,7 +635,8 @@ __device__ __host__ Player Board::Rollout()
 		Move *possible_moves = current_board.GetPossibleMoves(moves_count);
 		if (moves_count == 0)
 			break;
-		move_ind = rand() % moves_count;
+		//move_ind = rand() % moves_count;
+		move_ind = 0;
 		Board new_board = current_board.GetBoardAfterMove(possible_moves[move_ind]);
 		delete[] current_board.pieces;
 		current_board = new_board;

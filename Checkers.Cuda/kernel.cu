@@ -31,14 +31,8 @@ __global__ void RolloutGames(Board* rollout_boards, int* results, int size)
 	for (long long ind = threadID; ind < size; ind += numThreads)
 	{
 		Board current_board = rollout_boards[ind];
-		while (1)
-		{
-			int moves_count = 0;
-			Move *possible_moves = current_board.GetPossibleMovesGpu(moves_count);
-			if (moves_count == 0)
-				break;
-			current_board = current_board.GetBoardAfterMove(possible_moves[0]);
-		}
+		Player player = current_board.Rollout();
+		results[ind] = player == Player::BLACK ? 1 : 0;
 	}
 }
 
@@ -136,7 +130,7 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 			CUDA_CALL(cudaMemcpy(&(boards_d[i].pieces), &hostData, sizeof(int*), cudaMemcpyHostToDevice));
 		}
 
-		RolloutGames << <1, 1 >> > (boards_d, results_d, rollout_vector.size());
+		RolloutGames << <256, 256 >> > (boards_d, results_d, rollout_vector.size());
 		CUDA_CALL(cudaDeviceSynchronize());
 		CUDA_CALL(cudaGetLastError());
 		CUDA_CALL(cudaMemcpy(results, results_d, sizeof(int) * rollout_vector.size(), cudaMemcpyDeviceToHost));
