@@ -15,7 +15,7 @@ class Board
 {
 public:
 	int size;
-	int* pieces;
+	int pieces[100];
 	Player player;
 
 	__device__ __host__ Board(int size, int* _pieces, Player player);

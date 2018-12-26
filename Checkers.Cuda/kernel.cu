@@ -38,12 +38,12 @@ __global__ void RolloutGames(Board* rollout_boards, int* results, int size)
 
 __host__ Move* GetPossibleMovesFromInputParameters(int number_of_moves, int* possible_moves_array)
 {
-	Move* moves_to_fill = new Move[number_of_moves];
+	Move moves_to_fill[100];
 	int ind = 1;
 	for (int i = 0; i != number_of_moves; i++)
 	{
 		int beated_pieces_count = possible_moves_array[ind++];
-		int *beated_pieces = new int[beated_pieces_count];
+		int beated_pieces[100];
 		for (int j = 0; j != beated_pieces_count; j++)
 		{
 			beated_pieces[j] = possible_moves_array[ind++];
@@ -130,12 +130,16 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 			CUDA_CALL(cudaMemcpy(&(boards_d[i].pieces), &hostData, sizeof(int*), cudaMemcpyHostToDevice));
 		}
 
-		RolloutGames << <256, 256 >> > (boards_d, results_d, rollout_vector.size());
+		//RolloutGames << <1, 1>> > (boards_d, results_d, rollout_vector.size());
 		CUDA_CALL(cudaDeviceSynchronize());
 		CUDA_CALL(cudaGetLastError());
 		CUDA_CALL(cudaMemcpy(results, results_d, sizeof(int) * rollout_vector.size(), cudaMemcpyDeviceToHost));
 		CUDA_CALL(cudaFree(boards_d));
 		CUDA_CALL(cudaFree(results_d));
+		for (int i = 0; i != rollout_vector.size(); i++)
+		{
+			Player player = rollout_vector[i]->board.Rollout();
+		}
 		mcts_algorithm.BackpropagateResults(rollout_vector, results);
 
 		delete[] results;

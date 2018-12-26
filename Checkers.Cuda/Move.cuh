@@ -7,7 +7,7 @@ class Move
 {
 public:
 	int beated_pieces_count;
-	int *beated_pieces;
+	int beated_pieces[10];
 	int old_position;
 	int new_position;
 
