@@ -33,7 +33,7 @@ __global__ void RolloutGames(Board* rollout_boards, int* results, int size)
 	{
 		Board current_board = rollout_boards[ind];
 
-		Player player = current_board.Rollout();
+		Player player = current_board.RolloutGpu();
 		results[ind] = player == Player::BLACK ? 1 : 0;
 	}
 }
@@ -84,15 +84,17 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 	int
 		number_of_mcts_iterations = 25,										//liczba iteracji wykonana przez algorytm MCTS
 		possible_moves_count = possible_moves[0],							//liczba mo¿liwych ruchów spoœród których wybierany jest najlepszy
-		block_size = 1024,													//rozmiar gridu z którego gpu ma korzystaæ
-		grid_size = 1024,													//rozmiar bloku z którego gpu ma korzystaæ 
+		block_size = 20,													//rozmiar gridu z którego gpu ma korzystaæ
+		grid_size = 20,														//rozmiar bloku z którego gpu ma korzystaæ 
 		*results_d,															//wskaŸnik na pamiêæ w GPU przechowuj¹cy wyniki symulacji w danej iteracji
 		*results;															//wskaŸnik na pamiêæ w CPU przechowuj¹cy wyniki symulacji w danej iteracji
 	Board
 		start_board = Board(board_size, board, player),						//pocz¹tkowy stan planszy
 		*boards_d,															//wskaŸnik na pamiêæ w GPU przechowuj¹cy plansze do symulacji
 		*boards_to_rollout;													//wskaŸnik na pamiêæ w CPU przechowuj¹cy plansze do symulacji
-	Move* moves;															//lista mo¿liwych do wykonania ruchów
+	Move
+		*moves,																//lista mo¿liwych do wykonania ruchów
+		*possible_moves_d;													//wskaŸnik na pamiêæ w GPU przechowuj¹cy globaln¹ tablicê wszystkich mo¿liwych ruchów w danym threadzie
 	std::vector<MctsNode*> rollout_vector;									//wektor przechowuj¹cy elementy, dla których powinna zostaæ wykonana symulacja dla GPU
 	Mcts mcts_algorithm = Mcts();											//algorytm wybieraj¹cy optymalny ruch
 
@@ -125,6 +127,7 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 		}
 		CUDA_CALL(cudaMalloc((void**)&boards_d, rollout_vector.size() * sizeof(Board)));
 		CUDA_CALL(cudaMalloc((void**)&results_d, rollout_vector.size() * sizeof(int)));
+		CUDA_CALL(cudaMalloc((void**)&possible_moves_d, rollout_vector.size() * sizeof(Move) * 300));
 		CUDA_CALL(cudaMemset(boards_d, 0, rollout_vector.size() * sizeof(int)));
 		CUDA_CALL(cudaMemcpy(boards_d, boards_to_rollout, rollout_vector.size() * sizeof(Board), cudaMemcpyHostToDevice));
 
@@ -136,11 +139,11 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 			CUDA_CALL(cudaMemcpy(hostData, boards_to_rollout[i].pieces, sizeof(int) * boards_to_rollout[i].size, cudaMemcpyHostToDevice));
 			CUDA_CALL(cudaMemcpy(&(boards_d[i].pieces), &hostData, sizeof(int*), cudaMemcpyHostToDevice));
 		}
+		cudaDeviceProp prop;
 
-		size_t size;
-		CUDA_CALL(cudaDeviceGetLimit(&size, cudaLimitStackSize));
+		CUDA_CALL(cudaGetDeviceProperties(&prop, 0));
 		CUDA_CALL(cudaDeviceSetLimit(cudaLimitStackSize, 4096));
-		RolloutGames << <4, 256>> > (boards_d, results_d, rollout_vector.size());
+		RolloutGames << <block_size, grid_size>> > (boards_d, results_d, rollout_vector.size());
 		
 		CUDA_CALL(cudaDeviceSynchronize());
 		CUDA_CALL(cudaGetLastError());
@@ -148,7 +151,10 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 		CUDA_CALL(cudaFree(boards_d));
 		CUDA_CALL(cudaFree(results_d));
 		mcts_algorithm.BackpropagateResults(rollout_vector, results);
-
+		for (int i = 0; i != rollout_vector.size(); i++)
+		{
+			Player player = rollout_vector[i]->board.RolloutCpu();
+		}
 		delete[] results;
 		delete[] boards_to_rollout;
 	}

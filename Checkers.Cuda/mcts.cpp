@@ -17,7 +17,7 @@ void Mcts::GenerateRoot(Board startBoard, int movesCount, Move* possibleMoves)
 	Mcts::root = root;
 }
 
-MctsNode* Mcts::SelectNode(MctsNode *parent)
+__host__ MctsNode* Mcts::SelectNode(MctsNode *parent)
 {
 	MctsNode *leafNode = parent;
 	while (leafNode->children.size() != 0)
@@ -55,7 +55,7 @@ MctsNode* Mcts::SelectNode(MctsNode *parent)
 		int moves_count = 0;
 		if (leafNode->visited_in_current_iteration)
 			return 0;
-		auto moves = leafNode->board.GetPossibleMoves(moves_count);
+		auto moves = leafNode->board.GetPossibleMovesCpu(moves_count);
 		if (moves_count == 0)
 			return 0;
 		for (int i = 0; i != moves_count; i++)
