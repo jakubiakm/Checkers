@@ -31,25 +31,29 @@ __global__ void RolloutGames(Board* rollout_boards, int* results, int size)
 	for (long long ind = threadID; ind < size; ind += numThreads)
 	{
 		Board current_board = rollout_boards[ind];
-		Player player = current_board.Rollout();
-		results[ind] = player == Player::BLACK ? 1 : 0;
+		int i = 0;
+		Move *m = current_board.GetPossibleMovesGpu(i);
+		if (m[1000].beated_pieces_count == 0)
+			results[0] = 1;
+		//Player player = current_board.Rollout();
+		//results[ind] = player == Player::BLACK ? 1 : 0;
 	}
 }
 
-__host__ Move* GetPossibleMovesFromInputParameters(int number_of_moves, int* possible_moves_array)
+__host__ Move* GetPossibleMovesFromInputParameters(int number_of_moves, char* possible_moves_array)
 {
 	Move moves_to_fill[100];
 	int ind = 1;
 	for (int i = 0; i != number_of_moves; i++)
 	{
-		int beated_pieces_count = possible_moves_array[ind++];
-		int beated_pieces[100];
+		char beated_pieces_count = possible_moves_array[ind++];
+		char beated_pieces[100];
 		for (int j = 0; j != beated_pieces_count; j++)
 		{
 			beated_pieces[j] = possible_moves_array[ind++];
 		}
-		int old_position = possible_moves_array[ind++];
-		int new_position = possible_moves_array[ind++];
+		char old_position = possible_moves_array[ind++];
+		char new_position = possible_moves_array[ind++];
 		moves_to_fill[i] = Move(
 			old_position,
 			new_position,
@@ -72,10 +76,10 @@ __host__ void DeallocateMctsNode(MctsNode *node)
 
 extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 (
-	int board_size,
+	char board_size,
 	int current_player,			//0 - bia³y, 1 - czarny
-	int* board,					//0 - puste, 1 - bia³y pion, 2 - bia³a dama, 3 - czarny pion, 4 - czarna dama
-	int* possible_moves
+	char* board,					//0 - puste, 1 - bia³y pion, 2 - bia³a dama, 3 - czarny pion, 4 - czarna dama
+	char* possible_moves
 )
 {
 	Player player = current_player == 0 ? Player::WHITE : Player::BLACK;	//gracz dla którego wybierany jest optymalny ruch
@@ -90,11 +94,15 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 		start_board = Board(board_size, board, player),						//pocz¹tkowy stan planszy
 		*boards_d,															//wskaŸnik na pamiêæ w GPU przechowuj¹cy plansze do symulacji
 		*boards_to_rollout;													//wskaŸnik na pamiêæ w CPU przechowuj¹cy plansze do symulacji
-	Move *moves;															//lista mo¿liwych do wykonania ruchów
+	Move*
+		moves_pointer,														//lista mo¿liwych do wykonania ruchów
+		moves[100];
 	std::vector<MctsNode*> rollout_vector;									//wektor przechowuj¹cy elementy, dla których powinna zostaæ wykonana symulacja dla GPU
 	Mcts mcts_algorithm = Mcts();											//algorytm wybieraj¹cy optymalny ruch
 
-	moves = GetPossibleMovesFromInputParameters(possible_moves_count, possible_moves);
+	moves_pointer = GetPossibleMovesFromInputParameters(possible_moves_count, possible_moves);
+	for (int i = 0; i != 100; i++)
+		moves[i] = moves_pointer[i];
 	mcts_algorithm.GenerateRoot(start_board, possible_moves_count, moves);
 
 	while (number_of_mcts_iterations--)
@@ -130,7 +138,7 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 			CUDA_CALL(cudaMemcpy(&(boards_d[i].pieces), &hostData, sizeof(int*), cudaMemcpyHostToDevice));
 		}
 
-		//RolloutGames << <1, 1>> > (boards_d, results_d, rollout_vector.size());
+		RolloutGames << <1, 1>> > (boards_d, results_d, rollout_vector.size());
 		CUDA_CALL(cudaDeviceSynchronize());
 		CUDA_CALL(cudaGetLastError());
 		CUDA_CALL(cudaMemcpy(results, results_d, sizeof(int) * rollout_vector.size(), cudaMemcpyDeviceToHost));

@@ -20,7 +20,7 @@ namespace Checkers.Logic.Engines
         }
 
         [DllImport(@"D:\Users\syntaximus\Documents\GitHub\Checkers\x64\Debug\Checkers.Cuda.dll", CharSet = CharSet.Ansi, SetLastError = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int MakeMoveGpu(int size, int player, int[] board, int[] possibleMoves);
+        public static extern int MakeMoveGpu(char size, int player, char[] board, char[] possibleMoves);
 
         public Move MakeMove(CheckersBoard currentBoard)
         {
@@ -29,23 +29,23 @@ namespace Checkers.Logic.Engines
             int count = allPossibleMoves.Count;
             if (count == 0)
                 throw new NotAvailableMoveException(Color);
-            int elemIndex = MakeMoveGpu(currentBoard.Size, Color == PieceColor.White ? 0 : 1, currentBoard.GetBoardArray(), GetPossibleMovesArray(allPossibleMoves));
+            int elemIndex = MakeMoveGpu((char)currentBoard.Size, Color == PieceColor.White ? 0 : 1, currentBoard.GetBoardArray(), GetPossibleMovesArray(allPossibleMoves));
             return allPossibleMoves[elemIndex];
         }
 
-        public int[] GetPossibleMovesArray(List<Move> allPossibleMoves)
+        public char[] GetPossibleMovesArray(List<Move> allPossibleMoves)
         {
-            List<int> possibleMoves = new List<int>();
-            possibleMoves.Add(allPossibleMoves.Count);
+            List<char> possibleMoves = new List<char>();
+            possibleMoves.Add((char)allPossibleMoves.Count);
             foreach (var move in allPossibleMoves)
             {
-                possibleMoves.Add(move.BeatedPieces?.Count ?? 0);
+                possibleMoves.Add(move.BeatedPieces?.Count == null ? (char)0 : (char)move.BeatedPieces?.Count);
                 for (int i = 0; i != (move.BeatedPieces?.Count ?? 0); i++)
                 {
-                    possibleMoves.Add(move.BeatedPieces[i].Position);
+                    possibleMoves.Add((char)move.BeatedPieces[i].Position);
                 }
-                possibleMoves.Add(move.OldPiece.Position);
-                possibleMoves.Add(move.NewPiece.Position);
+                possibleMoves.Add((char)move.OldPiece.Position);
+                possibleMoves.Add((char)move.NewPiece.Position);
             }
             return possibleMoves.ToArray();
         }

@@ -6,12 +6,12 @@
 class Move
 {
 public:
-	int beated_pieces_count;
-	int beated_pieces[10];
-	int old_position;
-	int new_position;
+	char beated_pieces_count;
+	char beated_pieces[10];
+	char old_position;
+	char new_position;
 
 	__device__ __host__ Move();
-	__device__ __host__ Move(int oldPosition, int newPosition, int beatedPiecesCount, int *beatedPieces);
+	__device__ __host__ Move(char oldPosition, char newPosition, char beatedPiecesCount, char *beatedPieces);
 	__device__ __host__ ~Move();
 };

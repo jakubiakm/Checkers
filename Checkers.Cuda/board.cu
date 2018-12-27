@@ -4,7 +4,7 @@
 
 #include "Board.cuh"
 
-__device__ __host__ Board::Board(int size, int* _pieces, Player player) : size(size), player(player)
+__device__ __host__ Board::Board(char size, char* _pieces, Player player) : size(size), player(player)
 {
 	for (int i = 0; i != size * size; i++)
 	{
@@ -25,8 +25,9 @@ __device__ __host__ Board::~Board()
 
 __device__ __host__ Move* Board::GetPossibleMovesGpu(int &moves_count)
 {
-	Move moves[1];
-	moves[0] = Move(0, 0, 0, 0);
+	static Move moves[10000];
+	for(int i = 0; i != 10000; i++)
+	moves[i] = Move(0, 0, 0, 0);
 	return moves;
 }
 
@@ -39,14 +40,15 @@ __device__ __host__ Move* Board::GetPossibleMoves(int &moves_count)
 		*kings_moves,
 		*pawns_moves;
 	int
-		pawn_positions[25],
-		king_positions[25],
 		pawn_ind = 0,
 		king_ind = 0,
 		pawns_moves_count = 0,
 		kings_moves_count = 0,
 		maximal_beat_count = 0,
 		temp_size = 0;
+	char
+		pawn_positions[25],
+		king_positions[25];
 	for (int i = 0; i != Board::size * Board::size; i++)
 	{
 		if (Board::player == Player::BLACK)
@@ -109,7 +111,7 @@ __device__ __host__ Move* Board::GetPossibleMoves(int &moves_count)
 
 __device__ __host__ Board Board::GetBoardAfterMove(Move move)
 {
-	int _pieces[100];
+	char _pieces[100];
 	for (int i = 0; i != size * size; i++)
 	{
 		_pieces[i] = pieces[i];
@@ -132,10 +134,10 @@ __device__ __host__ Board Board::GetBoardAfterMove(Move move)
 	return Board(size, _pieces, player == Player::WHITE ? Player::BLACK : Player::WHITE);
 }
 
-__device__ __host__ Move* Board::GetPawnPossibleMoves(int position, int &moves_count)
+__device__ __host__ Move* Board::GetPawnPossibleMoves(char position, int &moves_count)
 {
 	Move possible_moves[100];
-	int
+	char
 		piece_row = Board::PositionToRow(position),
 		piece_column = Board::PositionToColumn(position);
 	switch (Board::player)
@@ -157,35 +159,35 @@ __device__ __host__ Move* Board::GetPawnPossibleMoves(int position, int &moves_c
 	//próba bicia w czterech ró¿nych kierunkach
 	if (Board::CanBeatPiece(piece_row, piece_column, piece_row - 1, piece_column - 1, position))
 	{
-		int beated_pieces[1];
+		char beated_pieces[1];
 		beated_pieces[0] = Board::ToPosition(piece_row - 1, piece_column - 1);
 		Board::GetAllBeatMoves(piece_row, piece_column, beated_pieces, 1, piece_row, piece_column, piece_row - 2, piece_column - 2, possible_moves, moves_count);
 	}
 	if (Board::CanBeatPiece(piece_row, piece_column, piece_row + 1, piece_column - 1, position))
 	{
-		int beated_pieces[1];
+		char beated_pieces[1];
 		beated_pieces[0] = Board::ToPosition(piece_row + 1, piece_column - 1);
 		Board::GetAllBeatMoves(piece_row, piece_column, beated_pieces, 1, piece_row, piece_column, piece_row + 2, piece_column - 2, possible_moves, moves_count);
 	}
 	if (Board::CanBeatPiece(piece_row, piece_column, piece_row - 1, piece_column + 1, position))
 	{
-		int beated_pieces[1];
+		char beated_pieces[1];
 		beated_pieces[0] = Board::ToPosition(piece_row - 1, piece_column + 1);
 		Board::GetAllBeatMoves(piece_row, piece_column, beated_pieces, 1, piece_row, piece_column, piece_row - 2, piece_column + 2, possible_moves, moves_count);
 	}
 	if (Board::CanBeatPiece(piece_row, piece_column, piece_row + 1, piece_column + 1, position))
 	{
-		int beated_pieces[1];
+		char beated_pieces[1];
 		beated_pieces[0] = Board::ToPosition(piece_row + 1, piece_column + 1);
 		Board::GetAllBeatMoves(piece_row, piece_column, beated_pieces, 1, piece_row, piece_column, piece_row + 2, piece_column + 2, possible_moves, moves_count);
 	}
 	return possible_moves;
 }
 
-__device__ __host__ Move* Board::GetKingPossibleMoves(int position, int &moves_count)
+__device__ __host__ Move* Board::GetKingPossibleMoves(char position, int &moves_count)
 {
 	Move possible_moves[200];
-	int
+	char
 		piece_row = Board::PositionToRow(position),
 		piece_column = Board::PositionToColumn(position);
 
@@ -223,7 +225,7 @@ __device__ __host__ Move* Board::GetKingPossibleMoves(int position, int &moves_c
 	for (int ind = 1; ind < Board::size; ind++)
 		if (Board::CanBeatPiece(piece_row, piece_column, piece_row - ind, piece_column - ind, position))
 		{
-			int beated_pieces[1];
+			char beated_pieces[1];
 			beated_pieces[0] = Board::ToPosition(piece_row - ind, piece_column - ind);
 			Board::GetAllKingBeatMoves(piece_row, piece_column, beated_pieces, 1, piece_row, piece_column, piece_row - ind - 1, piece_column - ind - 1, possible_moves, ind);
 		}
@@ -235,7 +237,7 @@ __device__ __host__ Move* Board::GetKingPossibleMoves(int position, int &moves_c
 	for (int ind = 1; ind < Board::size; ind++)
 		if (Board::CanBeatPiece(piece_row, piece_column, piece_row - ind, piece_column + ind, position))
 		{
-			int beated_pieces[1];
+			char beated_pieces[1];
 			beated_pieces[0] = Board::ToPosition(piece_row - ind, piece_column + ind);
 			Board::GetAllKingBeatMoves(piece_row, piece_column, beated_pieces, 1, piece_row, piece_column, piece_row - ind - 1, piece_column + ind + 1, possible_moves, ind);
 		}
@@ -247,7 +249,7 @@ __device__ __host__ Move* Board::GetKingPossibleMoves(int position, int &moves_c
 	for (int ind = 1; ind < Board::size; ind++)
 		if (Board::CanBeatPiece(piece_row, piece_column, piece_row + ind, piece_column - ind, position))
 		{
-			int beated_pieces[1];
+			char beated_pieces[1];
 			beated_pieces[0] = Board::ToPosition(piece_row + ind, piece_column - ind);
 			Board::GetAllKingBeatMoves(piece_row, piece_column, beated_pieces, 1, piece_row, piece_column, piece_row + ind + 1, piece_column - ind - 1, possible_moves, ind);
 		}
@@ -259,7 +261,7 @@ __device__ __host__ Move* Board::GetKingPossibleMoves(int position, int &moves_c
 	for (int ind = 1; ind < Board::size; ind++)
 		if (Board::CanBeatPiece(piece_row, piece_column, piece_row + ind, piece_column + ind, position))
 		{
-			int beated_pieces[1];
+			char beated_pieces[1];
 			beated_pieces[0] = Board::ToPosition(piece_row + ind, piece_column + ind);
 			Board::GetAllKingBeatMoves(piece_row, piece_column, beated_pieces, 1, piece_row, piece_column, piece_row + ind + 1, piece_column + ind + 1, possible_moves, ind);
 		}
@@ -271,12 +273,12 @@ __device__ __host__ Move* Board::GetKingPossibleMoves(int position, int &moves_c
 	return possible_moves;
 }
 
-__device__ __host__ void Board::GetAllBeatMoves(int piece_row, int piece_column, int *beated_pieces, int beated_pieces_length, int source_row, int source_column, int target_row, int target_column, Move* all_moves, int& all_moves_length)
+__device__ __host__ void Board::GetAllBeatMoves(char piece_row, char piece_column, char *beated_pieces, char beated_pieces_length, char source_row, char source_column, char target_row, char target_column, Move* all_moves, int& all_moves_length)
 {
 	all_moves[all_moves_length++] = Move(Board::ToPosition(piece_row, piece_column), Board::ToPosition(target_row, target_column), beated_pieces_length, beated_pieces);
 	if (Board::CanBeatPiece(target_row, target_column, target_row - 1, target_column - 1, Board::ToPosition(piece_row, piece_column)))
 	{
-		int beated_piece_position = Board::ToPosition(target_row - 1, target_column - 1);
+		char beated_piece_position = Board::ToPosition(target_row - 1, target_column - 1);
 		bool flag = true;
 		for (int i = 0; i != beated_pieces_length; i++)
 		{
@@ -287,7 +289,7 @@ __device__ __host__ void Board::GetAllBeatMoves(int piece_row, int piece_column,
 		}
 		if (flag)
 		{
-			int new_beated_pieces[10];
+			char new_beated_pieces[10];
 			for (int i = 0; i != beated_pieces_length; i++)
 			{
 				new_beated_pieces[i] = beated_pieces[i];
@@ -309,7 +311,7 @@ __device__ __host__ void Board::GetAllBeatMoves(int piece_row, int piece_column,
 		}
 		if (flag)
 		{
-			int new_beated_pieces[10];
+			char new_beated_pieces[10];
 			for (int i = 0; i != beated_pieces_length; i++)
 			{
 				new_beated_pieces[i] = beated_pieces[i];
@@ -331,7 +333,7 @@ __device__ __host__ void Board::GetAllBeatMoves(int piece_row, int piece_column,
 		}
 		if (flag)
 		{
-			int new_beated_pieces[10];
+			char new_beated_pieces[10];
 			for (int i = 0; i != beated_pieces_length; i++)
 			{
 				new_beated_pieces[i] = beated_pieces[i];
@@ -353,7 +355,7 @@ __device__ __host__ void Board::GetAllBeatMoves(int piece_row, int piece_column,
 		}
 		if (flag)
 		{
-			int new_beated_pieces[10];
+			char new_beated_pieces[10];
 			for (int i = 0; i != beated_pieces_length; i++)
 			{
 				new_beated_pieces[i] = beated_pieces[i];
@@ -364,7 +366,7 @@ __device__ __host__ void Board::GetAllBeatMoves(int piece_row, int piece_column,
 	}
 }
 
-__device__ __host__ void Board::GetAllKingBeatMoves(int piece_row, int piece_column, int *beated_pieces, int beated_pieces_length, int source_row, int source_column, int target_row, int target_column, Move* all_moves, int& all_moves_length)
+__device__ __host__ void Board::GetAllKingBeatMoves(char piece_row, char piece_column, char *beated_pieces, char beated_pieces_length, char source_row, char source_column, char target_row, char target_column, Move* all_moves, int& all_moves_length)
 {
 	all_moves[all_moves_length++] = Move(Board::ToPosition(piece_row, piece_column), Board::ToPosition(target_row, target_column), beated_pieces_length, beated_pieces);
 	for (int ind = 1; ind < Board::size; ind++)
@@ -372,7 +374,7 @@ __device__ __host__ void Board::GetAllKingBeatMoves(int piece_row, int piece_col
 		if (target_row - source_row > 0 && target_column - source_column > 0)
 			if (Board::CanMoveToPosition(target_row + ind, target_column + ind, Board::ToPosition(piece_row, piece_column)))
 			{
-				int new_beated_pieces[10];
+				char new_beated_pieces[10];
 				for (int i = 0; i != beated_pieces_length; i++)
 				{
 					new_beated_pieces[i] = beated_pieces[i];
@@ -384,7 +386,7 @@ __device__ __host__ void Board::GetAllKingBeatMoves(int piece_row, int piece_col
 		if (target_row - source_row > 0 && target_column - source_column < 0)
 			if (Board::CanMoveToPosition(target_row + ind, target_column - ind, Board::ToPosition(piece_row, piece_column)))
 			{
-				int new_beated_pieces[10];
+				char new_beated_pieces[10];
 				for (int i = 0; i != beated_pieces_length; i++)
 				{
 					new_beated_pieces[i] = beated_pieces[i];
@@ -396,7 +398,7 @@ __device__ __host__ void Board::GetAllKingBeatMoves(int piece_row, int piece_col
 		if (target_row - source_row < 0 && target_column - source_column > 0)
 			if (Board::CanMoveToPosition(target_row - ind, target_column + ind, Board::ToPosition(piece_row, piece_column)))
 			{
-				int new_beated_pieces[10];
+				char new_beated_pieces[10];
 				for (int i = 0; i != beated_pieces_length; i++)
 				{
 					new_beated_pieces[i] = beated_pieces[i];
@@ -408,7 +410,7 @@ __device__ __host__ void Board::GetAllKingBeatMoves(int piece_row, int piece_col
 		if (target_row - source_row < 0 && target_column - source_column < 0)
 			if (Board::CanMoveToPosition(target_row - ind, target_column - ind, Board::ToPosition(piece_row, piece_column)))
 			{
-				int new_beated_pieces[10];
+				char new_beated_pieces[10];
 				for (int i = 0; i != beated_pieces_length; i++)
 				{
 					new_beated_pieces[i] = beated_pieces[i];
@@ -422,7 +424,7 @@ __device__ __host__ void Board::GetAllKingBeatMoves(int piece_row, int piece_col
 		for (int ind = 1; ind < Board::size; ind++)
 			if (Board::CanBeatPiece(target_row, target_column, target_row - ind, target_column - ind, Board::ToPosition(piece_row, piece_column)))
 			{
-				int beated_piece_position = Board::ToPosition(target_row - ind, target_column - ind);
+				char beated_piece_position = Board::ToPosition(target_row - ind, target_column - ind);
 				bool flag = true;
 				for (int i = 0; i != beated_pieces_length; i++)
 				{
@@ -433,7 +435,7 @@ __device__ __host__ void Board::GetAllKingBeatMoves(int piece_row, int piece_col
 				}
 				if (flag)
 				{
-					int new_beated_pieces[10];
+					char new_beated_pieces[10];
 					for (int i = 0; i != beated_pieces_length; i++)
 					{
 						new_beated_pieces[i] = beated_pieces[i];
@@ -453,7 +455,7 @@ __device__ __host__ void Board::GetAllKingBeatMoves(int piece_row, int piece_col
 		for (int ind = 1; ind < Board::size; ind++)
 			if (Board::CanBeatPiece(target_row, target_column, target_row + ind, target_column - ind, Board::ToPosition(piece_row, piece_column)))
 			{
-				int beated_piece_position = Board::ToPosition(target_row + ind, target_column - ind);
+				char beated_piece_position = Board::ToPosition(target_row + ind, target_column - ind);
 				bool flag = true;
 				for (int i = 0; i != beated_pieces_length; i++)
 				{
@@ -464,7 +466,7 @@ __device__ __host__ void Board::GetAllKingBeatMoves(int piece_row, int piece_col
 				}
 				if (flag)
 				{
-					int new_beated_pieces[10];
+					char new_beated_pieces[10];
 					for (int i = 0; i != beated_pieces_length; i++)
 					{
 						new_beated_pieces[i] = beated_pieces[i];
@@ -484,7 +486,7 @@ __device__ __host__ void Board::GetAllKingBeatMoves(int piece_row, int piece_col
 		for (int ind = 1; ind < Board::size; ind++)
 			if (Board::CanBeatPiece(target_row, target_column, target_row - ind, target_column + ind, Board::ToPosition(piece_row, piece_column)))
 			{
-				int beated_piece_position = Board::ToPosition(target_row - ind, target_column + ind);
+				char beated_piece_position = Board::ToPosition(target_row - ind, target_column + ind);
 				bool flag = true;
 				for (int i = 0; i != beated_pieces_length; i++)
 				{
@@ -495,7 +497,7 @@ __device__ __host__ void Board::GetAllKingBeatMoves(int piece_row, int piece_col
 				}
 				if (flag)
 				{
-					int new_beated_pieces[10];
+					char new_beated_pieces[10];
 					for (int i = 0; i != beated_pieces_length; i++)
 					{
 						new_beated_pieces[i] = beated_pieces[i];
@@ -515,7 +517,7 @@ __device__ __host__ void Board::GetAllKingBeatMoves(int piece_row, int piece_col
 		for (int ind = 1; ind < Board::size; ind++)
 			if (CanBeatPiece(target_row, target_column, target_row + ind, target_column + ind, Board::ToPosition(piece_row, piece_column)))
 			{
-				int beated_piece_position = Board::ToPosition(target_row + ind, target_column + ind);
+				char beated_piece_position = Board::ToPosition(target_row + ind, target_column + ind);
 				bool flag = true;
 				for (int i = 0; i != beated_pieces_length; i++)
 				{
@@ -526,7 +528,7 @@ __device__ __host__ void Board::GetAllKingBeatMoves(int piece_row, int piece_col
 				}
 				if (flag)
 				{
-					int new_beated_pieces[10];
+					char new_beated_pieces[10];
 					for (int i = 0; i != beated_pieces_length; i++)
 					{
 						new_beated_pieces[i] = beated_pieces[i];
@@ -544,7 +546,7 @@ __device__ __host__ void Board::GetAllKingBeatMoves(int piece_row, int piece_col
 			}
 }
 
-__device__ __host__ bool Board::CanMoveToPosition(int position_row, int position_column, int source_move_position)
+__device__ __host__ bool Board::CanMoveToPosition(char position_row, char position_column, char source_move_position)
 {
 	int position = Board::ToPosition(position_row, position_column);
 	return
@@ -558,9 +560,9 @@ __device__ __host__ bool Board::CanMoveToPosition(int position_row, int position
 			);
 }
 
-__device__ __host__ bool Board::CanBeatPiece(int position_row, int position_column, int target_piece_position_row, int target_piece_position_column, int source_move_position)
+__device__ __host__ bool Board::CanBeatPiece(char position_row, char position_column, char target_piece_position_row, char target_piece_position_column, char source_move_position)
 {
-	int
+	char
 		target_piece_position = ToPosition(target_piece_position_row, target_piece_position_column),
 		row_after_beat = target_piece_position_row + (target_piece_position_row - position_row > 0 ? 1 : -1),
 		column_after_beat = target_piece_position_column + (target_piece_position_column - position_column > 0 ? 1 : -1);
@@ -595,19 +597,19 @@ __device__ __host__ bool Board::CanBeatPiece(int position_row, int position_colu
 			) && CanMoveToPosition(row_after_beat, column_after_beat, source_move_position);
 }
 
-__device__ __host__ int Board::PositionToColumn(int position)
+__device__ __host__ char Board::PositionToColumn(char position)
 {
 	int div = size / 2;
 	return 2 * ((position - 1) % div) + (Board::PositionToRow(position) % 2 == 1 ? 1 : 0);
 }
 
-__device__ __host__ int Board::PositionToRow(int position)
+__device__ __host__ char Board::PositionToRow(char position)
 {
 	int div = Board::size / 2;
 	return Board::size - 1 - (position - 1) / div;
 }
 
-__device__ __host__ int Board::ToPosition(int row, int column)
+__device__ __host__ char Board::ToPosition(char row, char column)
 {
 	if ((column % 2 == 0 && row % 2 == 1) || (row % 2 == 0 && column % 2 == 1))
 		return -1;
@@ -647,7 +649,7 @@ __device__ __host__ Player Board::Rollout()
 
 __device__ __host__ bool Board::IsGameFinished()
 {
-	int player_pieces = 0;
+	char player_pieces = 0;
 	for (int i = 0; i != Board::size * Board::size; i++)
 	{
 		if (pieces[i] == 1 || pieces[i] == 2)
