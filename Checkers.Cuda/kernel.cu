@@ -23,7 +23,7 @@ inline void GpuAssert(cudaError_t code, const char *file, int line, bool abort =
 	}
 }
 
-__global__ void RolloutGames(Board* rollout_boards, int* results, int size)
+__global__ void RolloutKernel(Board* rollout_boards, int* results, Move* possible_moves_device, int size)
 {
 	const long numThreads = blockDim.x * gridDim.x;
 	const long threadID = blockIdx.x * blockDim.x + threadIdx.x;
@@ -33,7 +33,7 @@ __global__ void RolloutGames(Board* rollout_boards, int* results, int size)
 	{
 		Board current_board = rollout_boards[ind];
 
-		Player player = current_board.RolloutGpu();
+		Player player = current_board.RolloutGpu(possible_moves_device, ind);
 		results[ind] = player == Player::BLACK ? 1 : 0;
 	}
 }
@@ -84,8 +84,8 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 	int
 		number_of_mcts_iterations = 25,										//liczba iteracji wykonana przez algorytm MCTS
 		possible_moves_count = possible_moves[0],							//liczba mo¿liwych ruchów spoœród których wybierany jest najlepszy
-		block_size = 20,													//rozmiar gridu z którego gpu ma korzystaæ
-		grid_size = 20,														//rozmiar bloku z którego gpu ma korzystaæ 
+		block_size = 50,													//rozmiar gridu z którego gpu ma korzystaæ
+		grid_size = 50,														//rozmiar bloku z którego gpu ma korzystaæ 
 		*results_d,															//wskaŸnik na pamiêæ w GPU przechowuj¹cy wyniki symulacji w danej iteracji
 		*results;															//wskaŸnik na pamiêæ w CPU przechowuj¹cy wyniki symulacji w danej iteracji
 	Board
@@ -127,34 +127,35 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 		}
 		CUDA_CALL(cudaMalloc((void**)&boards_d, rollout_vector.size() * sizeof(Board)));
 		CUDA_CALL(cudaMalloc((void**)&results_d, rollout_vector.size() * sizeof(int)));
-		CUDA_CALL(cudaMalloc((void**)&possible_moves_d, rollout_vector.size() * sizeof(Move) * 300));
+		CUDA_CALL(cudaMalloc((void**)&possible_moves_d, rollout_vector.size() * sizeof(Move) * 1000));
 		CUDA_CALL(cudaMemset(boards_d, 0, rollout_vector.size() * sizeof(int)));
 		CUDA_CALL(cudaMemcpy(boards_d, boards_to_rollout, rollout_vector.size() * sizeof(Board), cudaMemcpyHostToDevice));
 
 		//alokalcja dynamicznych tablic w klasach
-		for (int i = 0; i < rollout_vector.size(); i++)
-		{
-			int* hostData;
-			CUDA_CALL(cudaMalloc((void**)&hostData, sizeof(int) * boards_to_rollout[i].size));
-			CUDA_CALL(cudaMemcpy(hostData, boards_to_rollout[i].pieces, sizeof(int) * boards_to_rollout[i].size, cudaMemcpyHostToDevice));
-			CUDA_CALL(cudaMemcpy(&(boards_d[i].pieces), &hostData, sizeof(int*), cudaMemcpyHostToDevice));
-		}
+		//for (int i = 0; i < rollout_vector.size(); i++)
+		//{
+		//	int* hostData;
+		//	CUDA_CALL(cudaMalloc((void**)&hostData, sizeof(int) * boards_to_rollout[i].size));
+		//	CUDA_CALL(cudaMemcpy(hostData, boards_to_rollout[i].pieces, sizeof(int) * boards_to_rollout[i].size, cudaMemcpyHostToDevice));
+		//	CUDA_CALL(cudaMemcpy(&(boards_d[i].pieces), &hostData, sizeof(int*), cudaMemcpyHostToDevice));
+		//}
 		cudaDeviceProp prop;
 
 		CUDA_CALL(cudaGetDeviceProperties(&prop, 0));
-		CUDA_CALL(cudaDeviceSetLimit(cudaLimitStackSize, 4096));
-		RolloutGames << <block_size, grid_size>> > (boards_d, results_d, rollout_vector.size());
+		CUDA_CALL(cudaDeviceSetLimit(cudaLimitStackSize, 16000));
+		RolloutKernel << <block_size, grid_size>> > (boards_d, results_d, possible_moves_d, rollout_vector.size());
 		
 		CUDA_CALL(cudaDeviceSynchronize());
 		CUDA_CALL(cudaGetLastError());
 		CUDA_CALL(cudaMemcpy(results, results_d, sizeof(int) * rollout_vector.size(), cudaMemcpyDeviceToHost));
 		CUDA_CALL(cudaFree(boards_d));
 		CUDA_CALL(cudaFree(results_d));
+		CUDA_CALL(cudaFree(possible_moves_d));
 		mcts_algorithm.BackpropagateResults(rollout_vector, results);
-		for (int i = 0; i != rollout_vector.size(); i++)
-		{
-			Player player = rollout_vector[i]->board.RolloutCpu();
-		}
+		//for (int i = 0; i != rollout_vector.size(); i++)
+		//{
+		//	Player player = rollout_vector[i]->board.RolloutCpu();
+		//}
 		delete[] results;
 		delete[] boards_to_rollout;
 	}
