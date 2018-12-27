@@ -22,7 +22,6 @@ public:
 	__device__ __host__ Board();
 	__device__ __host__ ~Board();
 	__device__ __host__ Move* GetPossibleMoves(int &moves_count);
-	__device__ __host__ Move* GetPossibleMovesGpu(int &moves_count);
 	__device__ __host__ Board GetBoardAfterMove(Move move);
 	__device__ __host__ Player Rollout();
 private:
