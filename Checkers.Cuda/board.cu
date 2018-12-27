@@ -115,7 +115,7 @@ __device__ __host__ Move* Board::GetPossibleMoves(int &moves_count)
 
 __device__ __host__ Board Board::GetBoardAfterMove(Move move)
 {
-	char _pieces[100];
+	char *_pieces = new char[100];
 	for (int i = 0; i != size * size; i++)
 	{
 		_pieces[i] = pieces[i];

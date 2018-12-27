@@ -137,16 +137,16 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 			CUDA_CALL(cudaMemcpy(&(boards_d[i].pieces), &hostData, sizeof(int*), cudaMemcpyHostToDevice));
 		}
 
-		RolloutGames << <1, 1>> > (boards_d, results_d, rollout_vector.size());
+		size_t size;
+		CUDA_CALL(cudaDeviceGetLimit(&size, cudaLimitStackSize));
+		CUDA_CALL(cudaDeviceSetLimit(cudaLimitStackSize, 4096));
+		RolloutGames << <4, 256>> > (boards_d, results_d, rollout_vector.size());
+		
 		CUDA_CALL(cudaDeviceSynchronize());
 		CUDA_CALL(cudaGetLastError());
 		CUDA_CALL(cudaMemcpy(results, results_d, sizeof(int) * rollout_vector.size(), cudaMemcpyDeviceToHost));
 		CUDA_CALL(cudaFree(boards_d));
 		CUDA_CALL(cudaFree(results_d));
-		for (int i = 0; i != rollout_vector.size(); i++)
-		{
-			Player player = rollout_vector[i]->board.Rollout();
-		}
 		mcts_algorithm.BackpropagateResults(rollout_vector, results);
 
 		delete[] results;
