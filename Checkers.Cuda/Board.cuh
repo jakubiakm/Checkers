@@ -15,7 +15,7 @@ class Board
 {
 public:
 	char size;
-	char pieces[100];
+	char *pieces;
 	Player player;
 
 	__device__ __host__ Board(char size, char* _pieces, Player player);

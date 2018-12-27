@@ -28,26 +28,24 @@ __global__ void RolloutGames(Board* rollout_boards, int* results, int size)
 	const long numThreads = blockDim.x * gridDim.x;
 	const long threadID = blockIdx.x * blockDim.x + threadIdx.x;
 
+
 	for (long long ind = threadID; ind < size; ind += numThreads)
 	{
 		Board current_board = rollout_boards[ind];
-		int i = 0;
-		Move *m = current_board.GetPossibleMovesGpu(i);
-		if (m[1000].beated_pieces_count == 0)
-			results[0] = 1;
-		//Player player = current_board.Rollout();
-		//results[ind] = player == Player::BLACK ? 1 : 0;
+
+		Player player = current_board.Rollout();
+		results[ind] = player == Player::BLACK ? 1 : 0;
 	}
 }
 
 __host__ Move* GetPossibleMovesFromInputParameters(int number_of_moves, char* possible_moves_array)
 {
-	Move moves_to_fill[100];
+	Move *moves_to_fill = new Move[100];
 	int ind = 1;
 	for (int i = 0; i != number_of_moves; i++)
 	{
 		char beated_pieces_count = possible_moves_array[ind++];
-		char beated_pieces[100];
+		char *beated_pieces = new char[10];
 		for (int j = 0; j != beated_pieces_count; j++)
 		{
 			beated_pieces[j] = possible_moves_array[ind++];
@@ -94,16 +92,17 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 		start_board = Board(board_size, board, player),						//pocz¹tkowy stan planszy
 		*boards_d,															//wskaŸnik na pamiêæ w GPU przechowuj¹cy plansze do symulacji
 		*boards_to_rollout;													//wskaŸnik na pamiêæ w CPU przechowuj¹cy plansze do symulacji
-	Move*
-		moves_pointer,														//lista mo¿liwych do wykonania ruchów
-		moves[100];
+	Move* moves;															//lista mo¿liwych do wykonania ruchów
 	std::vector<MctsNode*> rollout_vector;									//wektor przechowuj¹cy elementy, dla których powinna zostaæ wykonana symulacja dla GPU
 	Mcts mcts_algorithm = Mcts();											//algorytm wybieraj¹cy optymalny ruch
 
-	moves_pointer = GetPossibleMovesFromInputParameters(possible_moves_count, possible_moves);
-	for (int i = 0; i != 100; i++)
-		moves[i] = moves_pointer[i];
+	moves = GetPossibleMovesFromInputParameters(possible_moves_count, possible_moves);
+
 	mcts_algorithm.GenerateRoot(start_board, possible_moves_count, moves);
+	for (int i = 0; i != possible_moves_count; i++)
+		if (moves[i].beated_pieces_count > 0)
+			delete[] moves[i].beated_pieces;
+	delete[] moves;
 
 	while (number_of_mcts_iterations--)
 	{

@@ -7,7 +7,7 @@ class Move
 {
 public:
 	char beated_pieces_count;
-	char beated_pieces[10];
+	char* beated_pieces;
 	char old_position;
 	char new_position;
 
