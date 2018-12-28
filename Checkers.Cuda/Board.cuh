@@ -2,6 +2,8 @@
 
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
+#include <curand.h>
+#include <curand_kernel.h>
 
 #include "move.cuh"
 
@@ -25,7 +27,7 @@ public:
 	__device__ void GetPossibleMovesGpu(int &moves_count, Move *all_moves_device, int thread_id);
 	__device__ __host__ Board GetBoardAfterMove(Move move);
 	__host__ Player RolloutCpu();
-	__device__ Player RolloutGpu(Move *all_moves_device, int thread_id);
+	__device__ Player RolloutGpu(curandState *state, Move *all_moves_device, int thread_id);
 private:
 	__host__ Move* GetPawnPossibleMovesCpu(char position, int &moves_count);
 	__host__ Move* GetKingPossibleMovesCpu(char position, int &moves_count);
@@ -41,4 +43,5 @@ private:
 	__device__ __host__ char PositionToColumn(char position);
 	__device__ __host__ char ToPosition(char row, char column);
 	__device__ __host__ bool IsGameFinished();
+	__device__ int GenerateRandomInt(curandState *state, int min, int max);
 };

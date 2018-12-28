@@ -67,13 +67,13 @@ __host__ MctsNode* Mcts::SelectNode(MctsNode *parent)
 	}
 }
 
-void Mcts::BackpropagateSimulations(MctsNode *leaf)
+void Mcts::BackpropagateSimulations(MctsNode *leaf, int duplication_count)
 {
 	number_of_total_simulations++;
 	leaf->visited_in_current_iteration = true;
 	while (leaf != 0)
 	{
-		leaf->simulations_count++;
+		leaf->simulations_count += duplication_count;
 		leaf = leaf->parent;
 	}
 }

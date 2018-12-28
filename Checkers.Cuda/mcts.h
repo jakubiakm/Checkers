@@ -10,7 +10,7 @@ public:
 	Mcts();
 	void GenerateRoot(Board startBoard, int movesCount, Move* possibleMoves);
 	MctsNode* SelectNode(MctsNode *parent);
-	void BackpropagateSimulations(MctsNode *leaf);
+	void BackpropagateSimulations(MctsNode *leaf, int duplication_count);
 	void BackpropagateResults(std::vector<MctsNode*> vector, int *results);
 	int GetBestMove();
 private:
