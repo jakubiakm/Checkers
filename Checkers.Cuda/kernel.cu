@@ -90,13 +90,13 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 {
 	Player player = current_player == 0 ? Player::WHITE : Player::BLACK;	//gracz dla którego wybierany jest optymalny ruch
 	int
-		number_of_mcts_iterations = 50,										//liczba iteracji wykonana przez algorytm MCTS
+		number_of_mcts_iterations = 10,										//liczba iteracji wykonana przez algorytm MCTS
 		possible_moves_count = possible_moves[0],							//liczba mo¿liwych ruchów spoœród których wybierany jest najlepszy
-		block_size = 225,													//rozmiar gridu z którego gpu ma korzystaæ
-		grid_size = 225,														//rozmiar bloku z którego gpu ma korzystaæ 
+		block_size = 3,														//rozmiar gridu z którego gpu ma korzystaæ
+		grid_size = 500,													//rozmiar bloku z którego gpu ma korzystaæ 
 		*results_d,															//wskaŸnik na pamiêæ w GPU przechowuj¹cy wyniki symulacji w danej iteracji
 		*results,															//wskaŸnik na pamiêæ w CPU przechowuj¹cy wyniki symulacji w danej iteracji
-		duplication_count = 1;												//parametr okreœlaj¹cy ile liœci duplikowaæ przy symulacji GPU
+		duplication_count = 10000;												//parametr okreœlaj¹cy ile liœci duplikowaæ przy symulacji GPU
 
 	Board
 		start_board = Board(board_size, board, player),						//pocz¹tkowy stan planszy
@@ -110,14 +110,20 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 	Mcts mcts_algorithm = Mcts();											//algorytm wybieraj¹cy optymalny ruch
 
 	moves = GetPossibleMovesFromInputParameters(possible_moves_count, possible_moves);
-
+	if (possible_moves_count == 1)
+	{
+		return 0;
+	}
 	mcts_algorithm.GenerateRoot(start_board, possible_moves_count, moves);
 
 	delete[] moves;
 
 	CUDA_CALL(cudaSetDevice(0));
 	CUDA_CALL(cudaDeviceReset());
-	CUDA_CALL(cudaMalloc(&state_d, block_size * grid_size * sizeof(curandState)));
+	CUDA_CALL(cudaMalloc(&state_d, block_size * grid_size * sizeof(curandState)));		
+	CUDA_CALL(cudaMalloc((void**)&boards_d, block_size * grid_size * sizeof(Board)));
+	CUDA_CALL(cudaMalloc((void**)&results_d, block_size * grid_size * sizeof(int)));
+	CUDA_CALL(cudaMalloc((void**)&possible_moves_d, block_size * grid_size * sizeof(Move) * 1000));
 	SetupCurandKernel << <block_size, grid_size >> > (state_d);
 
 	while (number_of_mcts_iterations--)
@@ -130,7 +136,8 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 				break;
 			mcts_algorithm.BackpropagateSimulations(node, duplication_count);
 			for (int j = 0; j != duplication_count; j++)
-				rollout_vector.push_back(node);
+				if (rollout_vector.size() < block_size * grid_size)
+					rollout_vector.push_back(node);
 		}
 
 		results = new int[rollout_vector.size()];
@@ -140,9 +147,7 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 		{
 			boards_to_rollout[i] = rollout_vector[i]->board;
 		}
-		CUDA_CALL(cudaMalloc((void**)&boards_d, rollout_vector.size() * sizeof(Board)));
-		CUDA_CALL(cudaMalloc((void**)&results_d, rollout_vector.size() * sizeof(int)));
-		CUDA_CALL(cudaMalloc((void**)&possible_moves_d, rollout_vector.size() * sizeof(Move) * 1000));
+
 		CUDA_CALL(cudaMemset(boards_d, 0, rollout_vector.size() * sizeof(int)));
 		CUDA_CALL(cudaMemcpy(boards_d, boards_to_rollout, rollout_vector.size() * sizeof(Board), cudaMemcpyHostToDevice));
 
@@ -157,15 +162,13 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 		cudaDeviceProp prop;
 
 		CUDA_CALL(cudaGetDeviceProperties(&prop, 0));
-		CUDA_CALL(cudaDeviceSetLimit(cudaLimitStackSize, 32000));
+		CUDA_CALL(cudaDeviceSetLimit(cudaLimitStackSize, 8192));
 		RolloutKernel << <block_size, grid_size >> > (state_d, boards_d, results_d, possible_moves_d, rollout_vector.size());
 
 		CUDA_CALL(cudaDeviceSynchronize());
 		CUDA_CALL(cudaGetLastError());
 		CUDA_CALL(cudaMemcpy(results, results_d, sizeof(int) * rollout_vector.size(), cudaMemcpyDeviceToHost));
-		CUDA_CALL(cudaFree(boards_d));
-		CUDA_CALL(cudaFree(results_d));
-		CUDA_CALL(cudaFree(possible_moves_d));
+
 		mcts_algorithm.BackpropagateResults(rollout_vector, results);
 		//for (int i = 0; i != rollout_vector.size(); i++)
 		//{
@@ -174,6 +177,9 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 		delete[] results;
 		delete[] boards_to_rollout;
 	}
+	CUDA_CALL(cudaFree(boards_d));
+	CUDA_CALL(cudaFree(results_d));
+	CUDA_CALL(cudaFree(possible_moves_d));
 	CUDA_CALL(cudaFree(state_d));
 	CUDA_CALL(cudaDeviceReset());
 	int best_move = mcts_algorithm.GetBestMove();

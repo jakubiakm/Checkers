@@ -458,7 +458,36 @@ __host__ void Board::GetAllBeatMovesCpu(char piece_row, char piece_column, char 
 
 __host__ void Board::GetAllKingBeatMovesCpu(char piece_row, char piece_column, char *beated_pieces, char beated_pieces_length, char source_row, char source_column, char target_row, char target_column, Move* all_moves, int& all_moves_length)
 {
-	all_moves[all_moves_length++] = Move(Board::ToPosition(piece_row, piece_column), Board::ToPosition(target_row, target_column), beated_pieces_length, beated_pieces);
+	bool flag = false;
+	Move new_move = Move(Board::ToPosition(piece_row, piece_column), Board::ToPosition(target_row, target_column), beated_pieces_length, beated_pieces);
+	for (int i = 0; i != all_moves_length; i++)
+	{
+		if (
+			all_moves[i].new_position == new_move.new_position &&
+			all_moves[i].old_position == new_move.old_position &&
+			all_moves[i].beated_pieces_count == new_move.beated_pieces_count)
+		{
+			if (new_move.beated_pieces_count == 0)
+			{
+				flag = false;
+				break;
+			}
+			for (int j = 0; j != beated_pieces_length; j++)
+			{
+				if (all_moves[i].beated_pieces[j] == new_move.beated_pieces[j])
+				{
+					if (j + 1 == beated_pieces_length)
+					{
+						flag = false;
+					}
+				}
+				if (!flag)
+					break;
+			}
+		}
+	}
+	if (flag)
+		all_moves[all_moves_length++] = new_move;
 	for (int ind = 1; ind < Board::size; ind++)
 	{
 		if (target_row - source_row > 0 && target_column - source_column > 0)
@@ -773,7 +802,39 @@ __device__ void Board::GetKingPossibleMovesGpu(char position, int &moves_count, 
 
 __device__ void Board::GetAllBeatMovesGpu(char piece_row, char piece_column, char *beated_pieces, char beated_pieces_length, char source_row, char source_column, char target_row, char target_column, int& moves_count, Move *all_moves_device, int thread_id)
 {
-	all_moves_device[1000 * (thread_id + 1) - 1 - moves_count++] = Move(Board::ToPosition(piece_row, piece_column), Board::ToPosition(target_row, target_column), beated_pieces_length, beated_pieces);
+	//sprawdzanie czy ruch zosta³ ju¿ dodany
+	bool flag = true;
+	Move new_move = Move(Board::ToPosition(piece_row, piece_column), Board::ToPosition(target_row, target_column), beated_pieces_length, beated_pieces);
+	for (int i = 0; i != moves_count; i++)
+	{
+		if (
+			all_moves_device[1000 * (thread_id + 1) - 1 - i].new_position == new_move.new_position &&
+			all_moves_device[1000 * (thread_id + 1) - 1 - i].old_position == new_move.old_position &&
+			all_moves_device[1000 * (thread_id + 1) - 1 - i].beated_pieces_count == new_move.beated_pieces_count
+			)
+		{
+			if (new_move.beated_pieces_count == 0)
+			{
+				flag = false;
+				break;
+			}
+			for (int j = 0; j != beated_pieces_length; j++)
+			{
+				if (all_moves_device[1000 * (thread_id + 1) - 1 - i].beated_pieces[j] == new_move.beated_pieces[j])
+				{
+					if (j + 1 == beated_pieces_length)
+					{
+						flag = false;
+					}
+				}
+				if (!flag)
+					break;
+			}
+		}
+	}
+	if (flag)
+		all_moves_device[1000 * (thread_id + 1) - 1 - moves_count++] = new_move;
+
 	if (Board::CanBeatPiece(target_row, target_column, target_row - 1, target_column - 1, Board::ToPosition(piece_row, piece_column)))
 	{
 		char beated_piece_position = Board::ToPosition(target_row - 1, target_column - 1);
@@ -1194,7 +1255,6 @@ __device__ Player Board::RolloutGpu(curandState *state, Move *all_moves_device, 
 		move_ind += 1000 * thread_id;
 		Board new_board = current_board.GetBoardAfterMove(all_moves_device[move_ind]);
 		current_board = new_board;
-
 	}
 	for (int i = 0; i != Board::size * Board::size; i++)
 	{
