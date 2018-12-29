@@ -34,16 +34,15 @@ __global__ void SetupCurandKernel(curandState *state)
 
 __global__ void RolloutKernel(curandState *curand_state, Board* rollout_boards, int* results, Move* possible_moves_device, int size)
 {
+	__shared__ Move all_moves_s[1000];
 	const long numThreads = blockDim.x * gridDim.x;
 	const long threadID = blockIdx.x * blockDim.x + threadIdx.x;
 
-	for (long long ind = threadID; ind < size; ind += numThreads)
-	{
-		Board current_board = rollout_boards[ind];
+	Board current_board = rollout_boards[threadID];
 
-		Player player = current_board.RolloutGpu(&curand_state[ind], possible_moves_device, ind);
-		results[ind] = player == Player::BLACK ? 1 : 0;
-	}
+	Player player = current_board.RolloutGpu(&curand_state[threadID], all_moves_s, threadID, threadIdx.x);
+	results[threadID] = player == Player::BLACK ? 1 : 0;
+	__syncthreads();
 }
 
 __host__ Move* GetPossibleMovesFromInputParameters(int number_of_moves, char* possible_moves_array)
@@ -92,7 +91,7 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 	int
 		number_of_mcts_iterations = 10,										//liczba iteracji wykonana przez algorytm MCTS
 		possible_moves_count = possible_moves[0],							//liczba mo¿liwych ruchów spoœród których wybierany jest najlepszy
-		block_size = 3,														//rozmiar gridu z którego gpu ma korzystaæ
+		block_size = 1,														//rozmiar gridu z którego gpu ma korzystaæ
 		grid_size = 500,													//rozmiar bloku z którego gpu ma korzystaæ 
 		*results_d,															//wskaŸnik na pamiêæ w GPU przechowuj¹cy wyniki symulacji w danej iteracji
 		*results,															//wskaŸnik na pamiêæ w CPU przechowuj¹cy wyniki symulacji w danej iteracji
@@ -120,7 +119,7 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 
 	CUDA_CALL(cudaSetDevice(0));
 	CUDA_CALL(cudaDeviceReset());
-	CUDA_CALL(cudaMalloc(&state_d, block_size * grid_size * sizeof(curandState)));		
+	CUDA_CALL(cudaMalloc(&state_d, block_size * grid_size * sizeof(curandState)));
 	CUDA_CALL(cudaMalloc((void**)&boards_d, block_size * grid_size * sizeof(Board)));
 	CUDA_CALL(cudaMalloc((void**)&results_d, block_size * grid_size * sizeof(int)));
 	CUDA_CALL(cudaMalloc((void**)&possible_moves_d, block_size * grid_size * sizeof(Move) * 1000));
@@ -163,7 +162,7 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 
 		CUDA_CALL(cudaGetDeviceProperties(&prop, 0));
 		CUDA_CALL(cudaDeviceSetLimit(cudaLimitStackSize, 8192));
-		RolloutKernel << <block_size, grid_size >> > (state_d, boards_d, results_d, possible_moves_d, rollout_vector.size());
+		RolloutKernel << <grid_size, block_size >> > (state_d, boards_d, results_d, possible_moves_d, rollout_vector.size());
 
 		CUDA_CALL(cudaDeviceSynchronize());
 		CUDA_CALL(cudaGetLastError());
