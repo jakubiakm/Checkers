@@ -14,9 +14,9 @@ public:
 	void BackpropagateResults(std::vector<MctsNode*> vector, int *results);
 	int GetBestMove();
 private:
-	int number_of_total_simulations;
+	double number_of_total_simulations;
 
 	// Sta³a w algorytmiu UCT
-	const int UCT_CONSTANT = 2;
+	const double UCT_CONSTANT = 2;
 };
 

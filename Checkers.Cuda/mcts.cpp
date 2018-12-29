@@ -98,21 +98,21 @@ int Mcts::GetBestMove()
 	int ind = 0;
 	for (int i = 0; i != root->children.size(); i++)
 	{
-		//if (root->children[i]->simulations_count > max)
+		if (root->children[i]->simulations_count > max)
+		{
+			max = root->children[i]->simulations_count;
+			ind = i;
+		}
+		//if (root->children[i]->simulations_count == 0)
 		//{
-		//	max = root->children[i]->simulations_count;
+		//	ind = i;
+		//	break;
+		//}
+		//if (root->children[i]->wins / root->children[i]->simulations_count + UCT_CONSTANT * sqrt(log(number_of_total_simulations) / root->children[i]->simulations_count) > max)
+		//{
+		//	max = root->children[i]->wins / root->children[i]->simulations_count + UCT_CONSTANT * sqrt(log(number_of_total_simulations) / root->children[i]->simulations_count);
 		//	ind = i;
 		//}
-		if (root->children[i]->simulations_count == 0)
-		{
-			ind = i;
-			break;
-		}
-		if (root->children[i]->wins / root->children[i]->simulations_count + UCT_CONSTANT * sqrt(log(number_of_total_simulations) / root->children[i]->simulations_count) > max)
-		{
-			max = root->children[i]->wins / root->children[i]->simulations_count + UCT_CONSTANT * sqrt(log(number_of_total_simulations) / root->children[i]->simulations_count);
-			ind = i;
-		}
 	}
 	return ind;
 }

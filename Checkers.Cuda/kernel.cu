@@ -91,13 +91,13 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 	//czas wykonania 500x500 x 10000  27s
 	Player player = current_player == 0 ? Player::WHITE : Player::BLACK;	//gracz dla którego wybierany jest optymalny ruch
 	int
-		number_of_mcts_iterations = 40,										//liczba iteracji wykonana przez algorytm MCTS
+		number_of_mcts_iterations = 50,										//liczba iteracji wykonana przez algorytm MCTS
 		possible_moves_count = possible_moves[0],							//liczba mo¿liwych ruchów spoœród których wybierany jest najlepszy
-		block_size = 500,													//rozmiar gridu z którego gpu ma korzystaæ
-		grid_size = 500,													//rozmiar bloku z którego gpu ma korzystaæ 
+		block_size = 10,													//rozmiar gridu z którego gpu ma korzystaæ
+		grid_size = 10,														//rozmiar bloku z którego gpu ma korzystaæ 
 		*results_d,															//wskaŸnik na pamiêæ w GPU przechowuj¹cy wyniki symulacji w danej iteracji
 		*results,															//wskaŸnik na pamiêæ w CPU przechowuj¹cy wyniki symulacji w danej iteracji
-		duplication_count = 1;											//parametr okreœlaj¹cy ile liœci duplikowaæ przy symulacji GPU
+		duplication_count = 1;												//parametr okreœlaj¹cy ile liœci duplikowaæ przy symulacji GPU
 
 	Board
 		start_board = Board(board_size, board, player),						//pocz¹tkowy stan planszy

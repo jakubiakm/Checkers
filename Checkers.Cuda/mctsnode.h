@@ -6,8 +6,8 @@ class MctsNode
 {
 public:
 	Player player;
-	int wins;
-	int simulations_count;
+	double wins;
+	double simulations_count;
 	bool visited_in_current_iteration;
 	Board board;
 	MctsNode *parent;
