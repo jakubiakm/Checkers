@@ -665,7 +665,7 @@ __device__ void Board::GetPawnPossibleMovesGpu(char position, int &moves_count, 
 		switch (Board::player)
 		{
 		case Player::WHITE:
-			if (maximal_beat_count == Board::CanMoveToPosition(piece_row + 1, piece_column + 1, position))
+			if (Board::CanMoveToPosition(piece_row + 1, piece_column + 1, position))
 				all_moves_device[1000 * (thread_id + 1) - 1 - moves_count++] = Move(position, Board::ToPosition(piece_row + 1, piece_column + 1), 0, 0);
 			if (Board::CanMoveToPosition(piece_row + 1, piece_column - 1, position))
 				all_moves_device[1000 * (thread_id + 1) - 1 - moves_count++] = Move(position, Board::ToPosition(piece_row + 1, piece_column - 1), 0, 0);
