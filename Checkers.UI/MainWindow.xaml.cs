@@ -118,7 +118,7 @@ namespace Checkers.UI
                         || (BoardViewModelObject.CurrentPlayer == PieceColor.Black && BoardViewModelObject.BlackIsHuman))
                     {
                         var path = (Path)clickedElement;
-                        if (path.Data is EllipseGeometry)
+                        if (path.Data is EllipseGeometry && path.StrokeThickness != 2)
                         {
                             if (HumanPlayerMove.Count != 0)
                             {
@@ -167,7 +167,7 @@ namespace Checkers.UI
                                 HumanPlayerMove.Clear();
                                 return;
                             }
-                            if (path.Fill == Brushes.Gold)
+                            if (path.Fill == Brushes.Gold && e.LeftButton == MouseButtonState.Pressed)
                             {
 
                                 try
