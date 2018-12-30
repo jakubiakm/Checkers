@@ -19,6 +19,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace Checkers.UI
 {
@@ -27,11 +28,61 @@ namespace Checkers.UI
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
+        DispatcherTimer NotHumanMoveTimer { get; set; }
+
         public MainWindow()
         {
             InitializeComponent();
             BoardViewModelObject = new BoardViewModel(this);
             HistoryViewModelObject = new HistoryViewModel();
+        }
+
+        public void SetNotHumanMoveTimer()
+        {
+            NotHumanMoveTimer = new DispatcherTimer();
+            // Hook up the Elapsed event for the timer. 
+            NotHumanMoveTimer.Tick += Timer_Elapsed;
+            NotHumanMoveTimer.Interval = new TimeSpan(0, 0, 0, 0, 200);
+            NotHumanMoveTimer.Start();
+        }
+
+        private async void Timer_Elapsed(object sender, EventArgs e)
+        {
+            if ((BoardViewModelObject.CurrentPlayer == PieceColor.White && !BoardViewModelObject.WhiteIsHumnan) ||
+                (BoardViewModelObject.CurrentPlayer == PieceColor.Black && !BoardViewModelObject.BlackIsHuman))
+            {
+                try
+                {
+                    var move = BoardViewModelObject.NextMove();
+                    if (move != null)
+                    {
+                        BoardViewModelObject.DrawNextMove(move);
+                        HistoryViewModelObject.AddHistoryItem(BoardViewModelObject.Game.Board.Size, move);
+                    }
+                }
+                catch (NotAvailableMoveException exception)
+                {
+                    NotHumanMoveTimer.Stop();
+                    await this.ShowMessageAsync("Remis", $"Gra zakończona remisem gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie może już wykonywać ruchów.");
+                    HistoryViewModelObject.History.Clear();
+                    BoardViewModelObject.StartNewGame();
+                    NotHumanMoveTimer.Start();
+                }
+                catch (NoAvailablePiecesException exception)
+                {
+                    NotHumanMoveTimer.Stop();
+                    BoardViewModelObject.DrawNextMove(exception.LastMove);
+                    await this.ShowMessageAsync("Koniec gry", $"Gra zakończony. Gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie ma już pionków.");
+                    HistoryViewModelObject.History.Clear();
+                    BoardViewModelObject.StartNewGame();
+                    NotHumanMoveTimer.Start();
+                }
+                catch (WrongMoveException exception)
+                {
+                    await this.ShowMessageAsync("Zły ruch", $"Gracz wykonał nielegalny ruch. Możliwa ilość pionków do bicia to {exception.MinimumBeatedPieces}.");
+
+                }
+            }
         }
 
         List<Path> HumanPlayerMove { get; set; } = new List<Path>();
@@ -52,6 +103,7 @@ namespace Checkers.UI
             BoardViewControl.DataContext = BoardViewModelObject;
             BoardCanvas = UiHelper.FindChild<Canvas>(BoardViewControl, "BoardCanvas");
             BoardCanvas.MouseDown += BoardCanvas_MouseDown;
+            SetNotHumanMoveTimer();
         }
 
         private async void BoardCanvas_MouseDown(object sender, MouseButtonEventArgs e)
@@ -162,16 +214,6 @@ namespace Checkers.UI
                                 path.Fill = Brushes.Gold;
                             }
                         }
-                    }
-                    else
-                    {
-                        var move = BoardViewModelObject.NextMove();
-                        if (move != null)
-                        {
-                            BoardViewModelObject.DrawNextMove(move);
-                            HistoryViewModelObject.AddHistoryItem(BoardViewModelObject.Game.Board.Size, move);
-                        }
-
                     }
                 }
                 catch (NotAvailableMoveException exception)
