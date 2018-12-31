@@ -1,0 +1,124 @@
+﻿<Controls:MetroWindow x:Class="Checkers.UI.SettingsWindow"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+                      xmlns:Converters="http://metro.mahapps.com/winfx/xaml/shared"
+                      xmlns:metro="clr-namespace:MahApps.Metro;assembly=MahApps.Metro"
+                      RenderOptions.ClearTypeHint="Enabled"
+                      TextOptions.TextFormattingMode="Display"
+                      Title="Ustawienia"
+                      SizeToContent="WidthAndHeight"
+                      GlowBrush="{DynamicResource AccentColorBrush}"
+                      ResizeMode="CanResizeWithGrip">
+
+    <Controls:MetroWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Controls:MetroWindow.Resources>
+
+    <Controls:MetroWindow.TitleTemplate>
+        <DataTemplate>
+            <TextBlock Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Content, Converter={Converters:ToUpperConverter}}"
+                       TextTrimming="CharacterEllipsis"
+                       VerticalAlignment="Center"
+                       Margin="8 -1 0 0"
+                       FontSize="{DynamicResource WindowTitleFontSize}"
+                       FontFamily="{DynamicResource DefaultFont}" />
+        </DataTemplate>
+    </Controls:MetroWindow.TitleTemplate>
+
+    <Grid>
+
+        <Grid.Resources>
+            <Style TargetType="Button"
+                   BasedOn="{StaticResource MetroButton}">
+                <Setter Property="Height"
+                        Value="23" />
+                <Setter Property="Margin"
+                        Value="2" />
+            </Style>
+        </Grid.Resources>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <GroupBox Grid.Row="0"
+                  Margin="5"
+                  Header="Ustawienia silnika">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <UniformGrid Grid.Row="1" Margin="5" Columns="3" Rows="2">
+                    <TextBlock Text="Rozmiar planszy" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Liczba białych pionków" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Liczba czarnych pionków" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <Controls:NumericUpDown x:Name="BoardSize" Width="80" Margin="0 0 2 0" Value="10" Minimum="8" Maximum="40" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Controls:NumericUpDown x:Name="NumberOfWhitePiecese" Width="80" HorizontalAlignment="Center" Margin="0 0 2 0" Value="20" Minimum="1" VerticalAlignment="Center"/>
+                    <Controls:NumericUpDown x:Name="NumberOfBlackPiecese" Width="80" HorizontalAlignment="Center" Margin="0 0 2 0" Value="20" Minimum="1" VerticalAlignment="Center"/>
+                </UniformGrid>
+                <UniformGrid Grid.Row="3" Margin="5" Columns="1" Rows="2">
+                    <TextBlock Text="Silnik białego gracza" Margin="0 0 2 0" VerticalAlignment="Center"/>
+                    <ComboBox x:Name="WhitePlayerEngineCombobox" VerticalAlignment="Center" Margin="0 0 2 0" />
+                </UniformGrid>
+                <UniformGrid Grid.Row="5" Margin="5" Columns="1" Rows="2">
+                    <TextBlock Text="Silnik czarnego gracza" Margin="0 0 2 0" VerticalAlignment="Center"/>
+                    <ComboBox x:Name="BlackPlayerEngingeCombobox" Margin="0 0 2 0" VerticalAlignment="Center"/>
+                </UniformGrid>
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Grid.Row="1"
+                  Margin="5"
+                  Header="Wygląd aplikacji">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <UniformGrid Grid.Row="0"
+                             Columns="2">
+                    <Button Content="Dark"
+                            Click="ChangeAppThemeButtonClick" />
+                    <Button Content="Light"
+                            Click="ChangeAppThemeButtonClick" />
+                </UniformGrid>
+
+                <UniformGrid Grid.Row="2" Margin="5" Columns="2" Rows="2">
+                    <TextBlock Text="Czas trwania animacji" Margin="0 0 2 0" VerticalAlignment="Center" />
+                    <TextBlock Text="Akcenty okna" Margin="10 0 2 0" VerticalAlignment="Center" />
+
+                    <Slider x:Name="AnimationTime" Margin="0 0 2 0" VerticalAlignment="Center"/>
+                    <ComboBox x:Name="AccentSelector"
+                              Margin="10 0 2 0"
+                              VerticalAlignment="Center"
+                              SelectionChanged="AccentSelectionChanged"
+                              ItemsSource="{x:Static metro:ThemeManager.Accents}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </UniformGrid>
+            </Grid>
+        </GroupBox>
+        <Button Content="Gra od nowa" Grid.Row="3" Margin="5"/>
+    </Grid>
+
+</Controls:MetroWindow>

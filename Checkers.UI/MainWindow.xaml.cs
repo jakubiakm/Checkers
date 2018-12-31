@@ -28,7 +28,9 @@ namespace Checkers.UI
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
-        DispatcherTimer NotHumanMoveTimer { get; set; }
+        public DispatcherTimer NotHumanMoveTimer { get; set; }
+
+        private MetroWindow settingsWindow;
 
         public MainWindow()
         {
@@ -294,6 +296,22 @@ namespace Checkers.UI
             {
                 PositionLabel.Content = "?";
             }
+        }
+
+        private void SettingsButtonClick(object sender, RoutedEventArgs e)
+        {
+            if (settingsWindow != null)
+            {
+                settingsWindow.Activate();
+                return;
+            }
+
+            settingsWindow = new SettingsWindow();
+            settingsWindow.Owner = this;
+            settingsWindow.Closed += (o, args) => settingsWindow = null;
+            settingsWindow.Left = this.Left + this.ActualWidth / 2.0;
+            settingsWindow.Top = this.Top + this.ActualHeight / 2.0;
+            settingsWindow.Show();
         }
     }
 }
