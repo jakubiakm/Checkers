@@ -28,13 +28,17 @@ namespace Checkers.Logic.GameObjects
             PiecesOnBoard = new List<Piece>();
             Size = size;
             if (size * size / 2 < numberOfWhitePieces + numberOfBlackPieces)
+            {
                 throw new ArgumentException("Pionki nie mieszczą się na planszy");
+            }
             if (size % 2 == 1)
+            {
                 throw new ArgumentException("Rozmiar planszy musi być liczbą parzystą");
+            }
             while (numberOfWhitePieces-- > 0)
-                PiecesOnBoard.Add(new Piece((size * size / 2) - numberOfWhitePieces, PieceColor.White, false));
+                PiecesOnBoard.Add(new Piece((size * size / 2) - numberOfWhitePieces, PieceColor.White, size, false));
             while (numberOfBlackPieces-- > 0)
-                PiecesOnBoard.Add(new Piece(numberOfBlackPieces + 1, PieceColor.Black, false));
+                PiecesOnBoard.Add(new Piece(numberOfBlackPieces + 1, PieceColor.Black, size, false));
         }
 
         public List<Move> GetAllPossibleMoves(PieceColor color)
@@ -62,28 +66,28 @@ namespace Checkers.Logic.GameObjects
             for (int ind = 1; ind < Size; ind++)
             {
                 if (CanMoveToPosition(piece.Row + ind, piece.Column + ind, piece))
-                    possibleMoves.Add(new Move(piece, new Piece(piece.Row + ind, piece.Column + ind, piece.Color, piece.IsKing), null));
+                    possibleMoves.Add(new Move(piece, new Piece(piece.Row + ind, piece.Column + ind, piece.Color, piece.Size, piece.IsKing), null));
                 else
                     break;
             }
             for (int ind = 1; ind < Size; ind++)
             {
                 if (CanMoveToPosition(piece.Row + ind, piece.Column - ind, piece))
-                    possibleMoves.Add(new Move(piece, new Piece(piece.Row + ind, piece.Column - ind, piece.Color, piece.IsKing), null));
+                    possibleMoves.Add(new Move(piece, new Piece(piece.Row + ind, piece.Column - ind, piece.Color, piece.Size, piece.IsKing), null));
                 else
                     break;
             }
             for (int ind = 1; ind < Size; ind++)
             {
                 if (CanMoveToPosition(piece.Row - ind, piece.Column + ind, piece))
-                    possibleMoves.Add(new Move(piece, new Piece(piece.Row - ind, piece.Column + ind, piece.Color, piece.IsKing), null));
+                    possibleMoves.Add(new Move(piece, new Piece(piece.Row - ind, piece.Column + ind, piece.Color, piece.Size, piece.IsKing), null));
                 else
                     break;
             }
             for (int ind = 1; ind < Size; ind++)
             {
                 if (CanMoveToPosition(piece.Row - ind, piece.Column - ind, piece))
-                    possibleMoves.Add(new Move(piece, new Piece(piece.Row - ind, piece.Column - ind, piece.Color, piece.IsKing), null));
+                    possibleMoves.Add(new Move(piece, new Piece(piece.Row - ind, piece.Column - ind, piece.Color, piece.Size, piece.IsKing), null));
                 else
                     break;
             }
@@ -147,15 +151,15 @@ namespace Checkers.Logic.GameObjects
             {
                 case PieceColor.White:
                     if (CanMoveToPosition(piece.Row + 1, piece.Column + 1, piece))
-                        possibleMoves.Add(new Move(piece, new Piece(piece.Row + 1, piece.Column + 1, PieceColor.White, piece.Row + 1 == Size - 1), null));
+                        possibleMoves.Add(new Move(piece, new Piece(piece.Row + 1, piece.Column + 1, PieceColor.White, piece.Size, piece.Row + 1 == Size - 1), null));
                     if (CanMoveToPosition(piece.Row + 1, piece.Column - 1, piece))
-                        possibleMoves.Add(new Move(piece, new Piece(piece.Row + 1, piece.Column - 1, PieceColor.White, piece.Row + 1 == Size - 1), null));
+                        possibleMoves.Add(new Move(piece, new Piece(piece.Row + 1, piece.Column - 1, PieceColor.White, piece.Size, piece.Row + 1 == Size - 1), null));
                     break;
                 case PieceColor.Black:
                     if (CanMoveToPosition(piece.Row - 1, piece.Column + 1, piece))
-                        possibleMoves.Add(new Move(piece, new Piece(piece.Row - 1, piece.Column + 1, PieceColor.Black, piece.Row - 1 == 0), null));
+                        possibleMoves.Add(new Move(piece, new Piece(piece.Row - 1, piece.Column + 1, PieceColor.Black, piece.Size, piece.Row - 1 == 0), null));
                     if (CanMoveToPosition(piece.Row - 1, piece.Column - 1, piece))
-                        possibleMoves.Add(new Move(piece, new Piece(piece.Row - 1, piece.Column - 1, PieceColor.Black, piece.Row - 1 == 0), null));
+                        possibleMoves.Add(new Move(piece, new Piece(piece.Row - 1, piece.Column - 1, PieceColor.Black, piece.Size, piece.Row - 1 == 0), null));
                     break;
             }
             //próba bicia w czterech różnych kierunkach
@@ -216,7 +220,7 @@ namespace Checkers.Logic.GameObjects
 
         private void GetAllBeatMoves(Piece piece, List<BeatedPiece> beatedPieces, int sourceRow, int sourceColumn, int targetRow, int targetColumn, ref List<Move> allMoves)
         {
-            Piece newPiece = new Piece(targetRow, targetColumn, piece.Color, piece.IsKing);
+            Piece newPiece = new Piece(targetRow, targetColumn, piece.Color, piece.Size, piece.IsKing);
             allMoves.Add(new Move(piece, newPiece, beatedPieces));
             if (CanBeatPiece(newPiece, targetRow - 1, targetColumn - 1, piece))
             {
@@ -266,7 +270,7 @@ namespace Checkers.Logic.GameObjects
 
         private void GetAllKingBeatMoves(Piece piece, List<BeatedPiece> beatedPieces, int sourceRow, int sourceColumn, int targetRow, int targetColumn, ref List<Move> allMoves)
         {
-            Piece newPiece = new Piece(targetRow, targetColumn, piece.Color, piece.IsKing);
+            Piece newPiece = new Piece(targetRow, targetColumn, piece.Color, piece.Size, piece.IsKing);
             allMoves.Add(new Move(piece, newPiece, beatedPieces));
             for (int ind = 1; ind < Size; ind++)
             {

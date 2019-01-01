@@ -21,7 +21,7 @@ namespace Checkers.Logic.GameObjects
 
         public IEngine BlackPlayerEngine { get; private set; }
 
-        public Game(IEngine whiteEngine, IEngine blackEngine, int boardSize = 10, int numberOfWhitePieces = 20, int numberOfBlackPieces = 20)
+        public Game(IEngine whiteEngine, IEngine blackEngine, int boardSize, int numberOfWhitePieces, int numberOfBlackPieces)
         {
             WhitePlayerEngine = whiteEngine;
             BlackPlayerEngine = blackEngine;

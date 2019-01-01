@@ -50,7 +50,8 @@ namespace Checkers.UI
 
         private async void Timer_Elapsed(object sender, EventArgs e)
         {
-            if ((BoardViewModelObject.CurrentPlayer == PieceColor.White && !BoardViewModelObject.WhiteIsHumnan) ||
+            if (BoardViewModelObject.Game != null &&
+                (BoardViewModelObject.CurrentPlayer == PieceColor.White && !BoardViewModelObject.WhiteIsHumnan) ||
                 (BoardViewModelObject.CurrentPlayer == PieceColor.Black && !BoardViewModelObject.BlackIsHuman))
             {
                 try
@@ -67,7 +68,7 @@ namespace Checkers.UI
                     NotHumanMoveTimer.Stop();
                     await this.ShowMessageAsync("Remis", $"Gra zakończona remisem gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie może już wykonywać ruchów.");
                     HistoryViewModelObject.History.Clear();
-                    BoardViewModelObject.StartNewGame();
+                    StartNewGame();
                     NotHumanMoveTimer.Start();
                 }
                 catch (NoAvailablePiecesException exception)
@@ -76,7 +77,7 @@ namespace Checkers.UI
                     BoardViewModelObject.DrawNextMove(exception.LastMove);
                     await this.ShowMessageAsync("Koniec gry", $"Gra zakończony. Gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie ma już pionków.");
                     HistoryViewModelObject.History.Clear();
-                    BoardViewModelObject.StartNewGame();
+                    StartNewGame();
                     NotHumanMoveTimer.Start();
                 }
                 catch (WrongMoveException exception)
@@ -99,9 +100,21 @@ namespace Checkers.UI
 
         HistoryViewModel HistoryViewModelObject;
 
+        public async void StartNewGame(int boardSize = 10, int whiteCountSize = 20, int blackCountSize = 20)
+        {
+            try
+            {
+                BoardViewModelObject.StartNewGame(boardSize, whiteCountSize, blackCountSize);
+            }
+            catch (ArgumentException e)
+            {
+                await this.ShowMessageAsync("Błąd", $"{e.Message}");
+            }
+        }
+
         public void BoardViewControl_Loaded(object sender, RoutedEventArgs e)
         {
-            BoardViewModelObject.StartNewGame();
+            StartNewGame();
             BoardViewControl.DataContext = BoardViewModelObject;
             BoardCanvas = UiHelper.FindChild<Canvas>(BoardViewControl, "BoardCanvas");
             BoardCanvas.MouseDown += BoardCanvas_MouseDown;
@@ -222,14 +235,14 @@ namespace Checkers.UI
                 {
                     await this.ShowMessageAsync("Remis", $"Gra zakończona remisem gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie może już wykonywać ruchów.");
                     HistoryViewModelObject.History.Clear();
-                    BoardViewModelObject.StartNewGame();
+                    StartNewGame();
                 }
                 catch (NoAvailablePiecesException exception)
                 {
                     BoardViewModelObject.DrawNextMove(exception.LastMove);
                     await this.ShowMessageAsync("Koniec gry", $"Gra zakończony. Gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie ma już pionków.");
                     HistoryViewModelObject.History.Clear();
-                    BoardViewModelObject.StartNewGame();
+                    StartNewGame();
                 }
                 catch (WrongMoveException exception)
                 {
@@ -281,7 +294,7 @@ namespace Checkers.UI
                 if (pathElem.Data is RectangleGeometry || pathElem.Data is EllipseGeometry)
                 {
                     var pos = BoardViewModelObject.BoardCanvasElements.SingleOrDefault(es => es.Geometry == pathElem.Data);
-                    var position = Piece.ToPosition(pos.X, pos.Y, 10);
+                    var position = Piece.ToPosition(pos.X, pos.Y, BoardViewModelObject.Game.Board.Size);
                     if (position == -1)
                     {
                         PositionLabel.Content = " ";
@@ -306,11 +319,10 @@ namespace Checkers.UI
                 return;
             }
 
-            settingsWindow = new SettingsWindow();
+            settingsWindow = new SettingsWindow(this);
             settingsWindow.Owner = this;
             settingsWindow.Closed += (o, args) => settingsWindow = null;
-            settingsWindow.Left = this.Left + this.ActualWidth / 2.0;
-            settingsWindow.Top = this.Top + this.ActualHeight / 2.0;
+
             settingsWindow.Show();
         }
     }

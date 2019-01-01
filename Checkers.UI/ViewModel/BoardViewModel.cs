@@ -40,10 +40,10 @@ namespace Checkers.UI.ViewModel
 
         double skipSize = 0;
 
-        public void StartNewGame()
+        public void StartNewGame(int boardSize, int whiteCountSize, int blackCountSize)
         {
             CurrentPlayer = PieceColor.White;
-            Game = new Game(new HumanEngine(PieceColor.White), new RandomEngine(PieceColor.Black));
+            Game = new Game(new HumanEngine(PieceColor.White), new RandomEngine(PieceColor.Black), boardSize, whiteCountSize, blackCountSize);
             WhiteIsHumnan = Game.WhitePlayerEngine is HumanEngine;
             BlackIsHuman = Game.BlackPlayerEngine is HumanEngine;
             skipSize = 700 / Game.Board.Size;
@@ -83,7 +83,7 @@ namespace Checkers.UI.ViewModel
             foreach (var path in paths)
             {
                 var elem = BoardCanvasElements.SingleOrDefault(e => e.Geometry == path.Data);
-                ret.Add(new Piece(elem.X, elem.Y, PieceColor.White, false));
+                ret.Add(new Piece(elem.X, elem.Y, PieceColor.White, Game.Board.Size, false));
             }
             return ret;
         }

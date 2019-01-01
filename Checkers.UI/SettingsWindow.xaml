@@ -66,7 +66,7 @@
                     <TextBlock Text="Rozmiar planszy" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     <TextBlock Text="Liczba białych pionków" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     <TextBlock Text="Liczba czarnych pionków" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    <Controls:NumericUpDown x:Name="BoardSize" Width="80" Margin="0 0 2 0" Value="10" Minimum="8" Maximum="40" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Controls:NumericUpDown x:Name="BoardSize" Width="80" Margin="0 0 2 0" Value="10" Minimum="6" Maximum="40" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     <Controls:NumericUpDown x:Name="NumberOfWhitePiecese" Width="80" HorizontalAlignment="Center" Margin="0 0 2 0" Value="20" Minimum="1" VerticalAlignment="Center"/>
                     <Controls:NumericUpDown x:Name="NumberOfBlackPiecese" Width="80" HorizontalAlignment="Center" Margin="0 0 2 0" Value="20" Minimum="1" VerticalAlignment="Center"/>
                 </UniformGrid>
@@ -118,7 +118,7 @@
                 </UniformGrid>
             </Grid>
         </GroupBox>
-        <Button Content="Gra od nowa" Grid.Row="3" Margin="5"/>
+        <Button Content="Gra od nowa" Grid.Row="3" Margin="5" Click="Button_Click"/>
     </Grid>
 
 </Controls:MetroWindow>

@@ -15,6 +15,8 @@ namespace Checkers.UI
     /// </summary>
     public partial class SettingsWindow : MetroWindow
     {
+        public MainWindow Window { get; set; }
+
         public static readonly DependencyProperty ColorsProperty
             = DependencyProperty.Register("Colors",
                                           typeof(List<KeyValuePair<string, Color>>),
@@ -27,8 +29,9 @@ namespace Checkers.UI
             set { SetValue(ColorsProperty, value); }
         }
 
-        public SettingsWindow()
+        public SettingsWindow(MainWindow window)
         {
+            Window = window;
             InitializeComponent();
 
             this.DataContext = this;
@@ -58,6 +61,15 @@ namespace Checkers.UI
                 ThemeManager.ChangeAppStyle(Application.Current, selectedAccent, theme.Item1);
                 Application.Current.MainWindow.Activate();
             }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                Application.Current.MainWindow.Activate();
+                Window.StartNewGame((int)BoardSize.Value, (int)NumberOfWhitePiecese.Value, (int)NumberOfBlackPiecese.Value);
+            });
         }
     }
 }

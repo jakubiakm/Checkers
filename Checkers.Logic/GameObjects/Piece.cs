@@ -16,6 +16,8 @@ namespace Checkers.Logic.GameObjects
 
         private int _position;
 
+        public int Size { get; set; }
+
         public int Row
         {
             get
@@ -25,7 +27,7 @@ namespace Checkers.Logic.GameObjects
             set
             {
                 _row = value;
-                _position = ToPosition(_row, _column);
+                _position = ToPosition(_row, _column, Size);
             }
         }
 
@@ -38,7 +40,7 @@ namespace Checkers.Logic.GameObjects
             set
             {
                 _column = value;
-                _position = ToPosition(_row, _column);
+                _position = ToPosition(_row, _column, Size);
             }
         }
 
@@ -51,8 +53,8 @@ namespace Checkers.Logic.GameObjects
             set
             {
                 _position = value;
-                _row = ToRow(value);
-                _column = ToColumn(value);
+                _row = ToRow(value, Size);
+                _column = ToColumn(value, Size);
             }
         }
 
@@ -60,16 +62,18 @@ namespace Checkers.Logic.GameObjects
 
         public PieceColor Color { get; internal set; }
 
-        public Piece(int row, int column, PieceColor color, bool isKing)
+        public Piece(int row, int column, PieceColor color, int boardSize, bool isKing)
         {
+            Size = boardSize;
             Row = row;
             Column = column;
             Color = color;
             IsKing = isKing;
         }
 
-        public Piece(int position, PieceColor color, bool isKing)
+        public Piece(int position, PieceColor color, int boardSize, bool isKing)
         {
+            Size = boardSize;
             Position = position;
             Color = color;
             IsKing = isKing;
@@ -80,7 +84,7 @@ namespace Checkers.Logic.GameObjects
             return $"[({Row},{Column}),King:{IsKing},{Color}]";
         }
 
-        public static int ToPosition(int row, int column, int size = 10)
+        public static int ToPosition(int row, int column, int size)
         {
             if ((column % 2 == 0 && row % 2 == 1) || (row % 2 == 0 && column % 2 == 1))
                 return -1;
@@ -88,16 +92,16 @@ namespace Checkers.Logic.GameObjects
                 return size / 2 * (size - row - 1) + ((row % 2 == 0) ? 1 : 0) + (column + 1) / 2;
         }
 
-        public static int ToRow(int position, int size = 10)
+        public static int ToRow(int position, int size)
         {
             int div = size / 2;
             return size - 1 - (position - 1) / div;
         }
 
-        public static int ToColumn(int position, int size = 10)
+        public static int ToColumn(int position, int size)
         {
             int div = size / 2;
-            return 2 * ((position - 1) % div) + (ToRow(position) % 2 == 1 ? 1 : 0);
+            return 2 * ((position - 1) % div) + (ToRow(position, size) % 2 == 1 ? 1 : 0);
         }
     }
 }
