@@ -11,6 +11,14 @@ namespace Checkers.Logic.Engines
 {
     public class HumanEngine : IEngine
     {
+        public EngineKind Kind
+        {
+            get
+            {
+                return EngineKind.Human;
+            }
+        }
+
         public PieceColor Color { get; set; }
 
         public List<Piece> HumanMove { get; set; }

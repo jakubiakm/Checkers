@@ -17,14 +17,22 @@ namespace Checkers.Logic.GameObjects
 
         public Move LastMove { get; set; }
 
+        public int NumberOfWhitePiecesAtBeggining { get; set; }
+
+        public int NumberOfBlackPiecesAtBeggining { get; set; }
+
         public CheckersBoard(int size, List<Piece> pieces)
         {
             Size = size;
             PiecesOnBoard = pieces;
+            NumberOfBlackPiecesAtBeggining = pieces.Count(piece => piece.Color == PieceColor.Black);
+            NumberOfWhitePiecesAtBeggining = pieces.Count(piece => piece.Color == PieceColor.White);
         }
 
         public CheckersBoard(int size, int numberOfWhitePieces, int numberOfBlackPieces)
         {
+            NumberOfBlackPiecesAtBeggining = numberOfBlackPieces;
+            NumberOfWhitePiecesAtBeggining = numberOfWhitePieces;
             PiecesOnBoard = new List<Piece>();
             Size = size;
             if (size * size / 2 < numberOfWhitePieces + numberOfBlackPieces)

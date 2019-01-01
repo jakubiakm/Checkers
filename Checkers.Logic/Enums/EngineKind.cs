@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace Checkers.Logic.Enums
 {
-    public enum GameVariant
+    public enum EngineKind
     {
-        [Description("Warcaby")]
-        Checkers,
+        [Description("Człowiek")]
+        Human,
 
-        [Description("Antywarcaby")]
-        Anticheckers
+        [Description("Losowy")]
+        Random
     }
 }

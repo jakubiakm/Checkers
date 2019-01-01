@@ -11,6 +11,14 @@ namespace Checkers.Logic.Engines
 {
     public class RandomEngine : IEngine
     {
+        public EngineKind Kind
+        {
+            get
+            {
+                return EngineKind.Random;
+            }
+        }
+
         public PieceColor Color { get; set; }
 
         public RandomEngine(PieceColor color)

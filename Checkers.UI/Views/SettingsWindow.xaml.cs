@@ -1,21 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Markup;
 using System.Windows.Media;
+using Checkers.Logic.Enums;
+using Checkers.UI.ViewModel;
 using MahApps.Metro;
 using MahApps.Metro.Controls;
 
-namespace Checkers.UI
+namespace Checkers.UI.Views
 {
+    [ValueConversion(typeof(Enum), typeof(IEnumerable<ValueDescription>))]
+    public class EnumToCollectionConverter : MarkupExtension, IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return EnumHelper.GetAllValuesAndDescriptions(value.GetType());
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return null;
+        }
+        public override object ProvideValue(IServiceProvider serviceProvider)
+        {
+            return this;
+        }
+    }
     /// <summary>
     /// Interaction logic for AccentStyleWindow.xaml
     /// </summary>
     public partial class SettingsWindow : MetroWindow
     {
         public MainWindow Window { get; set; }
+
+        SettingsViewModel viewModel;
 
         public static readonly DependencyProperty ColorsProperty
             = DependencyProperty.Register("Colors",
@@ -29,12 +52,30 @@ namespace Checkers.UI
             set { SetValue(ColorsProperty, value); }
         }
 
-        public SettingsWindow(MainWindow window)
+        public SettingsWindow(
+            MainWindow window,
+            int boardSize,
+            int whiteCountSize,
+            int blackCountSize,
+            GameVariant gameVariant,
+            EngineKind whiteEngineKind,
+            EngineKind blackEngineKind,
+            int moveAnimationTime)
         {
             Window = window;
             InitializeComponent();
 
+             viewModel = new SettingsViewModel(
+                 boardSize,
+                 whiteCountSize,
+                 blackCountSize,
+                 whiteEngineKind,
+                 blackEngineKind,
+                 gameVariant,
+                 moveAnimationTime);
+
             this.DataContext = this;
+            base.DataContext = viewModel;
 
             this.Colors = typeof(Colors)
                 .GetProperties()
@@ -70,7 +111,14 @@ namespace Checkers.UI
             Dispatcher.Invoke(() =>
             {
                 Application.Current.MainWindow.Activate();
-                Window.StartNewGame((int)BoardSize.Value, (int)NumberOfWhitePiecese.Value, (int)NumberOfBlackPiecese.Value);
+                Window.StartNewGame(
+                    viewModel.BoardSize,
+                    viewModel.WhitePiecesCount,
+                    viewModel.BlackPiecesCount,
+                    viewModel.CurrentGameVariant,
+                    viewModel.WhitePlayerEngineKind,
+                    viewModel.BlackPlayerEngineKind,
+                    viewModel.MoveAnimationTime);
             });
         }
     }
