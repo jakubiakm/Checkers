@@ -11,6 +11,14 @@ namespace Checkers.Logic.Engines
 {
     public class HumanEngine : IEngine
     {
+        public EngineKind Kind
+        {
+            get
+            {
+                return EngineKind.Human;
+            }
+        }
+
         public PieceColor Color { get; set; }
 
         public List<Piece> HumanMove { get; set; }
@@ -19,6 +27,12 @@ namespace Checkers.Logic.Engines
         {
             Color = color;
         }
+
+        public string GetName()
+        {
+            return "Człowiek";
+        }
+
         public Move MakeMove(CheckersBoard currentBoard)
         {
             List<Move> allPossibleMoves = currentBoard.GetAllPossibleMoves(Color);

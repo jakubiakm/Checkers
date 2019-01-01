@@ -3,8 +3,19 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"  
         xmlns:Views = "clr-namespace:Checkers.UI.Views"
+        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         Title="Warcaby" Height="733" Width="925" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" MouseMove="MetroWindow_MouseMove"
         >
+    <Controls:MetroWindow.RightWindowCommands>
+        <Controls:WindowCommands>
+            <Button Click="SettingsButtonClick">
+                <StackPanel Orientation="Horizontal">
+                    <iconPacks:PackIconModern Width="16" Height="16" Kind="Settings" />
+                    <TextBlock Margin="4 0 0 0" VerticalAlignment="Center" Text="Ustawienia"/>
+                </StackPanel>
+            </Button>
+        </Controls:WindowCommands>
+    </Controls:MetroWindow.RightWindowCommands>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="700"></ColumnDefinition>

@@ -36,18 +36,50 @@ namespace Checkers.UI.ViewModel
 
         public bool AnimationCompleted { get; private set; } = true;
 
+        public int MoveAnimationTime { get; set; }
+
         private Move lastMove = null;
 
         double skipSize = 0;
 
-        public void StartNewGame()
+        public void StartNewGame(
+            int boardSize,
+            int whiteCountSize,
+            int blackCountSize,
+            GameVariant gameVariant,
+            EngineKind whiteEngineKind,
+            EngineKind blackEngineKind,
+            int moveAnimationTime)
         {
+
             CurrentPlayer = PieceColor.White;
-            Game = new Game(new HumanEngine(PieceColor.White), new CudaEngine(PieceColor.Black));
+            MoveAnimationTime = moveAnimationTime;
+            Game = new Game(
+                ConvertEngineKindEnumToEngine(whiteEngineKind, PieceColor.White),
+                ConvertEngineKindEnumToEngine(blackEngineKind, PieceColor.Black),
+                boardSize,
+                whiteCountSize,
+                blackCountSize,
+                gameVariant);
             WhiteIsHumnan = Game.WhitePlayerEngine is HumanEngine;
             BlackIsHuman = Game.BlackPlayerEngine is HumanEngine;
             skipSize = 700 / Game.Board.Size;
             DrawCurrentBoard();
+        }
+
+        public IEngine ConvertEngineKindEnumToEngine(EngineKind kind, PieceColor color)
+        {
+            switch (kind)
+            {
+                case EngineKind.Human:
+                    return new HumanEngine(color);
+                case EngineKind.Random:
+                    return new RandomEngine(color);
+                case EngineKind.Cuda:
+                    return new CudaEngine(color);
+                default:
+                    throw new ArgumentException("Nierozpoznany typ silnika");
+            }
         }
 
         public Move NextMove(List<Path> humanMoves = null)
@@ -83,7 +115,7 @@ namespace Checkers.UI.ViewModel
             foreach (var path in paths)
             {
                 var elem = BoardCanvasElements.SingleOrDefault(e => e.Geometry == path.Data);
-                ret.Add(new Piece(elem.X, elem.Y, PieceColor.White, false));
+                ret.Add(new Piece(elem.X, elem.Y, PieceColor.White, Game.Board.Size, false));
             }
             return ret;
         }
@@ -113,11 +145,11 @@ namespace Checkers.UI.ViewModel
             {
                 foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == Game.Board.LastMove.OldPiece.Row && e.Y == Game.Board.LastMove.OldPiece.Column).ToList())
                 {
-                    elem.Fill =  Brushes.DarkOrange;
+                    elem.Fill = Brushes.DarkOrange;
                 }
                 foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == Game.Board.LastMove.NewPiece.Row && e.Y == Game.Board.LastMove.NewPiece.Column).ToList())
                 {
-                    elem.Fill =  Brushes.DarkOrange;
+                    elem.Fill = Brushes.DarkOrange;
                 }
                 foreach (var piece in Game.Board.LastMove?.BeatedPieces ?? new List<BeatedPiece>())
                 {
@@ -184,11 +216,11 @@ namespace Checkers.UI.ViewModel
             }
             foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == Game.History[moveNumber].LastMove.OldPiece.Row && e.Y == Game.History[moveNumber].LastMove.OldPiece.Column).ToList())
             {
-                elem.Fill =  Brushes.DarkOrange;
+                elem.Fill = Brushes.DarkOrange;
             }
             foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == Game.History[moveNumber].LastMove.NewPiece.Row && e.Y == Game.History[moveNumber].LastMove.NewPiece.Column).ToList())
             {
-                elem.Fill =  Brushes.DarkOrange;
+                elem.Fill = Brushes.DarkOrange;
             }
             foreach (var piece in Game.History[moveNumber].LastMove?.BeatedPieces ?? new List<BeatedPiece>())
             {
@@ -259,11 +291,11 @@ namespace Checkers.UI.ViewModel
         {
             foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == move.OldPiece.Row && e.Y == move.OldPiece.Column).ToList())
             {
-                elem.Fill =  Brushes.DarkOrange;
+                elem.Fill = Brushes.DarkOrange;
             }
             foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == move.NewPiece.Row && e.Y == move.NewPiece.Column).ToList())
             {
-                elem.Fill =  Brushes.DarkOrange;
+                elem.Fill = Brushes.DarkOrange;
             }
             foreach (var piece in Game.Board.LastMove?.BeatedPieces ?? new List<BeatedPiece>())
             {
@@ -341,7 +373,7 @@ namespace Checkers.UI.ViewModel
 
 
                 PointAnimationUsingPath myPointAnimation = new PointAnimationUsingPath();
-                myPointAnimation.Duration = TimeSpan.FromSeconds(0.33 * ((move.BeatedPieces?.Count()) ?? 1));
+                myPointAnimation.Duration = TimeSpan.FromSeconds((double)MoveAnimationTime / 100 * ((move.BeatedPieces?.Count()) ?? 1));
                 myPointAnimation.FillBehavior = FillBehavior.Stop;
                 myPointAnimation.PathGeometry = animationPath;
 

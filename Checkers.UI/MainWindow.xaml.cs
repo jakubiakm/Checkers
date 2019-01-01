@@ -1,7 +1,9 @@
-﻿using Checkers.Logic.Enums;
+﻿using Checkers.Logic.Engines;
+using Checkers.Logic.Enums;
 using Checkers.Logic.Exceptions;
 using Checkers.Logic.GameObjects;
 using Checkers.UI.ViewModel;
+using Checkers.UI.Views;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using System;
@@ -28,7 +30,9 @@ namespace Checkers.UI
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
-        DispatcherTimer NotHumanMoveTimer { get; set; }
+        public DispatcherTimer NotHumanMoveTimer { get; set; }
+
+        private MetroWindow settingsWindow;
 
         public MainWindow()
         {
@@ -40,15 +44,15 @@ namespace Checkers.UI
         public void SetNotHumanMoveTimer()
         {
             NotHumanMoveTimer = new DispatcherTimer();
-            // Hook up the Elapsed event for the timer. 
             NotHumanMoveTimer.Tick += Timer_Elapsed;
-            NotHumanMoveTimer.Interval = new TimeSpan(0, 0, 0, 0, 200);
+            NotHumanMoveTimer.Interval = new TimeSpan(0, 0, 0, 0, 1);
             NotHumanMoveTimer.Start();
         }
 
         private async void Timer_Elapsed(object sender, EventArgs e)
         {
-            if ((BoardViewModelObject.CurrentPlayer == PieceColor.White && !BoardViewModelObject.WhiteIsHumnan) ||
+            if (BoardViewModelObject.Game != null &&
+                (BoardViewModelObject.CurrentPlayer == PieceColor.White && !BoardViewModelObject.WhiteIsHumnan) ||
                 (BoardViewModelObject.CurrentPlayer == PieceColor.Black && !BoardViewModelObject.BlackIsHuman))
             {
                 try
@@ -65,7 +69,15 @@ namespace Checkers.UI
                     NotHumanMoveTimer.Stop();
                     await this.ShowMessageAsync("Remis", $"Gra zakończona remisem gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie może już wykonywać ruchów.");
                     HistoryViewModelObject.History.Clear();
-                    BoardViewModelObject.StartNewGame();
+                    StartNewGame(
+                        BoardViewModelObject.Game.Board.Size, 
+                        BoardViewModelObject.Game.Board.NumberOfWhitePiecesAtBeggining,
+                        BoardViewModelObject.Game.Board.NumberOfBlackPiecesAtBeggining,
+                        BoardViewModelObject.Game.Variant,
+                        BoardViewModelObject.Game.WhitePlayerEngine.Kind,
+                        BoardViewModelObject.Game.BlackPlayerEngine.Kind,
+                        BoardViewModelObject.MoveAnimationTime
+                        );
                     NotHumanMoveTimer.Start();
                 }
                 catch (NoAvailablePiecesException exception)
@@ -74,7 +86,15 @@ namespace Checkers.UI
                     BoardViewModelObject.DrawNextMove(exception.LastMove);
                     await this.ShowMessageAsync("Koniec gry", $"Gra zakończony. Gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie ma już pionków.");
                     HistoryViewModelObject.History.Clear();
-                    BoardViewModelObject.StartNewGame();
+                    StartNewGame(
+                        BoardViewModelObject.Game.Board.Size,
+                        BoardViewModelObject.Game.Board.NumberOfWhitePiecesAtBeggining,
+                        BoardViewModelObject.Game.Board.NumberOfBlackPiecesAtBeggining,
+                        BoardViewModelObject.Game.Variant,
+                        BoardViewModelObject.Game.WhitePlayerEngine.Kind,
+                        BoardViewModelObject.Game.BlackPlayerEngine.Kind,
+                        BoardViewModelObject.MoveAnimationTime
+                        );
                     NotHumanMoveTimer.Start();
                 }
                 catch (WrongMoveException exception)
@@ -97,9 +117,44 @@ namespace Checkers.UI
 
         HistoryViewModel HistoryViewModelObject;
 
+        public async void StartNewGame(
+            int boardSize, 
+            int whiteCountSize, 
+            int blackCountSize, 
+            GameVariant gameVariant,
+            EngineKind whiteEngineKind,
+            EngineKind blackEngineKind,
+            int moveAnimationTime)
+        {
+            try
+            {
+                BoardViewModelObject.StartNewGame(
+                    boardSize, 
+                    whiteCountSize, 
+                    blackCountSize,
+                    gameVariant,
+                    whiteEngineKind,
+                    blackEngineKind,
+                    moveAnimationTime);
+                HistoryViewModelObject.History.Clear();
+                HistoryShowed = false;
+            }
+            catch (ArgumentException e)
+            {
+                await this.ShowMessageAsync("Błąd", $"{e.Message}");
+            }
+        }
+
         public void BoardViewControl_Loaded(object sender, RoutedEventArgs e)
         {
-            BoardViewModelObject.StartNewGame();
+            StartNewGame(
+                boardSize: 10,
+                whiteCountSize: 20,
+                blackCountSize: 20,
+                gameVariant: GameVariant.Checkers,
+                whiteEngineKind: EngineKind.Human,
+                blackEngineKind: EngineKind.Random,
+                moveAnimationTime: 33);
             BoardViewControl.DataContext = BoardViewModelObject;
             BoardCanvas = UiHelper.FindChild<Canvas>(BoardViewControl, "BoardCanvas");
             BoardCanvas.MouseDown += BoardCanvas_MouseDown;
@@ -118,7 +173,7 @@ namespace Checkers.UI
                         || (BoardViewModelObject.CurrentPlayer == PieceColor.Black && BoardViewModelObject.BlackIsHuman))
                     {
                         var path = (Path)clickedElement;
-                        if (path.Data is EllipseGeometry)
+                        if (path.Data is EllipseGeometry && path.StrokeThickness != 2)
                         {
                             if (HumanPlayerMove.Count != 0)
                             {
@@ -167,7 +222,7 @@ namespace Checkers.UI
                                 HumanPlayerMove.Clear();
                                 return;
                             }
-                            if (path.Fill == Brushes.Gold)
+                            if (path.Fill == Brushes.Gold && e.LeftButton == MouseButtonState.Pressed)
                             {
 
                                 try
@@ -219,15 +274,27 @@ namespace Checkers.UI
                 catch (NotAvailableMoveException exception)
                 {
                     await this.ShowMessageAsync("Remis", $"Gra zakończona remisem gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie może już wykonywać ruchów.");
-                    HistoryViewModelObject.History.Clear();
-                    BoardViewModelObject.StartNewGame();
+                    StartNewGame(
+                        BoardViewModelObject.Game.Board.Size,
+                        BoardViewModelObject.Game.Board.NumberOfWhitePiecesAtBeggining,
+                        BoardViewModelObject.Game.Board.NumberOfBlackPiecesAtBeggining,
+                        BoardViewModelObject.Game.Variant,
+                        BoardViewModelObject.Game.WhitePlayerEngine.Kind,
+                        BoardViewModelObject.Game.BlackPlayerEngine.Kind,
+                        BoardViewModelObject.MoveAnimationTime);
                 }
                 catch (NoAvailablePiecesException exception)
                 {
                     BoardViewModelObject.DrawNextMove(exception.LastMove);
                     await this.ShowMessageAsync("Koniec gry", $"Gra zakończony. Gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie ma już pionków.");
-                    HistoryViewModelObject.History.Clear();
-                    BoardViewModelObject.StartNewGame();
+                    StartNewGame(
+                        BoardViewModelObject.Game.Board.Size,
+                        BoardViewModelObject.Game.Board.NumberOfWhitePiecesAtBeggining,
+                        BoardViewModelObject.Game.Board.NumberOfBlackPiecesAtBeggining,
+                        BoardViewModelObject.Game.Variant,
+                        BoardViewModelObject.Game.WhitePlayerEngine.Kind,
+                        BoardViewModelObject.Game.BlackPlayerEngine.Kind,
+                        BoardViewModelObject.MoveAnimationTime);
                 }
                 catch (WrongMoveException exception)
                 {
@@ -279,7 +346,7 @@ namespace Checkers.UI
                 if (pathElem.Data is RectangleGeometry || pathElem.Data is EllipseGeometry)
                 {
                     var pos = BoardViewModelObject.BoardCanvasElements.SingleOrDefault(es => es.Geometry == pathElem.Data);
-                    var position = Piece.ToPosition(pos.X, pos.Y, 10);
+                    var position = Piece.ToPosition(pos.X, pos.Y, BoardViewModelObject.Game.Board.Size);
                     if (position == -1)
                     {
                         PositionLabel.Content = " ";
@@ -294,6 +361,29 @@ namespace Checkers.UI
             {
                 PositionLabel.Content = "?";
             }
+        }
+
+        private void SettingsButtonClick(object sender, RoutedEventArgs e)
+        {
+            if (settingsWindow != null)
+            {
+                settingsWindow.Activate();
+                return;
+            }
+
+            settingsWindow = new SettingsWindow(
+                this,
+                BoardViewModelObject.Game.Board.Size,
+                BoardViewModelObject.Game.Board.NumberOfWhitePiecesAtBeggining,
+                BoardViewModelObject.Game.Board.NumberOfBlackPiecesAtBeggining,
+                BoardViewModelObject.Game.Variant,
+                BoardViewModelObject.Game.WhitePlayerEngine.Kind,
+                BoardViewModelObject.Game.BlackPlayerEngine.Kind,
+                BoardViewModelObject.MoveAnimationTime);
+            settingsWindow.Owner = this;
+            settingsWindow.Closed += (o, args) => settingsWindow = null;
+
+            settingsWindow.Show();
         }
     }
 }

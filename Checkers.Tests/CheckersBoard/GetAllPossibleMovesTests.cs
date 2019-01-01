@@ -17,12 +17,12 @@ namespace Checkers.Tests
         {
             CheckersBoard board = new CheckersBoard(10, new List<Piece>()
             {
-                new Piece(4,4, PieceColor.White, true),
-                new Piece(6,6, PieceColor.Black, false),
-                new Piece(7,7, PieceColor.Black, false),
-                new Piece(8,8, PieceColor.Black, false)
+                new Piece(4,4, PieceColor.White, 10, true),
+                new Piece(6,6, PieceColor.Black, 10, false),
+                new Piece(7,7, PieceColor.Black, 10, false),
+                new Piece(8,8, PieceColor.Black, 10, false)
             });
-            var moves = board.GetAllPossibleMoves(PieceColor.White);
+            var moves = board.GetAllPossibleMoves(PieceColor.White); ;
             Assert.IsTrue(moves.Where(m => m.BeatedPieces == null).Count() > 0);
         }
 
@@ -31,9 +31,9 @@ namespace Checkers.Tests
         {
             CheckersBoard board = new CheckersBoard(10, new List<Piece>()
             {
-                new Piece(1,1, PieceColor.White, true),
-                new Piece(5,5, PieceColor.Black, false),
-                new Piece(7,7, PieceColor.Black, false)
+                new Piece(1,1, PieceColor.White, 10, true),
+                new Piece(5,5, PieceColor.Black, 10, false),
+                new Piece(7,7, PieceColor.Black, 10, false)
             });
             var moves = board.GetAllPossibleMoves(PieceColor.White);
             Assert.IsTrue(moves.Where(m => m.BeatedPieces?.Count == 2).Count() > 0);
@@ -44,9 +44,9 @@ namespace Checkers.Tests
         {
             CheckersBoard board = new CheckersBoard(10, new List<Piece>()
             {
-                new Piece(1,1, PieceColor.White, true),
-                new Piece(5,5, PieceColor.Black, false),
-                new Piece(8,8, PieceColor.Black, false)
+                new Piece(1,1, PieceColor.White, 10, true),
+                new Piece(5,5, PieceColor.Black, 10, false),
+                new Piece(8,8, PieceColor.Black, 10, false)
             });
             var moves = board.GetAllPossibleMoves(PieceColor.White);
             Assert.IsTrue(moves.Where(m => m.BeatedPieces?.Count == 2).Count() > 0);
@@ -57,9 +57,9 @@ namespace Checkers.Tests
         {
             CheckersBoard board = new CheckersBoard(10, new List<Piece>()
             {
-                new Piece(3,3, PieceColor.White, true),
-                new Piece(1,1, PieceColor.Black, false),
-                new Piece(8,8, PieceColor.Black, false)
+                new Piece(3,3, PieceColor.White, 10, true),
+                new Piece(1,1, PieceColor.Black, 10, false),
+                new Piece(8,8, PieceColor.Black, 10, false)
             });
             var moves = board.GetAllPossibleMoves(PieceColor.White);
             Assert.IsTrue(moves.Where(m => m.BeatedPieces?.Count == 1).Count() == 2);
@@ -70,15 +70,15 @@ namespace Checkers.Tests
         {
             CheckersBoard board = new CheckersBoard(10, new List<Piece>()
             {
-                new Piece(1,1, PieceColor.White, true),
-                new Piece(3,3, PieceColor.Black, false),
-                new Piece(2,4, PieceColor.Black, false),
-                new Piece(2,6, PieceColor.Black, false),
-                new Piece(2,8, PieceColor.Black, false),
-                new Piece(4,8, PieceColor.Black, false),
-                new Piece(8,2, PieceColor.Black, false),
-                new Piece(8,4, PieceColor.Black, false),
-                new Piece(6,6, PieceColor.Black, false)
+                new Piece(1,1, PieceColor.White, 10, true),
+                new Piece(3,3, PieceColor.Black, 10, false),
+                new Piece(2,4, PieceColor.Black, 10, false),
+                new Piece(2,6, PieceColor.Black, 10, false),
+                new Piece(2,8, PieceColor.Black, 10, false),
+                new Piece(4,8, PieceColor.Black, 10, false),
+                new Piece(8,2, PieceColor.Black, 10, false),
+                new Piece(8,4, PieceColor.Black, 10, false),
+                new Piece(6,6, PieceColor.Black, 10, false)
             });
             var moves = board.GetAllPossibleMoves(PieceColor.White);
             Assert.IsTrue(moves.Where(m => m.BeatedPieces?.Count == 7).Count() > 0 && moves.Where(m => m.BeatedPieces.Last().Row == 4 || m.BeatedPieces.Last().Column == 8).Count() == 0);
@@ -89,17 +89,17 @@ namespace Checkers.Tests
         {
             CheckersBoard board = new CheckersBoard(10, new List<Piece>()
             {
-                new Piece(1,1, PieceColor.White, true),
-                new Piece(3,3, PieceColor.Black, false),
-                new Piece(2,4, PieceColor.Black, false),
-                new Piece(3,5, PieceColor.Black, false),
-                new Piece(2,8, PieceColor.Black, false),
-                new Piece(1,5, PieceColor.Black, false),
-                new Piece(3,7, PieceColor.Black, false),
-                new Piece(7,3, PieceColor.Black, false),
-                new Piece(7,5, PieceColor.Black, false),
-                new Piece(5,7, PieceColor.Black, false),
-                new Piece(0,4, PieceColor.Black, false),
+                new Piece(1,1, PieceColor.White, 10, true),
+                new Piece(3,3, PieceColor.Black, 10, false),
+                new Piece(2,4, PieceColor.Black, 10, false),
+                new Piece(3,5, PieceColor.Black, 10, false),
+                new Piece(2,8, PieceColor.Black, 10, false),
+                new Piece(1,5, PieceColor.Black, 10, false),
+                new Piece(3,7, PieceColor.Black, 10, false),
+                new Piece(7,3, PieceColor.Black, 10, false),
+                new Piece(7,5, PieceColor.Black, 10, false),
+                new Piece(5,7, PieceColor.Black, 10, false),
+                new Piece(0,4, PieceColor.Black, 10, false),
 
             });
             var moves = board.GetAllPossibleMoves(PieceColor.White);
@@ -111,16 +111,16 @@ namespace Checkers.Tests
         {
             CheckersBoard board = new CheckersBoard(10, new List<Piece>()
             {
-                new Piece(1,1, PieceColor.White, false),
-                new Piece(3,3, PieceColor.Black, false),
-                new Piece(2,4, PieceColor.Black, false),
-                new Piece(3,5, PieceColor.Black, false),
-                new Piece(2,8, PieceColor.Black, false),
-                new Piece(1,5, PieceColor.Black, false),
-                new Piece(3,7, PieceColor.Black, false),
-                new Piece(7,3, PieceColor.Black, false),
-                new Piece(7,5, PieceColor.Black, false),
-                new Piece(5,7, PieceColor.Black, false)
+                new Piece(1,1, PieceColor.White, 10, false),
+                new Piece(3,3, PieceColor.Black, 10, false),
+                new Piece(2,4, PieceColor.Black, 10, false),
+                new Piece(3,5, PieceColor.Black, 10, false),
+                new Piece(2,8, PieceColor.Black, 10, false),
+                new Piece(1,5, PieceColor.Black, 10, false),
+                new Piece(3,7, PieceColor.Black, 10, false),
+                new Piece(7,3, PieceColor.Black, 10, false),
+                new Piece(7,5, PieceColor.Black, 10, false),
+                new Piece(5,7, PieceColor.Black, 10, false)
             });
             var moves = board.GetAllPossibleMoves(PieceColor.White);
             Assert.IsTrue(moves.Where(m => (m.BeatedPieces?.Count ?? 0) == 0).Count() > 0);
@@ -131,16 +131,16 @@ namespace Checkers.Tests
         {
             CheckersBoard board = new CheckersBoard(10, new List<Piece>()
             {
-                new Piece(2,2, PieceColor.White, false),
-                new Piece(3,3, PieceColor.Black, false),
-                new Piece(2,4, PieceColor.Black, false),
-                new Piece(3,5, PieceColor.Black, false),
-                new Piece(2,8, PieceColor.Black, false),
-                new Piece(1,5, PieceColor.Black, false),
-                new Piece(3,7, PieceColor.Black, false),
-                new Piece(7,3, PieceColor.Black, false),
-                new Piece(7,5, PieceColor.Black, false),
-                new Piece(5,7, PieceColor.Black, false)
+                new Piece(2,2, PieceColor.White, 10, false),
+                new Piece(3,3, PieceColor.Black, 10, false),
+                new Piece(2,4, PieceColor.Black, 10, false),
+                new Piece(3,5, PieceColor.Black, 10, false),
+                new Piece(2,8, PieceColor.Black, 10, false),
+                new Piece(1,5, PieceColor.Black, 10, false),
+                new Piece(3,7, PieceColor.Black, 10, false),
+                new Piece(7,3, PieceColor.Black, 10, false),
+                new Piece(7,5, PieceColor.Black, 10, false),
+                new Piece(5,7, PieceColor.Black, 10, false)
             });
             var moves = board.GetAllPossibleMoves(PieceColor.White);
             Assert.IsTrue(moves.Where(m => m.BeatedPieces?.Count == 6).Count() > 0);
@@ -151,12 +151,12 @@ namespace Checkers.Tests
         {
             CheckersBoard board = new CheckersBoard(10, new List<Piece>()
             {
-                new Piece(3, 5, PieceColor.White, true),
-                new Piece(4, 6, PieceColor.Black, true),
-                new Piece(6, 8, PieceColor.Black, true),
-                new Piece(7, 5, PieceColor.Black, true),
-                new Piece(7, 3, PieceColor.Black, true),
-                new Piece(3, 1, PieceColor.Black, true)
+                new Piece(3, 5, PieceColor.White, 10, true),
+                new Piece(4, 6, PieceColor.Black, 10, true),
+                new Piece(6, 8, PieceColor.Black, 10, true),
+                new Piece(7, 5, PieceColor.Black, 10, true),
+                new Piece(7, 3, PieceColor.Black, 10, true),
+                new Piece(3, 1, PieceColor.Black, 10, true)
             });
             var moves = board.GetAllPossibleMoves(PieceColor.White);
             Assert.IsTrue(moves.Where(m => m.BeatedPieces?.Count == 4).Count() > 0);
@@ -167,11 +167,11 @@ namespace Checkers.Tests
         {
             CheckersBoard board = new CheckersBoard(10, new List<Piece>()
             {
-                new Piece(9,5, PieceColor.White, true),
-                new Piece(8,4, PieceColor.Black, true),
-                new Piece(6,4, PieceColor.Black, true),
-                new Piece(8,6, PieceColor.Black, true),
-                new Piece(6,6, PieceColor.Black, true)
+                new Piece(9,5, PieceColor.White, 10, true),
+                new Piece(8,4, PieceColor.Black, 10, true),
+                new Piece(6,4, PieceColor.Black, 10, true),
+                new Piece(8,6, PieceColor.Black, 10, true),
+                new Piece(6,6, PieceColor.Black, 10, true)
             });
             var moves = board.GetAllPossibleMoves(PieceColor.White);
             Assert.IsTrue(moves.Where(m => m.BeatedPieces?.Count == 4).Count() > 0);

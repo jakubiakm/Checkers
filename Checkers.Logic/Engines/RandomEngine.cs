@@ -12,11 +12,24 @@ namespace Checkers.Logic.Engines
 {
     public class RandomEngine : IEngine
     {
+        public EngineKind Kind
+        {
+            get
+            {
+                return EngineKind.Random;
+            }
+        }
+
         public PieceColor Color { get; set; }
 
         public RandomEngine(PieceColor color)
         {
             Color = color;
+        }
+
+        public string GetName()
+        {
+            return "Losowy";
         }
 
         public Move MakeMove(CheckersBoard currentBoard)

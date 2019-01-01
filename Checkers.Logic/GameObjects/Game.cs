@@ -21,20 +21,24 @@ namespace Checkers.Logic.GameObjects
 
         public IEngine BlackPlayerEngine { get; private set; }
 
-        public Game(IEngine whiteEngine, IEngine blackEngine, int boardSize = 10, int numberOfWhitePieces = 20, int numberOfBlackPieces = 20)
+        public GameVariant Variant { get; set; }
+
+        public Game(IEngine whiteEngine, IEngine blackEngine, int boardSize, int numberOfWhitePieces, int numberOfBlackPieces, GameVariant variant)
         {
             WhitePlayerEngine = whiteEngine;
             BlackPlayerEngine = blackEngine;
             Board = new CheckersBoard(boardSize, numberOfWhitePieces, numberOfBlackPieces);
             History = new List<CheckersBoard>();
+            Variant = variant;
         }
 
-        public Game(IEngine whiteEngine, IEngine blackEngine, int boardSize, List<Piece> pieces)
+        public Game(IEngine whiteEngine, IEngine blackEngine, int boardSize, List<Piece> pieces, GameVariant variant)
         {
             WhitePlayerEngine = whiteEngine;
             BlackPlayerEngine = blackEngine;
             Board = new CheckersBoard(boardSize, pieces);
             History = new List<CheckersBoard>();
+            Variant = variant;
         }
 
         public Move MakeMove(PieceColor color)

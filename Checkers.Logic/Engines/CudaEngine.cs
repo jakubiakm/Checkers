@@ -12,6 +12,14 @@ namespace Checkers.Logic.Engines
 {
     public class CudaEngine : IEngine
     {
+        public EngineKind Kind
+        {
+            get
+            {
+                return EngineKind.Cuda;
+            }
+        }
+
         public PieceColor Color { get; set; }
 
         public CudaEngine(PieceColor color)
