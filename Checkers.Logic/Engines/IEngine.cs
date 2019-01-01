@@ -9,6 +9,8 @@ namespace Checkers.Logic.Engines
 {
     public interface IEngine
     {
+        string GetName();
+
         Move MakeMove(CheckersBoard currentBoard);
     }
 }

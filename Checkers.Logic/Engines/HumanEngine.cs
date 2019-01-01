@@ -19,6 +19,12 @@ namespace Checkers.Logic.Engines
         {
             Color = color;
         }
+
+        public string GetName()
+        {
+            return "Człowiek";
+        }
+
         public Move MakeMove(CheckersBoard currentBoard)
         {
             List<Move> allPossibleMoves = currentBoard.GetAllPossibleMoves(Color);

@@ -42,6 +42,7 @@ namespace Checkers.UI.ViewModel
 
         public void StartNewGame(int boardSize, int whiteCountSize, int blackCountSize)
         {
+            
             CurrentPlayer = PieceColor.White;
             Game = new Game(new HumanEngine(PieceColor.White), new RandomEngine(PieceColor.Black), boardSize, whiteCountSize, blackCountSize);
             WhiteIsHumnan = Game.WhitePlayerEngine is HumanEngine;

@@ -70,13 +70,18 @@
                     <Controls:NumericUpDown x:Name="NumberOfWhitePiecese" Width="80" HorizontalAlignment="Center" Margin="0 0 2 0" Value="20" Minimum="1" VerticalAlignment="Center"/>
                     <Controls:NumericUpDown x:Name="NumberOfBlackPiecese" Width="80" HorizontalAlignment="Center" Margin="0 0 2 0" Value="20" Minimum="1" VerticalAlignment="Center"/>
                 </UniformGrid>
-                <UniformGrid Grid.Row="3" Margin="5" Columns="1" Rows="2">
+                <UniformGrid Grid.Row="3" Margin="5" Columns="2" Rows="2">
                     <TextBlock Text="Silnik białego gracza" Margin="0 0 2 0" VerticalAlignment="Center"/>
+                    <TextBlock Text="Silnik czarnego gracza" Margin="5 0 2 0" VerticalAlignment="Center"/>
                     <ComboBox x:Name="WhitePlayerEngineCombobox" VerticalAlignment="Center" Margin="0 0 2 0" />
+                    <ComboBox x:Name="BlackPlayerEngingeCombobox" Margin="5 0 2 0" VerticalAlignment="Center"/>
                 </UniformGrid>
+
                 <UniformGrid Grid.Row="5" Margin="5" Columns="1" Rows="2">
-                    <TextBlock Text="Silnik czarnego gracza" Margin="0 0 2 0" VerticalAlignment="Center"/>
-                    <ComboBox x:Name="BlackPlayerEngingeCombobox" Margin="0 0 2 0" VerticalAlignment="Center"/>
+                    <TextBlock Text="Wariant gry" Margin="0 0 2 0" VerticalAlignment="Center"/>
+                    <ComboBox x:Name="GameVariant" Margin="0 0 2 0" VerticalAlignment="Center">
+                        
+                    </ComboBox>
                 </UniformGrid>
             </Grid>
         </GroupBox>
@@ -103,7 +108,7 @@
                     <TextBlock Text="Czas trwania animacji" Margin="0 0 2 0" VerticalAlignment="Center" />
                     <TextBlock Text="Akcenty okna" Margin="10 0 2 0" VerticalAlignment="Center" />
 
-                    <Slider x:Name="AnimationTime" Margin="0 0 2 0" VerticalAlignment="Center"/>
+                    <Slider x:Name="AnimationTime" Margin="0 0 2 0" Minimum="0" Maximum="100" Value="50" VerticalAlignment="Center"/>
                     <ComboBox x:Name="AccentSelector"
                               Margin="10 0 2 0"
                               VerticalAlignment="Center"

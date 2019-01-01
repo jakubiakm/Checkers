@@ -18,6 +18,11 @@ namespace Checkers.Logic.Engines
             Color = color;
         }
 
+        public string GetName()
+        {
+            return "Losowy";
+        }
+
         public Move MakeMove(CheckersBoard currentBoard)
         {
             Random random = new Random();

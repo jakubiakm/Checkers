@@ -50,6 +50,7 @@ namespace Checkers.UI
         {
             var theme = ThemeManager.DetectAppStyle(Application.Current);
             ThemeManager.ChangeAppStyle(Application.Current, theme.Item2, ThemeManager.GetAppTheme("Base" + ((Button)sender).Content));
+            ThemeManager.ChangeAppStyle(this, theme.Item2, ThemeManager.GetAppTheme("Base" + ((Button)sender).Content));
         }
 
         private void AccentSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -59,6 +60,7 @@ namespace Checkers.UI
             {
                 var theme = ThemeManager.DetectAppStyle(Application.Current);
                 ThemeManager.ChangeAppStyle(Application.Current, selectedAccent, theme.Item1);
+                ThemeManager.ChangeAppStyle(this, selectedAccent, theme.Item1);
                 Application.Current.MainWindow.Activate();
             }
         }

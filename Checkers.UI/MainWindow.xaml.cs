@@ -42,9 +42,8 @@ namespace Checkers.UI
         public void SetNotHumanMoveTimer()
         {
             NotHumanMoveTimer = new DispatcherTimer();
-            // Hook up the Elapsed event for the timer. 
             NotHumanMoveTimer.Tick += Timer_Elapsed;
-            NotHumanMoveTimer.Interval = new TimeSpan(0, 0, 0, 0, 200);
+            NotHumanMoveTimer.Interval = new TimeSpan(0, 0, 0, 0, 1);
             NotHumanMoveTimer.Start();
         }
 
@@ -105,6 +104,8 @@ namespace Checkers.UI
             try
             {
                 BoardViewModelObject.StartNewGame(boardSize, whiteCountSize, blackCountSize);
+                HistoryViewModelObject.History.Clear();
+                HistoryShowed = false;
             }
             catch (ArgumentException e)
             {
@@ -234,14 +235,12 @@ namespace Checkers.UI
                 catch (NotAvailableMoveException exception)
                 {
                     await this.ShowMessageAsync("Remis", $"Gra zakończona remisem gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie może już wykonywać ruchów.");
-                    HistoryViewModelObject.History.Clear();
                     StartNewGame();
                 }
                 catch (NoAvailablePiecesException exception)
                 {
                     BoardViewModelObject.DrawNextMove(exception.LastMove);
                     await this.ShowMessageAsync("Koniec gry", $"Gra zakończony. Gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie ma już pionków.");
-                    HistoryViewModelObject.History.Clear();
                     StartNewGame();
                 }
                 catch (WrongMoveException exception)
