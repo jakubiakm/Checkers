@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -49,6 +50,8 @@ namespace Checkers.UI
             NotHumanMoveTimer.Start();
         }
 
+
+
         private async void Timer_Elapsed(object sender, EventArgs e)
         {
             if (BoardViewModelObject.Game != null &&
@@ -57,6 +60,8 @@ namespace Checkers.UI
             {
                 try
                 {
+                    //TODO nie działa dla CUDA
+                    //var move = await Task.Factory.StartNew(() => BoardViewModelObject.NextMove());
                     var move = BoardViewModelObject.NextMove();
                     if (move != null)
                     {
@@ -76,8 +81,7 @@ namespace Checkers.UI
                         BoardViewModelObject.Game.Variant,
                         BoardViewModelObject.Game.WhitePlayerEngine.Kind,
                         BoardViewModelObject.Game.BlackPlayerEngine.Kind,
-                        BoardViewModelObject.MoveAnimationTime
-                        );
+                        BoardViewModelObject.MoveAnimationTime);
                     NotHumanMoveTimer.Start();
                 }
                 catch (NoAvailablePiecesException exception)
@@ -93,8 +97,7 @@ namespace Checkers.UI
                         BoardViewModelObject.Game.Variant,
                         BoardViewModelObject.Game.WhitePlayerEngine.Kind,
                         BoardViewModelObject.Game.BlackPlayerEngine.Kind,
-                        BoardViewModelObject.MoveAnimationTime
-                        );
+                        BoardViewModelObject.MoveAnimationTime);
                     NotHumanMoveTimer.Start();
                 }
                 catch (WrongMoveException exception)

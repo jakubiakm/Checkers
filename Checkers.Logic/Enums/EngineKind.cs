@@ -15,7 +15,7 @@ namespace Checkers.Logic.Enums
         [Description("Losowy")]
         Random,
 
-        [Description("NVIDIA CUDA MCTS UCT")]
+        [Description("Nvidia cuda mcts")]
         Cuda
     }
 }
