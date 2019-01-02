@@ -34,6 +34,12 @@ namespace Checkers.Logic.Engines
         [DllImport(@"D:\Users\syntaximus\Documents\GitHub\Checkers\x64\Release\Checkers.Cuda.dll", CharSet = CharSet.Ansi, SetLastError = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int MakeMoveGpu(char size, int player, char[] board, char[] possibleMoves);
 #endif
+
+        public void Reset()
+        {
+
+        }
+
         public Move MakeMove(CheckersBoard currentBoard)
         {
             Random random = new Random();

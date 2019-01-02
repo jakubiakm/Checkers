@@ -27,9 +27,13 @@ namespace Checkers.Logic.Engines
         /// <returns></returns>
         Move MakeMove(CheckersBoard currentBoard);
 
+<<<<<<< HEAD
+
+=======
         /// <summary>
         /// Resetowanie silnika - po każdej rozegranej grze wartości silnika powinny zostać zresetowane (jak np. ziarno do generatora liczb pseudolosowych)
         /// </summary>
         void Reset();
+>>>>>>> master
     }
 }

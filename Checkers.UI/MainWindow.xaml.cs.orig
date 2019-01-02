@@ -79,8 +79,13 @@ namespace Checkers.UI
                         BoardViewModelObject.Game.Board.NumberOfWhitePiecesAtBeggining,
                         BoardViewModelObject.Game.Board.NumberOfBlackPiecesAtBeggining,
                         BoardViewModelObject.Game.Variant,
+<<<<<<< HEAD
+                        BoardViewModelObject.Game.WhitePlayerEngine.Kind,
+                        BoardViewModelObject.Game.BlackPlayerEngine.Kind,
+=======
                         BoardViewModelObject.Game.WhitePlayerEngine,
                         BoardViewModelObject.Game.BlackPlayerEngine,
+>>>>>>> master
                         BoardViewModelObject.MoveAnimationTime);
                     NotHumanMoveTimer.Start();
                 }
@@ -95,9 +100,16 @@ namespace Checkers.UI
                         BoardViewModelObject.Game.Board.NumberOfWhitePiecesAtBeggining,
                         BoardViewModelObject.Game.Board.NumberOfBlackPiecesAtBeggining,
                         BoardViewModelObject.Game.Variant,
+<<<<<<< HEAD
+                        BoardViewModelObject.Game.WhitePlayerEngine.Kind,
+                        BoardViewModelObject.Game.BlackPlayerEngine.Kind,
+                        BoardViewModelObject.MoveAnimationTime);
+=======
                         BoardViewModelObject.Game.WhitePlayerEngine,
                         BoardViewModelObject.Game.BlackPlayerEngine,
-                        BoardViewModelObject.MoveAnimationTime);
+                        BoardViewModelObject.MoveAnimationTime
+                        );
+>>>>>>> master
                     NotHumanMoveTimer.Start();
                 }
                 catch (WrongMoveException exception)

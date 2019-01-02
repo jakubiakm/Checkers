@@ -65,8 +65,26 @@ namespace Checkers.UI.ViewModel
             BlackIsHuman = Game.BlackPlayerEngine is HumanEngine;
             skipSize = 700 / Game.Board.Size;
             DrawCurrentBoard();
+<<<<<<< HEAD
+        }
+
+        public IEngine ConvertEngineKindEnumToEngine(EngineKind kind, PieceColor color)
+        {
+            switch (kind)
+            {
+                case EngineKind.Human:
+                    return new HumanEngine(color);
+                case EngineKind.Random:
+                    return new RandomEngine(color);
+                case EngineKind.Cuda:
+                    return new CudaEngine(color);
+                default:
+                    throw new ArgumentException("Nierozpoznany typ silnika");
+            }
+=======
             Game.WhitePlayerEngine.Reset();
             Game.BlackPlayerEngine.Reset();
+>>>>>>> master
         }
 
         public Move NextMove(List<Path> humanMoves = null)

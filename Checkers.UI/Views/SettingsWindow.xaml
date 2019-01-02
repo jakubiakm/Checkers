@@ -34,7 +34,6 @@
     </Controls:MetroWindow.TitleTemplate>
 
     <Grid>
-
         <Grid.Resources>
             <Style TargetType="Button"
                    BasedOn="{StaticResource MetroButton}">
@@ -49,35 +48,38 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <GroupBox Grid.Row="0"
+        <Grid Grid.Row="0">
+            <GroupBox
                   Margin="5"
                   Header="Ustawienia silnika">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
 
-                <UniformGrid Grid.Row="1" Margin="5" Columns="3" Rows="2">
-                    <TextBlock Text="Rozmiar planszy" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    <TextBlock Text="Liczba białych pionków" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    <TextBlock Text="Liczba czarnych pionków" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    <Controls:NumericUpDown 
+                    <UniformGrid Grid.Row="1" Margin="5" Columns="3" Rows="2">
+                        <TextBlock Text="Rozmiar planszy" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Liczba białych pionków" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Liczba czarnych pionków" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <Controls:NumericUpDown 
                         x:Name="BoardSize" 
                         Width="80" 
                         Margin="0 0 2 0" 
                         Value="{Binding Path=BoardSize, Mode=TwoWay}"
                         Minimum="6" 
-                        Maximum="40" 
+                        Maximum="24" 
                         HorizontalAlignment="Center" 
                         VerticalAlignment="Center"/>
-                    <Controls:NumericUpDown 
+                        <Controls:NumericUpDown 
                         x:Name="NumberOfWhitePieces" 
                         Width="80" 
                         HorizontalAlignment="Center" 
@@ -85,7 +87,7 @@
                         Value="{Binding Path=WhitePiecesCount, Mode=TwoWay}"
                         Minimum="1" 
                         VerticalAlignment="Center"/>
-                    <Controls:NumericUpDown 
+                        <Controls:NumericUpDown 
                         x:Name="NumberOfBlackPieces" 
                         Width="80" 
                         HorizontalAlignment="Center" 
@@ -93,11 +95,11 @@
                         Value="{Binding Path=BlackPiecesCount, Mode=TwoWay}"
                         Minimum="1" 
                         VerticalAlignment="Center"/>
-                </UniformGrid>
-                <UniformGrid Grid.Row="3" Margin="5" Columns="2" Rows="2">
-                    <TextBlock Text="Silnik białego gracza" Margin="0 0 2 0" VerticalAlignment="Center"/>
-                    <TextBlock Text="Silnik czarnego gracza" Margin="5 0 2 0" VerticalAlignment="Center"/>
-                    <ComboBox 
+                    </UniformGrid>
+                    <UniformGrid Grid.Row="3" Margin="5" Columns="2" Rows="2">
+                        <TextBlock Text="Silnik białego gracza" Margin="0 0 2 0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Silnik czarnego gracza" Margin="5 0 2 0" VerticalAlignment="Center"/>
+                        <ComboBox 
                         x:Name="WhitePlayerEngineCombobox" 
                         ItemsSource="{Binding Path=WhitePlayerEngineKind, Converter={x1:EnumToCollectionConverter}, Mode=OneTime}"
                         SelectedValue="{Binding Path=WhitePlayerEngineKind}"
@@ -105,19 +107,18 @@
                         DisplayMemberPath="Description"
                         VerticalAlignment="Center" 
                         Margin="0 0 2 0"  />
-                    <ComboBox 
-                        x:Name="BlackPlayerEngingeCombobox" 
+                        <ComboBox 
+                        x:Name="BlackPlayerEngineCombobox" 
                         ItemsSource="{Binding Path=BlackPlayerEngineKind, Converter={x1:EnumToCollectionConverter}, Mode=OneTime}"
                         SelectedValue="{Binding Path=BlackPlayerEngineKind}"
                         SelectedValuePath="Value"
                         DisplayMemberPath="Description"
                         VerticalAlignment="Center"
                         Margin="5 0 2 0"/>
-                </UniformGrid>
-
-                <UniformGrid Grid.Row="5" Margin="5" Columns="1" Rows="2">
-                    <TextBlock Text="Wariant gry" Margin="0 0 2 0" VerticalAlignment="Center"/>
-                    <ComboBox 
+                    </UniformGrid>
+                    <UniformGrid Grid.Row="5" Margin="5" Columns="1" Rows="2">
+                        <TextBlock Text="Wariant gry" Margin="0 0 2 0" VerticalAlignment="Center"/>
+                        <ComboBox 
                         x:Name="GameVariant"
                         ItemsSource="{Binding Path=CurrentGameVariant, Converter={x1:EnumToCollectionConverter}, Mode=OneTime}"
                         SelectedValue="{Binding Path=CurrentGameVariant}"
@@ -125,12 +126,121 @@
                         DisplayMemberPath="Description"
                         VerticalAlignment="Center" 
                         Margin="0 0 2 0">
-                    </ComboBox>
-                </UniformGrid>
-            </Grid>
-        </GroupBox>
+                        </ComboBox>
+                    </UniformGrid>
+                </Grid>
+            </GroupBox>
+        </Grid>
 
-        <GroupBox Grid.Row="1"
+        <Grid Grid.Row="1">
+            <Grid>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=WhitePlayerEngineCombobox, Path=SelectedIndex}" Value="1">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <GroupBox
+                  Margin="5"
+                  Header="Ustawienia białego gracza">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <UniformGrid Grid.Row="1" Margin="5" Columns="2" Rows="2">
+                            <TextBlock Text="Losowe ziarno" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Ziarno" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <CheckBox 
+                                Name="WhitePlayerRandomEngineUseRandomSeedCheckbox"
+                                VerticalAlignment="Center" 
+                                HorizontalAlignment="Center" 
+                                IsChecked="{Binding Path=WhitePlayerRandomEngineUseRandomSeed, Mode=TwoWay}"/>
+                            <TextBox 
+                                PreviewTextInput="NumberValidationTextBox"
+                                VerticalAlignment="Center" 
+                                HorizontalAlignment="Center" 
+                                TextAlignment="Center"
+                                MaxLength="9"
+                                Width="180"
+                                Text="{Binding Path=WhitePlayerRandomEngineSeedValue, Mode=TwoWay}">
+                                <TextBox.Style>
+                                    <Style TargetType="TextBox">
+                                        <Setter Property="IsEnabled" Value="False" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ElementName=WhitePlayerRandomEngineUseRandomSeedCheckbox, Path=IsChecked}" Value="False">
+                                                <Setter Property="IsEnabled" Value="True" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
+                        </UniformGrid>
+                    </Grid>
+                </GroupBox>
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Row="2">
+            <Grid>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=BlackPlayerEngineCombobox, Path=SelectedIndex}" Value="1">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <GroupBox
+                  Margin="5"
+                  Header="Ustawienia czarnego gracza">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <UniformGrid Grid.Row="1" Margin="5" Columns="2" Rows="2">
+                            <TextBlock Text="Losowe ziarno" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Ziarno" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <CheckBox 
+                                Name="BlackPlayerRandomEngineUseRandomSeedCheckbox"
+                                VerticalAlignment="Center" 
+                                HorizontalAlignment="Center"
+                                IsChecked="{Binding Path=BlackPlayerRandomEngineUseRandomSeed, Mode=TwoWay}"/>
+                            <TextBox 
+                                PreviewTextInput="NumberValidationTextBox"
+                                VerticalAlignment="Center" 
+                                HorizontalAlignment="Center" 
+                                TextAlignment="Center"
+                                MaxLength="9"
+                                Width="180"
+                                Text="{Binding Path=BlackPlayerRandomEngineSeedValue, Mode=TwoWay}">
+                                <TextBox.Style>
+                                    <Style TargetType="TextBox">
+                                        <Setter Property="IsEnabled" Value="False" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ElementName=BlackPlayerRandomEngineUseRandomSeedCheckbox, Path=IsChecked}" Value="False">
+                                                <Setter Property="IsEnabled" Value="True" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
+                        </UniformGrid>
+                    </Grid>
+                </GroupBox>
+            </Grid>
+        </Grid>
+
+        <GroupBox Grid.Row="3"
                   Margin="5"
                   Header="Wygląd aplikacji">
             <Grid>
@@ -173,7 +283,7 @@
                 </UniformGrid>
             </Grid>
         </GroupBox>
-        <Button Content="Gra od nowa" Grid.Row="3" Margin="5" Click="Button_Click"/>
+        <Button Content="Gra od nowa" Grid.Row="4" Margin="5" Click="Button_Click"/>
     </Grid>
 
 </Controls:MetroWindow>
