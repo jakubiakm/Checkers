@@ -21,24 +21,35 @@ namespace Checkers.Logic.Engines
 
         public PieceColor Color { get; set; }
 
-        public RandomEngine(PieceColor color)
+        public int? Seed { get; private set; }
+
+        private Random randomGenerator;
+
+        public RandomEngine(PieceColor color, int? seed)
         {
+            Seed = seed;
+            if (Seed != null)
+                randomGenerator = new Random((int)Seed);
+            else
+                randomGenerator = new Random();
             Color = color;
         }
 
-        public string GetName()
+        public void Reset()
         {
-            return "Losowy";
+            if (Seed != null)
+                randomGenerator = new Random((int)Seed);
+            else
+                randomGenerator = new Random();
         }
 
         public Move MakeMove(CheckersBoard currentBoard)
         {
-            Random random = new Random();
             List<Move> allPossibleMoves = currentBoard.GetAllPossibleMoves(Color);
             int count = allPossibleMoves.Count;
             if (count == 0)
                 throw new NotAvailableMoveException(Color);
-            int elemIndex = random.Next(count);       
+            int elemIndex = randomGenerator.Next(count);       
             return allPossibleMoves[elemIndex];
         }
     }

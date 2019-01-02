@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Markup;
 using System.Windows.Media;
+using Checkers.Logic.Engines;
 using Checkers.Logic.Enums;
 using Checkers.UI.ViewModel;
 using MahApps.Metro;
@@ -58,8 +60,8 @@ namespace Checkers.UI.Views
             int whiteCountSize,
             int blackCountSize,
             GameVariant gameVariant,
-            EngineKind whiteEngineKind,
-            EngineKind blackEngineKind,
+            IEngine whiteEngine,
+            IEngine blackEngine,
             int moveAnimationTime)
         {
             Window = window;
@@ -69,8 +71,8 @@ namespace Checkers.UI.Views
                  boardSize,
                  whiteCountSize,
                  blackCountSize,
-                 whiteEngineKind,
-                 blackEngineKind,
+                 whiteEngine,
+                 blackEngine,
                  gameVariant,
                  moveAnimationTime);
 
@@ -116,10 +118,36 @@ namespace Checkers.UI.Views
                     viewModel.WhitePiecesCount,
                     viewModel.BlackPiecesCount,
                     viewModel.CurrentGameVariant,
-                    viewModel.WhitePlayerEngineKind,
-                    viewModel.BlackPlayerEngineKind,
+                    ConvertEngineKindToEngine(viewModel.WhitePlayerEngineKind, PieceColor.White),
+                    ConvertEngineKindToEngine(viewModel.BlackPlayerEngineKind, PieceColor.Black),
                     viewModel.MoveAnimationTime);
             });
+        }
+
+        private IEngine ConvertEngineKindToEngine(EngineKind engineKind, PieceColor color)
+        {
+            switch(engineKind)
+            {
+                case EngineKind.Human:
+                    return new HumanEngine(color);
+                case EngineKind.Random:
+                    if(color == PieceColor.White)
+                    {
+                        return new RandomEngine(color, viewModel.WhitePlayerRandomEngineUseRandomSeed ? null : (int?)viewModel.WhitePlayerRandomEngineSeedValue);
+                    }
+                    else
+                    {
+                        return new RandomEngine(color, viewModel.BlackPlayerRandomEngineUseRandomSeed ? null : (int?)viewModel.BlackPlayerRandomEngineSeedValue);
+                    }
+                default:
+                    throw new ArgumentException("Nierozpoznany typ silnika");
+            }
+        }
+
+        private void NumberValidationTextBox(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("[^0-9]");
+            e.Handled = regex.IsMatch(e.Text);
         }
     }
 }

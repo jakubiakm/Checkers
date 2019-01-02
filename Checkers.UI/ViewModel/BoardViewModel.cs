@@ -47,16 +47,16 @@ namespace Checkers.UI.ViewModel
             int whiteCountSize,
             int blackCountSize,
             GameVariant gameVariant,
-            EngineKind whiteEngineKind,
-            EngineKind blackEngineKind,
+            IEngine whiteEngine,
+            IEngine blackEngine,
             int moveAnimationTime)
         {
 
             CurrentPlayer = PieceColor.White;
             MoveAnimationTime = moveAnimationTime;
             Game = new Game(
-                ConvertEngineKindEnumToEngine(whiteEngineKind, PieceColor.White),
-                ConvertEngineKindEnumToEngine(blackEngineKind, PieceColor.Black),
+                whiteEngine,
+                blackEngine,
                 boardSize,
                 whiteCountSize,
                 blackCountSize,
@@ -65,19 +65,8 @@ namespace Checkers.UI.ViewModel
             BlackIsHuman = Game.BlackPlayerEngine is HumanEngine;
             skipSize = 700 / Game.Board.Size;
             DrawCurrentBoard();
-        }
-
-        public IEngine ConvertEngineKindEnumToEngine(EngineKind kind, PieceColor color)
-        {
-            switch (kind)
-            {
-                case EngineKind.Human:
-                    return new HumanEngine(color);
-                case EngineKind.Random:
-                    return new RandomEngine(color);
-                default:
-                    throw new ArgumentException("Nierozpoznany typ silnika");
-            }
+            Game.WhitePlayerEngine.Reset();
+            Game.BlackPlayerEngine.Reset();
         }
 
         public Move NextMove(List<Path> humanMoves = null)

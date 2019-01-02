@@ -28,9 +28,9 @@ namespace Checkers.Logic.Engines
             Color = color;
         }
 
-        public string GetName()
+        public void Reset()
         {
-            return "Człowiek";
+
         }
 
         public Move MakeMove(CheckersBoard currentBoard)

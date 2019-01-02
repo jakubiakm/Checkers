@@ -74,10 +74,9 @@ namespace Checkers.UI
                         BoardViewModelObject.Game.Board.NumberOfWhitePiecesAtBeggining,
                         BoardViewModelObject.Game.Board.NumberOfBlackPiecesAtBeggining,
                         BoardViewModelObject.Game.Variant,
-                        BoardViewModelObject.Game.WhitePlayerEngine.Kind,
-                        BoardViewModelObject.Game.BlackPlayerEngine.Kind,
-                        BoardViewModelObject.MoveAnimationTime
-                        );
+                        BoardViewModelObject.Game.WhitePlayerEngine,
+                        BoardViewModelObject.Game.BlackPlayerEngine,
+                        BoardViewModelObject.MoveAnimationTime);
                     NotHumanMoveTimer.Start();
                 }
                 catch (NoAvailablePiecesException exception)
@@ -91,8 +90,8 @@ namespace Checkers.UI
                         BoardViewModelObject.Game.Board.NumberOfWhitePiecesAtBeggining,
                         BoardViewModelObject.Game.Board.NumberOfBlackPiecesAtBeggining,
                         BoardViewModelObject.Game.Variant,
-                        BoardViewModelObject.Game.WhitePlayerEngine.Kind,
-                        BoardViewModelObject.Game.BlackPlayerEngine.Kind,
+                        BoardViewModelObject.Game.WhitePlayerEngine,
+                        BoardViewModelObject.Game.BlackPlayerEngine,
                         BoardViewModelObject.MoveAnimationTime
                         );
                     NotHumanMoveTimer.Start();
@@ -122,8 +121,8 @@ namespace Checkers.UI
             int whiteCountSize, 
             int blackCountSize, 
             GameVariant gameVariant,
-            EngineKind whiteEngineKind,
-            EngineKind blackEngineKind,
+            IEngine whiteEngine,
+            IEngine blackEngine,
             int moveAnimationTime)
         {
             try
@@ -133,8 +132,8 @@ namespace Checkers.UI
                     whiteCountSize, 
                     blackCountSize,
                     gameVariant,
-                    whiteEngineKind,
-                    blackEngineKind,
+                    whiteEngine,
+                    blackEngine,
                     moveAnimationTime);
                 HistoryViewModelObject.History.Clear();
                 HistoryShowed = false;
@@ -152,8 +151,8 @@ namespace Checkers.UI
                 whiteCountSize: 20,
                 blackCountSize: 20,
                 gameVariant: GameVariant.Checkers,
-                whiteEngineKind: EngineKind.Human,
-                blackEngineKind: EngineKind.Random,
+                whiteEngine: new HumanEngine(PieceColor.White),
+                blackEngine: new RandomEngine(PieceColor.Black, null),
                 moveAnimationTime: 33);
             BoardViewControl.DataContext = BoardViewModelObject;
             BoardCanvas = UiHelper.FindChild<Canvas>(BoardViewControl, "BoardCanvas");
@@ -279,8 +278,8 @@ namespace Checkers.UI
                         BoardViewModelObject.Game.Board.NumberOfWhitePiecesAtBeggining,
                         BoardViewModelObject.Game.Board.NumberOfBlackPiecesAtBeggining,
                         BoardViewModelObject.Game.Variant,
-                        BoardViewModelObject.Game.WhitePlayerEngine.Kind,
-                        BoardViewModelObject.Game.BlackPlayerEngine.Kind,
+                        BoardViewModelObject.Game.WhitePlayerEngine,
+                        BoardViewModelObject.Game.BlackPlayerEngine,
                         BoardViewModelObject.MoveAnimationTime);
                 }
                 catch (NoAvailablePiecesException exception)
@@ -292,8 +291,8 @@ namespace Checkers.UI
                         BoardViewModelObject.Game.Board.NumberOfWhitePiecesAtBeggining,
                         BoardViewModelObject.Game.Board.NumberOfBlackPiecesAtBeggining,
                         BoardViewModelObject.Game.Variant,
-                        BoardViewModelObject.Game.WhitePlayerEngine.Kind,
-                        BoardViewModelObject.Game.BlackPlayerEngine.Kind,
+                        BoardViewModelObject.Game.WhitePlayerEngine,
+                        BoardViewModelObject.Game.BlackPlayerEngine,
                         BoardViewModelObject.MoveAnimationTime);
                 }
                 catch (WrongMoveException exception)
@@ -377,8 +376,8 @@ namespace Checkers.UI
                 BoardViewModelObject.Game.Board.NumberOfWhitePiecesAtBeggining,
                 BoardViewModelObject.Game.Board.NumberOfBlackPiecesAtBeggining,
                 BoardViewModelObject.Game.Variant,
-                BoardViewModelObject.Game.WhitePlayerEngine.Kind,
-                BoardViewModelObject.Game.BlackPlayerEngine.Kind,
+                BoardViewModelObject.Game.WhitePlayerEngine,
+                BoardViewModelObject.Game.BlackPlayerEngine,
                 BoardViewModelObject.MoveAnimationTime);
             settingsWindow.Owner = this;
             settingsWindow.Closed += (o, args) => settingsWindow = null;
