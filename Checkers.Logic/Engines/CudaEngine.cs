@@ -22,17 +22,26 @@ namespace Checkers.Logic.Engines
 
         public PieceColor Color { get; set; }
 
-        public CudaEngine(PieceColor color)
+        public int MctsIterationCount { get; set; }
+
+        public int GridSize { get; set; }
+
+        public int BlockSize { get; set; }
+
+        public CudaEngine(PieceColor color, int mctsIterationCount, int gridSize, int blockSize)
         {
             Color = color;
+            MctsIterationCount = mctsIterationCount;
+            GridSize = gridSize;
+            BlockSize = blockSize;
         }
 
 #if DEBUG
         [DllImport(@"D:\Users\syntaximus\Documents\GitHub\Checkers\x64\Debug\Checkers.Cuda.dll", CharSet = CharSet.Ansi, SetLastError = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int MakeMoveGpu(char size, int player, char[] board, char[] possibleMoves);
+        public static extern int MakeMoveGpu(char size, int player, char[] board, char[] possibleMoves, int mctsIterationCount, int gridSize, int blockSize, int gameVariant);
 #else
         [DllImport(@"D:\Users\syntaximus\Documents\GitHub\Checkers\x64\Release\Checkers.Cuda.dll", CharSet = CharSet.Ansi, SetLastError = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int MakeMoveGpu(char size, int player, char[] board, char[] possibleMoves);
+        public static extern int MakeMoveGpu(char size, int player, char[] board, char[] possibleMoves, int mctsIterationCount, int gridSize, int blockSize, int gameVariant);
 #endif
 
         public void Reset()
@@ -40,15 +49,14 @@ namespace Checkers.Logic.Engines
 
         }
 
-        public Move MakeMove(CheckersBoard currentBoard)
+        public Move MakeMove(CheckersBoard currentBoard, GameVariant variant)
         {
             Random random = new Random();
             List<Move> allPossibleMoves = currentBoard.GetAllPossibleMoves(Color);
             int count = allPossibleMoves.Count;
             if (count == 0)
                 throw new NotAvailableMoveException(Color);
-            int elemIndex = MakeMoveGpu((char)currentBoard.Size, Color == PieceColor.White ? 0 : 1, currentBoard.GetBoardArray(), GetPossibleMovesArray(allPossibleMoves));
-            return allPossibleMoves[elemIndex];
+            int elemIndex = MakeMoveGpu((char)currentBoard.Size, Color == PieceColor.White ? 0 : 1, currentBoard.GetBoardArray(), GetPossibleMovesArray(allPossibleMoves), MctsIterationCount, GridSize, BlockSize, variant == GameVariant.Checkers ? 0 : 1);          return allPossibleMoves[elemIndex];
         }
 
         public char[] GetPossibleMovesArray(List<Move> allPossibleMoves)

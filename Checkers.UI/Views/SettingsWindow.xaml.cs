@@ -67,14 +67,14 @@ namespace Checkers.UI.Views
             Window = window;
             InitializeComponent();
 
-             viewModel = new SettingsViewModel(
-                 boardSize,
-                 whiteCountSize,
-                 blackCountSize,
-                 whiteEngine,
-                 blackEngine,
-                 gameVariant,
-                 moveAnimationTime);
+            viewModel = new SettingsViewModel(
+                boardSize,
+                whiteCountSize,
+                blackCountSize,
+                whiteEngine,
+                blackEngine,
+                gameVariant,
+                moveAnimationTime);
 
             this.DataContext = this;
             base.DataContext = viewModel;
@@ -126,12 +126,12 @@ namespace Checkers.UI.Views
 
         private IEngine ConvertEngineKindToEngine(EngineKind engineKind, PieceColor color)
         {
-            switch(engineKind)
+            switch (engineKind)
             {
                 case EngineKind.Human:
                     return new HumanEngine(color);
                 case EngineKind.Random:
-                    if(color == PieceColor.White)
+                    if (color == PieceColor.White)
                     {
                         return new RandomEngine(color, viewModel.WhitePlayerRandomEngineUseRandomSeed ? null : (int?)viewModel.WhitePlayerRandomEngineSeedValue);
                     }
@@ -140,7 +140,14 @@ namespace Checkers.UI.Views
                         return new RandomEngine(color, viewModel.BlackPlayerRandomEngineUseRandomSeed ? null : (int?)viewModel.BlackPlayerRandomEngineSeedValue);
                     }
                 case EngineKind.Cuda:
-                    return new CudaEngine(color);
+                    if(color == PieceColor.White)
+                    {
+                        return new CudaEngine(color, viewModel.WhitePlayerCudaEngineMctsIteration, viewModel.WhitePlayerCudaEngineGridSize, viewModel.WhitePlayerCudaEngineBlockSize);
+                    }
+                    else
+                    {
+                        return new CudaEngine(color, viewModel.BlackPlayerCudaEngineMctsIteration, viewModel.BlackPlayerCudaEngineGridSize, viewModel.BlackPlayerCudaEngineBlockSize);
+                    }
                 default:
                     throw new ArgumentException("Nierozpoznany typ silnika");
             }
@@ -150,6 +157,34 @@ namespace Checkers.UI.Views
         {
             Regex regex = new Regex("[^0-9]");
             e.Handled = regex.IsMatch(e.Text);
+        }
+
+        private void BlackPlayerEngineCombobox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (BlackPlayerEngineCombobox.SelectedValue != null && (EngineKind)BlackPlayerEngineCombobox.SelectedValue == EngineKind.Cuda)
+            {
+                BoardSize.IsEnabled = false;
+                viewModel.BlackPiecesCount = 20;
+                viewModel.BoardSize = 10;
+            }
+            else
+            {
+                BoardSize.IsEnabled = true;
+            }
+        }
+
+        private void WhitePlayerEngineCombobox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (WhitePlayerEngineCombobox.SelectedValue != null && (EngineKind)WhitePlayerEngineCombobox.SelectedValue == EngineKind.Cuda)
+            {
+                BoardSize.IsEnabled = false;
+                viewModel.WhitePiecesCount = 20;
+                viewModel.BoardSize = 10;
+            }
+            else
+            {
+                BoardSize.IsEnabled = true;
+            }
         }
     }
 }

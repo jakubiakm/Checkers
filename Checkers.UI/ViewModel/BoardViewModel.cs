@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -69,6 +70,12 @@ namespace Checkers.UI.ViewModel
             Game.BlackPlayerEngine.Reset();
         }
 
+        public void ChangePlayer()
+        {
+            CurrentPlayer = CurrentPlayer == PieceColor.Black ? PieceColor.White : PieceColor.Black;
+
+        }
+
         public Move NextMove(List<Path> humanMoves = null)
         {
             if (AnimationCompleted)
@@ -88,8 +95,6 @@ namespace Checkers.UI.ViewModel
                     move = Game.MakeMove(PieceColor.White);
                 else
                     move = Game.MakeMove(PieceColor.Black);
-
-                CurrentPlayer = CurrentPlayer == PieceColor.Black ? PieceColor.White : PieceColor.Black;
 
                 return move;
             }
@@ -368,6 +373,7 @@ namespace Checkers.UI.ViewModel
                 myPointAnimation.Completed += delegate
                 {
                     DrawMoveMovement(move, elem);
+                    Thread.Sleep(100);
                     AnimationCompleted = true;
                 };
 

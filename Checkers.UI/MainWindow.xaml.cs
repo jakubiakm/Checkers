@@ -46,7 +46,7 @@ namespace Checkers.UI
         {
             NotHumanMoveTimer = new DispatcherTimer();
             NotHumanMoveTimer.Tick += Timer_Elapsed;
-            NotHumanMoveTimer.Interval = new TimeSpan(0, 0, 0, 0, 1);
+            NotHumanMoveTimer.Interval = new TimeSpan(0, 0, 0, 0, 10);
             NotHumanMoveTimer.Start();
         }
 
@@ -55,6 +55,7 @@ namespace Checkers.UI
         private async void Timer_Elapsed(object sender, EventArgs e)
         {
             if (BoardViewModelObject.Game != null &&
+                BoardViewModelObject.AnimationCompleted &&
                 (BoardViewModelObject.CurrentPlayer == PieceColor.White && !BoardViewModelObject.WhiteIsHumnan) ||
                 (BoardViewModelObject.CurrentPlayer == PieceColor.Black && !BoardViewModelObject.BlackIsHuman))
             {
@@ -67,6 +68,7 @@ namespace Checkers.UI
                     {
                         BoardViewModelObject.DrawNextMove(move);
                         HistoryViewModelObject.AddHistoryItem(BoardViewModelObject.Game.Board.Size, move);
+                        BoardViewModelObject.ChangePlayer();
                     }
                 }
                 catch (NotAvailableMoveException exception)
@@ -249,6 +251,7 @@ namespace Checkers.UI
                                     {
                                         BoardViewModelObject.DrawNextMove(move);
                                         HistoryViewModelObject.AddHistoryItem(BoardViewModelObject.Game.Board.Size, move);
+                                        BoardViewModelObject.ChangePlayer();
                                     }
                                     else
                                     {

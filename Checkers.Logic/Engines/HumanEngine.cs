@@ -33,7 +33,7 @@ namespace Checkers.Logic.Engines
 
         }
 
-        public Move MakeMove(CheckersBoard currentBoard)
+        public Move MakeMove(CheckersBoard currentBoard, GameVariant variant)
         {
             List<Move> allPossibleMoves = currentBoard.GetAllPossibleMoves(Color);
             int count = allPossibleMoves.Count;

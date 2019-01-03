@@ -32,7 +32,7 @@ __global__ void SetupCurandKernel(curandState *state)
 	curand_init(1234, threadID, 0, &state[threadID]);
 }
 
-__global__ void RolloutKernel(curandState *curand_state, Board* rollout_boards, int* results, Move* possible_moves_device, int size)
+__global__ void RolloutKernel(curandState *curand_state, Board* rollout_boards, int* results, Move* possible_moves_device, int size, Player current_player, int game_variant)
 {
 	const long numThreads = blockDim.x * gridDim.x;
 	const long threadID = blockIdx.x * blockDim.x + threadIdx.x;
@@ -42,7 +42,7 @@ __global__ void RolloutKernel(curandState *curand_state, Board* rollout_boards, 
 		Board current_board = rollout_boards[ind];
 
 		Player player = current_board.RolloutGpu(&curand_state[ind], possible_moves_device, ind);
-		results[ind] = player == Player::BLACK ? 1 : 0;
+		results[ind] = player == current_player ? 1 - game_variant : 0 + game_variant;
 	}
 }
 
@@ -85,16 +85,20 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 	char board_size,
 	int current_player,			//0 - bia³y, 1 - czarny
 	char* board,				//0 - puste, 1 - bia³y pion, 2 - bia³a dama, 3 - czarny pion, 4 - czarna dama
-	char* possible_moves
+	char* possible_moves,
+	int mcts_iteration_count, 
+	int gridsize, 
+	int blocksize,
+	int gamevariant				//0 - checkers, 1 - anticheckers
 )
 {
 	//czas wykonania 500x500 x 10000  27s
 	Player player = current_player == 0 ? Player::WHITE : Player::BLACK;	//gracz dla którego wybierany jest optymalny ruch
 	int
-		number_of_mcts_iterations = 50,										//liczba iteracji wykonana przez algorytm MCTS
+		number_of_mcts_iterations = mcts_iteration_count,					//liczba iteracji wykonana przez algorytm MCTS
 		possible_moves_count = possible_moves[0],							//liczba mo¿liwych ruchów spoœród których wybierany jest najlepszy
-		block_size = 10,													//rozmiar gridu z którego gpu ma korzystaæ
-		grid_size = 10,														//rozmiar bloku z którego gpu ma korzystaæ 
+		block_size = blocksize,												//rozmiar gridu z którego gpu ma korzystaæ
+		grid_size = gridsize,												//rozmiar bloku z którego gpu ma korzystaæ 
 		*results_d,															//wskaŸnik na pamiêæ w GPU przechowuj¹cy wyniki symulacji w danej iteracji
 		*results,															//wskaŸnik na pamiêæ w CPU przechowuj¹cy wyniki symulacji w danej iteracji
 		duplication_count = 1;												//parametr okreœlaj¹cy ile liœci duplikowaæ przy symulacji GPU
@@ -163,7 +167,7 @@ extern "C" int __declspec(dllexport) __stdcall MakeMoveGpu
 
 		CUDA_CALL(cudaGetDeviceProperties(&prop, 0));
 		CUDA_CALL(cudaDeviceSetLimit(cudaLimitStackSize, 8192));
-		RolloutKernel << <grid_size, block_size >> > (state_d, boards_d, results_d, possible_moves_d, rollout_vector.size());
+		RolloutKernel << <grid_size, block_size >> > (state_d, boards_d, results_d, possible_moves_d, rollout_vector.size(), player, gamevariant);
 
 		CUDA_CALL(cudaDeviceSynchronize());
 		CUDA_CALL(cudaGetLastError());

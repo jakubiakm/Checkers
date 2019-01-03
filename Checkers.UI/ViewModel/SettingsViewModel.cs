@@ -2,8 +2,10 @@
 using Checkers.Logic.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
@@ -13,7 +15,7 @@ namespace Checkers.UI.ViewModel
 {
 
 
-    public class SettingsViewModel
+    public class SettingsViewModel : INotifyPropertyChanged
     {
         public SettingsViewModel(
             int boardSize,
@@ -33,30 +35,86 @@ namespace Checkers.UI.ViewModel
             MoveAnimationTime = moveAnimationTime;
             WhitePlayerRandomEngineUseRandomSeed = true;
             BlackPlayerRandomEngineUseRandomSeed = true;
+
+            #region CUDA ENGINE
+            WhitePlayerCudaEngineBlockSize = 10;
+            WhitePlayerCudaEngineGridSize = 10;
+            WhitePlayerCudaEngineMctsIteration = 50;
+            BlackPlayerCudaEngineBlockSize = 10;
+            BlackPlayerCudaEngineGridSize = 10;
+            BlackPlayerCudaEngineMctsIteration = 50;
+            #endregion
+
+
             switch (whitePlayerEngine.Kind)
             {
                 case EngineKind.Random:
-                    var engine = (RandomEngine)whitePlayerEngine;
-                    WhitePlayerRandomEngineUseRandomSeed = engine.Seed == null;
-                    WhitePlayerRandomEngineSeedValue = engine.Seed ?? 0;
+                    var randomEngine = (RandomEngine)whitePlayerEngine;
+                    WhitePlayerRandomEngineUseRandomSeed = randomEngine.Seed == null;
+                    WhitePlayerRandomEngineSeedValue = randomEngine.Seed ?? 0;
+                    break;
+                case EngineKind.Cuda:
+                    var cudaEngine = (CudaEngine)whitePlayerEngine;
+                    WhitePlayerCudaEngineBlockSize = cudaEngine.BlockSize;
+                    WhitePlayerCudaEngineGridSize = cudaEngine.GridSize;
+                    WhitePlayerCudaEngineMctsIteration = cudaEngine.MctsIterationCount;
                     break;
             }
 
             switch (blackPlayerEngine.Kind)
             {
                 case EngineKind.Random:
-                    var engine = (RandomEngine)blackPlayerEngine;
-                    BlackPlayerRandomEngineUseRandomSeed = engine.Seed == null;
-                    BlackPlayerRandomEngineSeedValue = engine.Seed ?? 0;
+                    var randomEngine = (RandomEngine)blackPlayerEngine;
+                    BlackPlayerRandomEngineUseRandomSeed = randomEngine.Seed == null;
+                    BlackPlayerRandomEngineSeedValue = randomEngine.Seed ?? 0;
+                    break;
+                case EngineKind.Cuda:
+                    var cudaEngine = (CudaEngine)blackPlayerEngine;
+                    BlackPlayerCudaEngineBlockSize = cudaEngine.BlockSize;
+                    BlackPlayerCudaEngineGridSize = cudaEngine.GridSize;
+                    BlackPlayerCudaEngineMctsIteration = cudaEngine.MctsIterationCount;
                     break;
             }
         }
 
-        public int BoardSize { get; set; }
+        public int BoardSize
+        {
+            get
+            {
+                return boardSize;
+            }
+            set
+            {
+                boardSize = value;
+                NotifyPropertyChanged();
+            }
+        }
 
-        public int WhitePiecesCount { get; set; }
+        public int WhitePiecesCount
+        {
+            get
+            {
+                return whitePiecesCount;
+            }
+            set
+            {
+                whitePiecesCount = value;
+                NotifyPropertyChanged();
+            }
+        }
 
-        public int BlackPiecesCount { get; set; }
+        public int BlackPiecesCount
+        {
+            get
+            {
+                return blackPiecesCount;
+            }
+            set
+            {
+                blackPiecesCount = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         public int MoveAnimationTime { get; set; }
 
@@ -73,5 +131,111 @@ namespace Checkers.UI.ViewModel
         public int WhitePlayerRandomEngineSeedValue { get; set; }
 
         public int BlackPlayerRandomEngineSeedValue { get; set; }
+
+        public int WhitePlayerCudaEngineMctsIteration
+        {
+            get
+            {
+                return whitePlayerCudaEngineMctsIteration;
+            }
+            set
+            {
+                whitePlayerCudaEngineMctsIteration = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public int WhitePlayerCudaEngineGridSize
+        {
+            get
+            {
+                return whitePlayerCudaEngineGridSize;
+            }
+            set
+            {
+                whitePlayerCudaEngineGridSize = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public int WhitePlayerCudaEngineBlockSize
+        {
+            get
+            {
+                return whitePlayerCudaEngineBlockSize;
+            }
+            set
+            {
+                whitePlayerCudaEngineBlockSize = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public int BlackPlayerCudaEngineMctsIteration
+        {
+            get
+            {
+                return blackPlayerCudaEngineMctsIteration;
+            }
+            set
+            {
+                blackPlayerCudaEngineMctsIteration = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public int BlackPlayerCudaEngineGridSize
+        {
+            get
+            {
+                return blackPlayerCudaEngineGridSize;
+            }
+            set
+            {
+                blackPlayerCudaEngineGridSize = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public int BlackPlayerCudaEngineBlockSize
+        {
+            get
+            {
+                return blackPlayerCudaEngineBlockSize;
+            }
+            set
+            {
+                blackPlayerCudaEngineBlockSize = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private int boardSize;
+
+        private int whitePiecesCount;
+
+        private int blackPiecesCount;
+
+        private int whitePlayerCudaEngineMctsIteration;
+
+        private int whitePlayerCudaEngineGridSize;
+
+        private int whitePlayerCudaEngineBlockSize;
+
+        private int blackPlayerCudaEngineMctsIteration;
+
+        private int blackPlayerCudaEngineGridSize;
+
+        private int blackPlayerCudaEngineBlockSize;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        // This method is called by the Set accessor of each property.  
+        // The CallerMemberName attribute that is applied to the optional propertyName  
+        // parameter causes the property name of the caller to be substituted as an argument.  
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }

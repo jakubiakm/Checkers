@@ -44,7 +44,7 @@ namespace Checkers.Logic.Engines
                 randomGenerator = new Random();
         }
 
-        public Move MakeMove(CheckersBoard currentBoard)
+        public Move MakeMove(CheckersBoard currentBoard, GameVariant variant)
         {
             List<Move> allPossibleMoves = currentBoard.GetAllPossibleMoves(Color);
             int count = allPossibleMoves.Count;
