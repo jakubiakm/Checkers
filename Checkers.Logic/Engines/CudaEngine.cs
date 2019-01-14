@@ -37,10 +37,10 @@ namespace Checkers.Logic.Engines
         }
 
 #if DEBUG
-        [DllImport(@"D:\Users\syntaximus\Documents\GitHub\Checkers\x64\Debug\Checkers.Cuda.dll", CharSet = CharSet.Ansi, SetLastError = true, CallingConvention = CallingConvention.StdCall)]
+        [DllImport(@"..\..\..\x64\Debug\Checkers.Cuda.dll", CharSet = CharSet.Ansi, SetLastError = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int MakeMoveGpu(char size, int player, char[] board, char[] possibleMoves, int mctsIterationCount, int gridSize, int blockSize, int gameVariant);
 #else
-        [DllImport(@"D:\Users\syntaximus\Documents\GitHub\Checkers\x64\Release\Checkers.Cuda.dll", CharSet = CharSet.Ansi, SetLastError = true, CallingConvention = CallingConvention.StdCall)]
+        [DllImport(@"..\..\..\x64\Release\Checkers.Cuda.dll", CharSet = CharSet.Ansi, SetLastError = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int MakeMoveGpu(char size, int player, char[] board, char[] possibleMoves, int mctsIterationCount, int gridSize, int blockSize, int gameVariant);
 #endif
 

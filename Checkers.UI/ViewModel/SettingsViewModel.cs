@@ -39,10 +39,10 @@ namespace Checkers.UI.ViewModel
             #region CUDA ENGINE
             WhitePlayerCudaEngineBlockSize = 10;
             WhitePlayerCudaEngineGridSize = 10;
-            WhitePlayerCudaEngineMctsIteration = 50;
-            BlackPlayerCudaEngineBlockSize = 10;
-            BlackPlayerCudaEngineGridSize = 10;
-            BlackPlayerCudaEngineMctsIteration = 50;
+            WhitePlayerCudaEngineMctsIteration = 25;
+            BlackPlayerCudaEngineBlockSize = 75;
+            BlackPlayerCudaEngineGridSize = 75;
+            BlackPlayerCudaEngineMctsIteration = 25;
             #endregion
 
 

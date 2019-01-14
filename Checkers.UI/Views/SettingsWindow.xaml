@@ -87,16 +87,6 @@
                             Value="{Binding Path=WhitePiecesCount, Mode=TwoWay}"
                             Minimum="1" 
                             VerticalAlignment="Center">
-                            <Controls:NumericUpDown.Style>
-                                <Style TargetType="Controls:NumericUpDown">
-                                    <Setter Property="IsEnabled"  Value="True" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ElementName=WhitePlayerEngineCombobox, Path=SelectedIndex}" Value="2">
-                                            <Setter Property="IsEnabled" Value="False" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Controls:NumericUpDown.Style>
                         </Controls:NumericUpDown>
                         <Controls:NumericUpDown 
                             x:Name="NumberOfBlackPieces" 
@@ -106,16 +96,6 @@
                             Value="{Binding Path=BlackPiecesCount, Mode=TwoWay}"
                             Minimum="1" 
                             VerticalAlignment="Center">
-                            <Controls:NumericUpDown.Style>
-                                <Style TargetType="Controls:NumericUpDown">
-                                    <Setter Property="IsEnabled"  Value="True" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ElementName=BlackPlayerEngineCombobox, Path=SelectedIndex}" Value="2">
-                                            <Setter Property="IsEnabled" Value="False" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Controls:NumericUpDown.Style>
                         </Controls:NumericUpDown>
                     </UniformGrid>
                     <UniformGrid Grid.Row="3" Margin="5" Columns="2" Rows="2">
