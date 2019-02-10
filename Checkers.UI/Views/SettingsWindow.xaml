@@ -11,7 +11,8 @@
                       Title="Ustawienia"
                       SizeToContent="WidthAndHeight"
                       GlowBrush="{DynamicResource AccentColorBrush}"
-                      ResizeMode="CanResizeWithGrip">
+                      ResizeMode="CanResizeWithGrip"
+                      WindowStartupLocation="Manual">
 
     <Controls:MetroWindow.Resources>
         <ResourceDictionary>
