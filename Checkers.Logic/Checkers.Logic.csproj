@@ -61,6 +61,7 @@
     <Compile Include="Engines\RandomEngine.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="GameObjects\Game.cs" />
+    <Compile Include="GameObjects\HistoryBoard.cs" />
     <Compile Include="GameObjects\Move.cs" />
     <Compile Include="GameObjects\Piece.cs" />
     <Compile Include="Enums\PieceColor.cs" />

@@ -68,6 +68,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>CheckersModel.edmx</DependentUpon>
     </Compile>
+    <Compile Include="DatabaseLayer.cs" />
     <Compile Include="game.cs">
       <DependentUpon>CheckersModel.tt</DependentUpon>
     </Compile>

@@ -21,5 +21,16 @@ namespace Checkers.Logic.GameObjects
             NewPiece = newPiece;
             BeatedPieces = beatedPieces;
         }
+
+        public string GetBeatedPiecesString()
+        {
+            string beatedPiecesString = "";
+            if (BeatedPieces != null)
+                foreach (var beatedPiece in BeatedPieces)
+                {
+                    beatedPiecesString += $"{beatedPiece.Position} ";
+                }
+            return beatedPiecesString;
+        }
     }
 }

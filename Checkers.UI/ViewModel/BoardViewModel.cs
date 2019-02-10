@@ -206,22 +206,22 @@ namespace Checkers.UI.ViewModel
                 }
                 index++;
             }
-            foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == Game.History[moveNumber].LastMove.OldPiece.Row && e.Y == Game.History[moveNumber].LastMove.OldPiece.Column).ToList())
+            foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == Game.History[moveNumber].Board.LastMove.OldPiece.Row && e.Y == Game.History[moveNumber].Board.LastMove.OldPiece.Column).ToList())
             {
                 elem.Fill = Brushes.DarkOrange;
             }
-            foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == Game.History[moveNumber].LastMove.NewPiece.Row && e.Y == Game.History[moveNumber].LastMove.NewPiece.Column).ToList())
+            foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == Game.History[moveNumber].Board.LastMove.NewPiece.Row && e.Y == Game.History[moveNumber].Board.LastMove.NewPiece.Column).ToList())
             {
                 elem.Fill = Brushes.DarkOrange;
             }
-            foreach (var piece in Game.History[moveNumber].LastMove?.BeatedPieces ?? new List<BeatedPiece>())
+            foreach (var piece in Game.History[moveNumber].Board.LastMove?.BeatedPieces ?? new List<BeatedPiece>())
             {
                 foreach (var elem in BoardCanvasElements.Where(e => e.Geometry is RectangleGeometry && e.X == piece.Row && e.Y == piece.Column).ToList())
                 {
                     elem.Fill = Brushes.Crimson;
                 }
             }
-            foreach (var elem in Game.History[moveNumber].PiecesOnBoard)
+            foreach (var elem in Game.History[moveNumber].Board.PiecesOnBoard)
             {
                 BoardCanvasElements.Add(new Model.CanvasElement
                 {
