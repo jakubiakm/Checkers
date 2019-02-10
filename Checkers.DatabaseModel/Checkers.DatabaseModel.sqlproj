@@ -57,5 +57,20 @@
   <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
   <ItemGroup>
     <Folder Include="Properties" />
+    <Folder Include="cmn\" />
+    <Folder Include="cmn\Tables\" />
+    <Folder Include="cmn\Views\" />
+    <Folder Include="Security\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="cmn\Tables\algorithm.sql" />
+    <Build Include="cmn\Tables\player_information.sql" />
+    <Build Include="cmn\Tables\game.sql" />
+    <Build Include="cmn\Tables\game_move.sql" />
+    <Build Include="cmn\Tables\game_type.sql" />
+    <Build Include="cmn\Tables\player.sql" />
+    <Build Include="cmn\Views\player_information_statistics.sql" />
+    <Build Include="cmn\Views\game_statistics.sql" />
+    <Build Include="Security\cmn.sql" />
   </ItemGroup>
 </Project>
