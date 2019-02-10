@@ -11,6 +11,7 @@
     <AssemblyName>Checkers.Logic</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,6 +40,7 @@
       <HintPath>..\packages\ManagedCuda-NPP.10.0.31\lib\net46\NPP.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -61,6 +63,7 @@
     <Compile Include="Engines\RandomEngine.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="GameObjects\Game.cs" />
+    <Compile Include="GameObjects\HistoryBoard.cs" />
     <Compile Include="GameObjects\Move.cs" />
     <Compile Include="GameObjects\Piece.cs" />
     <Compile Include="Enums\PieceColor.cs" />
@@ -68,6 +71,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Checkers.Data\Checkers.Data.csproj">
+      <Project>{c1e851e7-1f8e-468e-b93b-b742795a84b9}</Project>
+      <Name>Checkers.Data</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

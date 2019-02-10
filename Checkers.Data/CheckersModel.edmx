@@ -1,0 +1,441 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="CheckersModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="algorithm">
+          <Key>
+            <PropertyRef Name="algorithm_id" />
+          </Key>
+          <Property Name="algorithm_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="algorithm_name" Type="varchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="game">
+          <Key>
+            <PropertyRef Name="game_id" />
+          </Key>
+          <Property Name="game_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="white_player_information_id" Type="int" Nullable="false" />
+          <Property Name="black_player_information_id" Type="int" Nullable="false" />
+          <Property Name="game_type_id" Type="int" Nullable="false" />
+          <Property Name="game_size" Type="int" Nullable="false" />
+          <Property Name="game_result" Type="varchar" MaxLength="1" Nullable="false" />
+          <Property Name="move_count" Type="int" Nullable="false" />
+          <Property Name="start_date" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="game_move">
+          <Key>
+            <PropertyRef Name="game_move_id" />
+          </Key>
+          <Property Name="game_move_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="game_id" Type="int" Nullable="false" />
+          <Property Name="player" Type="varchar" MaxLength="1" Nullable="false" />
+          <Property Name="start_time" Type="datetime" Nullable="false" />
+          <Property Name="end_time" Type="datetime" Nullable="false" />
+          <Property Name="from_position" Type="int" Nullable="false" />
+          <Property Name="to_position" Type="int" Nullable="false" />
+          <Property Name="beated_pieces_count" Type="int" Nullable="false" />
+          <Property Name="beated_pieces" Type="varchar(max)" />
+          <Property Name="board_after_move" Type="varchar(max)" />
+        </EntityType>
+        <EntityType Name="game_type">
+          <Key>
+            <PropertyRef Name="game_type_id" />
+          </Key>
+          <Property Name="game_type_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="game_type_name" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="player">
+          <Key>
+            <PropertyRef Name="player_id" />
+          </Key>
+          <Property Name="player_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="player_name" Type="varchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="player_information">
+          <Key>
+            <PropertyRef Name="player_information_id" />
+          </Key>
+          <Property Name="player_information_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="player_id" Type="int" Nullable="false" />
+          <Property Name="algorithm_id" Type="int" Nullable="false" />
+          <Property Name="number_of_pieces" Type="int" Nullable="false" />
+        </EntityType>
+        <Association Name="FK__game__black_play__66603565">
+          <End Role="player_information" Type="Self.player_information" Multiplicity="1" />
+          <End Role="game" Type="Self.game" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="player_information">
+              <PropertyRef Name="player_information_id" />
+            </Principal>
+            <Dependent Role="game">
+              <PropertyRef Name="black_player_information_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__game__game_type___6754599E">
+          <End Role="game_type" Type="Self.game_type" Multiplicity="1" />
+          <End Role="game" Type="Self.game" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="game_type">
+              <PropertyRef Name="game_type_id" />
+            </Principal>
+            <Dependent Role="game">
+              <PropertyRef Name="game_type_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__game__white_play__68487DD7">
+          <End Role="player_information" Type="Self.player_information" Multiplicity="1" />
+          <End Role="game" Type="Self.game" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="player_information">
+              <PropertyRef Name="player_information_id" />
+            </Principal>
+            <Dependent Role="game">
+              <PropertyRef Name="white_player_information_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__game_move__game___6383C8BA">
+          <End Role="game" Type="Self.game" Multiplicity="1" />
+          <End Role="game_move" Type="Self.game_move" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="game">
+              <PropertyRef Name="game_id" />
+            </Principal>
+            <Dependent Role="game_move">
+              <PropertyRef Name="game_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__player_in__algor__59FA5E80">
+          <End Role="algorithm" Type="Self.algorithm" Multiplicity="1" />
+          <End Role="player_information" Type="Self.player_information" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="algorithm">
+              <PropertyRef Name="algorithm_id" />
+            </Principal>
+            <Dependent Role="player_information">
+              <PropertyRef Name="algorithm_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__player_in__playe__59063A47">
+          <End Role="player" Type="Self.player" Multiplicity="1" />
+          <End Role="player_information" Type="Self.player_information" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="player">
+              <PropertyRef Name="player_id" />
+            </Principal>
+            <Dependent Role="player_information">
+              <PropertyRef Name="player_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="CheckersModelStoreContainer">
+          <EntitySet Name="algorithm" EntityType="Self.algorithm" Schema="cmn" store:Type="Tables" />
+          <EntitySet Name="game" EntityType="Self.game" Schema="cmn" store:Type="Tables" />
+          <EntitySet Name="game_move" EntityType="Self.game_move" Schema="cmn" store:Type="Tables" />
+          <EntitySet Name="game_type" EntityType="Self.game_type" Schema="cmn" store:Type="Tables" />
+          <EntitySet Name="player" EntityType="Self.player" Schema="cmn" store:Type="Tables" />
+          <EntitySet Name="player_information" EntityType="Self.player_information" Schema="cmn" store:Type="Tables" />
+          <AssociationSet Name="FK__game__black_play__66603565" Association="Self.FK__game__black_play__66603565">
+            <End Role="player_information" EntitySet="player_information" />
+            <End Role="game" EntitySet="game" />
+          </AssociationSet>
+          <AssociationSet Name="FK__game__game_type___6754599E" Association="Self.FK__game__game_type___6754599E">
+            <End Role="game_type" EntitySet="game_type" />
+            <End Role="game" EntitySet="game" />
+          </AssociationSet>
+          <AssociationSet Name="FK__game__white_play__68487DD7" Association="Self.FK__game__white_play__68487DD7">
+            <End Role="player_information" EntitySet="player_information" />
+            <End Role="game" EntitySet="game" />
+          </AssociationSet>
+          <AssociationSet Name="FK__game_move__game___6383C8BA" Association="Self.FK__game_move__game___6383C8BA">
+            <End Role="game" EntitySet="game" />
+            <End Role="game_move" EntitySet="game_move" />
+          </AssociationSet>
+          <AssociationSet Name="FK__player_in__algor__59FA5E80" Association="Self.FK__player_in__algor__59FA5E80">
+            <End Role="algorithm" EntitySet="algorithm" />
+            <End Role="player_information" EntitySet="player_information" />
+          </AssociationSet>
+          <AssociationSet Name="FK__player_in__playe__59063A47" Association="Self.FK__player_in__playe__59063A47">
+            <End Role="player" EntitySet="player" />
+            <End Role="player_information" EntitySet="player_information" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="CheckersModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="algorithm">
+          <Key>
+            <PropertyRef Name="algorithm_id" />
+          </Key>
+          <Property Name="algorithm_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="algorithm_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="player_information" Relationship="Self.FK__player_in__algor__59FA5E80" FromRole="algorithm" ToRole="player_information" />
+        </EntityType>
+        <EntityType Name="game">
+          <Key>
+            <PropertyRef Name="game_id" />
+          </Key>
+          <Property Name="game_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="white_player_information_id" Type="Int32" Nullable="false" />
+          <Property Name="black_player_information_id" Type="Int32" Nullable="false" />
+          <Property Name="game_type_id" Type="Int32" Nullable="false" />
+          <Property Name="game_size" Type="Int32" Nullable="false" />
+          <Property Name="game_result" Type="String" MaxLength="1" FixedLength="false" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="player_information" Relationship="Self.FK__game__black_play__5EBF139D" FromRole="game" ToRole="player_information" />
+          <NavigationProperty Name="game_type" Relationship="Self.FK__game__game_type___5FB337D6" FromRole="game" ToRole="game_type" />
+          <NavigationProperty Name="player_information1" Relationship="Self.FK__game__white_play__5DCAEF64" FromRole="game" ToRole="player_information" />
+          <NavigationProperty Name="game_move" Relationship="Self.FK__game_move__game___6383C8BA" FromRole="game" ToRole="game_move" />
+          <Property Name="move_count" Type="Int32" Nullable="false" />
+          <Property Name="start_date" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <EntityType Name="game_move">
+          <Key>
+            <PropertyRef Name="game_move_id" />
+          </Key>
+          <Property Name="game_move_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="game_id" Type="Int32" Nullable="false" />
+          <Property Name="player" Type="String" MaxLength="1" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="start_time" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="end_time" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="from_position" Type="Int32" Nullable="false" />
+          <Property Name="to_position" Type="Int32" Nullable="false" />
+          <Property Name="beated_pieces_count" Type="Int32" Nullable="false" />
+          <Property Name="beated_pieces" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="board_after_move" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="game" Relationship="Self.FK__game_move__game___6383C8BA" FromRole="game_move" ToRole="game" />
+        </EntityType>
+        <EntityType Name="game_type">
+          <Key>
+            <PropertyRef Name="game_type_id" />
+          </Key>
+          <Property Name="game_type_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="game_type_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="games" Relationship="Self.FK__game__game_type___5FB337D6" FromRole="game_type" ToRole="game" />
+        </EntityType>
+        <EntityType Name="player">
+          <Key>
+            <PropertyRef Name="player_id" />
+          </Key>
+          <Property Name="player_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="player_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="player_information" Relationship="Self.FK__player_in__playe__59063A47" FromRole="player" ToRole="player_information" />
+        </EntityType>
+        <EntityType Name="player_information">
+          <Key>
+            <PropertyRef Name="player_information_id" />
+          </Key>
+          <Property Name="player_information_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="player_id" Type="Int32" Nullable="false" />
+          <Property Name="algorithm_id" Type="Int32" Nullable="false" />
+          <Property Name="number_of_pieces" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="algorithm" Relationship="Self.FK__player_in__algor__59FA5E80" FromRole="player_information" ToRole="algorithm" />
+          <NavigationProperty Name="games" Relationship="Self.FK__game__black_play__5EBF139D" FromRole="player_information" ToRole="game" />
+          <NavigationProperty Name="games1" Relationship="Self.FK__game__white_play__5DCAEF64" FromRole="player_information" ToRole="game" />
+          <NavigationProperty Name="player" Relationship="Self.FK__player_in__playe__59063A47" FromRole="player_information" ToRole="player" />
+        </EntityType>
+        <Association Name="FK__player_in__algor__59FA5E80">
+          <End Role="algorithm" Type="Self.algorithm" Multiplicity="1" />
+          <End Role="player_information" Type="Self.player_information" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="algorithm">
+              <PropertyRef Name="algorithm_id" />
+            </Principal>
+            <Dependent Role="player_information">
+              <PropertyRef Name="algorithm_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__game__black_play__5EBF139D">
+          <End Role="player_information" Type="Self.player_information" Multiplicity="1" />
+          <End Role="game" Type="Self.game" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="player_information">
+              <PropertyRef Name="player_information_id" />
+            </Principal>
+            <Dependent Role="game">
+              <PropertyRef Name="black_player_information_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__game__game_type___5FB337D6">
+          <End Role="game_type" Type="Self.game_type" Multiplicity="1" />
+          <End Role="game" Type="Self.game" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="game_type">
+              <PropertyRef Name="game_type_id" />
+            </Principal>
+            <Dependent Role="game">
+              <PropertyRef Name="game_type_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__game__white_play__5DCAEF64">
+          <End Role="player_information" Type="Self.player_information" Multiplicity="1" />
+          <End Role="game" Type="Self.game" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="player_information">
+              <PropertyRef Name="player_information_id" />
+            </Principal>
+            <Dependent Role="game">
+              <PropertyRef Name="white_player_information_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__game_move__game___6383C8BA">
+          <End Role="game" Type="Self.game" Multiplicity="1" />
+          <End Role="game_move" Type="Self.game_move" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="game">
+              <PropertyRef Name="game_id" />
+            </Principal>
+            <Dependent Role="game_move">
+              <PropertyRef Name="game_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__player_in__playe__59063A47">
+          <End Role="player" Type="Self.player" Multiplicity="1" />
+          <End Role="player_information" Type="Self.player_information" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="player">
+              <PropertyRef Name="player_id" />
+            </Principal>
+            <Dependent Role="player_information">
+              <PropertyRef Name="player_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="CheckersEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="algorithms" EntityType="Self.algorithm" />
+          <EntitySet Name="games" EntityType="Self.game" />
+          <EntitySet Name="game_move" EntityType="Self.game_move" />
+          <EntitySet Name="game_type" EntityType="Self.game_type" />
+          <EntitySet Name="players" EntityType="Self.player" />
+          <EntitySet Name="player_information" EntityType="Self.player_information" />
+          <AssociationSet Name="FK__player_in__algor__59FA5E80" Association="Self.FK__player_in__algor__59FA5E80">
+            <End Role="algorithm" EntitySet="algorithms" />
+            <End Role="player_information" EntitySet="player_information" />
+          </AssociationSet>
+          <AssociationSet Name="FK__game__black_play__5EBF139D" Association="Self.FK__game__black_play__5EBF139D">
+            <End Role="player_information" EntitySet="player_information" />
+            <End Role="game" EntitySet="games" />
+          </AssociationSet>
+          <AssociationSet Name="FK__game__game_type___5FB337D6" Association="Self.FK__game__game_type___5FB337D6">
+            <End Role="game_type" EntitySet="game_type" />
+            <End Role="game" EntitySet="games" />
+          </AssociationSet>
+          <AssociationSet Name="FK__game__white_play__5DCAEF64" Association="Self.FK__game__white_play__5DCAEF64">
+            <End Role="player_information" EntitySet="player_information" />
+            <End Role="game" EntitySet="games" />
+          </AssociationSet>
+          <AssociationSet Name="FK__game_move__game___6383C8BA" Association="Self.FK__game_move__game___6383C8BA">
+            <End Role="game" EntitySet="games" />
+            <End Role="game_move" EntitySet="game_move" />
+          </AssociationSet>
+          <AssociationSet Name="FK__player_in__playe__59063A47" Association="Self.FK__player_in__playe__59063A47">
+            <End Role="player" EntitySet="players" />
+            <End Role="player_information" EntitySet="player_information" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="CheckersModelStoreContainer" CdmEntityContainer="CheckersEntities">
+          <EntitySetMapping Name="algorithms">
+            <EntityTypeMapping TypeName="CheckersModel.algorithm">
+              <MappingFragment StoreEntitySet="algorithm">
+                <ScalarProperty Name="algorithm_id" ColumnName="algorithm_id" />
+                <ScalarProperty Name="algorithm_name" ColumnName="algorithm_name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="games">
+            <EntityTypeMapping TypeName="CheckersModel.game">
+              <MappingFragment StoreEntitySet="game">
+                <ScalarProperty Name="start_date" ColumnName="start_date" />
+                <ScalarProperty Name="move_count" ColumnName="move_count" />
+                <ScalarProperty Name="game_id" ColumnName="game_id" />
+                <ScalarProperty Name="white_player_information_id" ColumnName="white_player_information_id" />
+                <ScalarProperty Name="black_player_information_id" ColumnName="black_player_information_id" />
+                <ScalarProperty Name="game_type_id" ColumnName="game_type_id" />
+                <ScalarProperty Name="game_size" ColumnName="game_size" />
+                <ScalarProperty Name="game_result" ColumnName="game_result" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="game_move">
+            <EntityTypeMapping TypeName="CheckersModel.game_move">
+              <MappingFragment StoreEntitySet="game_move">
+                <ScalarProperty Name="game_move_id" ColumnName="game_move_id" />
+                <ScalarProperty Name="game_id" ColumnName="game_id" />
+                <ScalarProperty Name="player" ColumnName="player" />
+                <ScalarProperty Name="start_time" ColumnName="start_time" />
+                <ScalarProperty Name="end_time" ColumnName="end_time" />
+                <ScalarProperty Name="from_position" ColumnName="from_position" />
+                <ScalarProperty Name="to_position" ColumnName="to_position" />
+                <ScalarProperty Name="beated_pieces_count" ColumnName="beated_pieces_count" />
+                <ScalarProperty Name="beated_pieces" ColumnName="beated_pieces" />
+                <ScalarProperty Name="board_after_move" ColumnName="board_after_move" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="game_type">
+            <EntityTypeMapping TypeName="CheckersModel.game_type">
+              <MappingFragment StoreEntitySet="game_type">
+                <ScalarProperty Name="game_type_id" ColumnName="game_type_id" />
+                <ScalarProperty Name="game_type_name" ColumnName="game_type_name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="players">
+            <EntityTypeMapping TypeName="CheckersModel.player">
+              <MappingFragment StoreEntitySet="player">
+                <ScalarProperty Name="player_id" ColumnName="player_id" />
+                <ScalarProperty Name="player_name" ColumnName="player_name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="player_information">
+            <EntityTypeMapping TypeName="CheckersModel.player_information">
+              <MappingFragment StoreEntitySet="player_information">
+                <ScalarProperty Name="player_information_id" ColumnName="player_information_id" />
+                <ScalarProperty Name="player_id" ColumnName="player_id" />
+                <ScalarProperty Name="algorithm_id" ColumnName="algorithm_id" />
+                <ScalarProperty Name="number_of_pieces" ColumnName="number_of_pieces" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

@@ -64,6 +64,9 @@ namespace Checkers.UI.Views
             IEngine blackEngine,
             int moveAnimationTime)
         {
+            this.Left = 0;
+            this.Top = 0;
+
             Window = window;
             InitializeComponent();
 
