@@ -38,6 +38,8 @@ namespace Checkers.UI
         public MainWindow()
         {
             InitializeComponent();
+            this.Left = SystemParameters.PrimaryScreenWidth - this.Width;
+            this.Top = 0;
             BoardViewModelObject = new BoardViewModel(this);
             HistoryViewModelObject = new HistoryViewModel();
         }

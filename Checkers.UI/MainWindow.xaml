@@ -4,7 +4,7 @@
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"  
         xmlns:Views = "clr-namespace:Checkers.UI.Views"
         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-        Title="Warcaby" Height="733" Width="925" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" MouseMove="MetroWindow_MouseMove"
+        Title="Warcaby" Height="733" Width="925" WindowStartupLocation="Manual" ResizeMode="NoResize" MouseMove="MetroWindow_MouseMove"
         >
     <Controls:MetroWindow.RightWindowCommands>
         <Controls:WindowCommands>
