@@ -44,13 +44,17 @@ namespace Checkers.Logic.Engines
                 randomGenerator = new Random();
         }
 
-        public Move MakeMove(CheckersBoard currentBoard, GameVariant variant)
+        public Move MakeMove(CheckersBoard currentBoard)
         {
             List<Move> allPossibleMoves = currentBoard.GetAllPossibleMoves(Color);
             int count = allPossibleMoves.Count;
             if (count == 0)
                 throw new NotAvailableMoveException(Color);
+<<<<<<< HEAD
+            int elemIndex = random.Next(count);
+=======
             int elemIndex = randomGenerator.Next(count);       
+>>>>>>> master
             return allPossibleMoves[elemIndex];
         }
     }

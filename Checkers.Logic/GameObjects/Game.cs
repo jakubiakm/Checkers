@@ -47,10 +47,10 @@ namespace Checkers.Logic.GameObjects
             switch(color)
             {
                 case PieceColor.White:
-                    Board.LastMove = Board.MakeMove(WhitePlayerEngine.MakeMove(Board));
+                    Board.LastMove = Board.MakeMove(WhitePlayerEngine.MakeMove(Board, Variant));
                     break;
                 case PieceColor.Black:
-                    Board.LastMove = Board.MakeMove(BlackPlayerEngine.MakeMove(Board));
+                    Board.LastMove = Board.MakeMove(BlackPlayerEngine.MakeMove(Board, Variant));
                     break;
             }
             if (Board.PiecesOnBoard.Where(p => p.Color == PieceColor.Black).Count() == 0)

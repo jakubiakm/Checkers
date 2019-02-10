@@ -67,6 +67,31 @@ namespace Checkers.Logic.GameObjects
             return move;
         }
 
+        public char[] GetBoardArray()
+        {
+            char[] array = new char[Size * Size];
+            foreach (var piece in PiecesOnBoard)
+            {
+                if (piece.Color == PieceColor.White && !piece.IsKing)
+                {
+                    array[piece.Position] = (char)1;
+                }
+                if (piece.Color == PieceColor.White && piece.IsKing)
+                {
+                    array[piece.Position] = (char)2;
+                }
+                if (piece.Color == PieceColor.Black && !piece.IsKing)
+                {
+                    array[piece.Position] = (char)3;
+                }
+                if (piece.Color == PieceColor.Black && piece.IsKing)
+                {
+                    array[piece.Position] = (char)4;
+                }
+            }
+            return array;
+        }
+
         private List<Move> GetKingPossibleMoves(Piece piece)
         {
             List<Move> possibleMoves = new List<Move>();
@@ -198,6 +223,13 @@ namespace Checkers.Logic.GameObjects
             return possibleMoves;
         }
 
+        /// <summary>
+        /// Funkcja sprawdzająca, czy można się ruszyć na daną pozycję na planszy
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="column"></param>
+        /// <param name="sourceMovePiece"></param>
+        /// <returns></returns>
         private bool CanMoveToPosition(int row, int column, Piece sourceMovePiece)
         {
             return

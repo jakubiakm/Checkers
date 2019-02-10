@@ -13,6 +13,9 @@ namespace Checkers.Logic.Enums
         Human,
 
         [Description("Losowy")]
-        Random
+        Random,
+
+        [Description("Nvidia cuda mcts")]
+        Cuda
     }
 }

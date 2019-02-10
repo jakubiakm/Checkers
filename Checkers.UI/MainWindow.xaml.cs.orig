@@ -46,7 +46,7 @@ namespace Checkers.UI
         {
             NotHumanMoveTimer = new DispatcherTimer();
             NotHumanMoveTimer.Tick += Timer_Elapsed;
-            NotHumanMoveTimer.Interval = new TimeSpan(0, 0, 0, 0, 10);
+            NotHumanMoveTimer.Interval = new TimeSpan(0, 0, 0, 0, 1);
             NotHumanMoveTimer.Start();
         }
 
@@ -55,7 +55,6 @@ namespace Checkers.UI
         private async void Timer_Elapsed(object sender, EventArgs e)
         {
             if (BoardViewModelObject.Game != null &&
-                BoardViewModelObject.AnimationCompleted &&
                 (BoardViewModelObject.CurrentPlayer == PieceColor.White && !BoardViewModelObject.WhiteIsHumnan) ||
                 (BoardViewModelObject.CurrentPlayer == PieceColor.Black && !BoardViewModelObject.BlackIsHuman))
             {
@@ -68,7 +67,6 @@ namespace Checkers.UI
                     {
                         BoardViewModelObject.DrawNextMove(move);
                         HistoryViewModelObject.AddHistoryItem(BoardViewModelObject.Game.Board.Size, move);
-                        BoardViewModelObject.ChangePlayer();
                     }
                 }
                 catch (NotAvailableMoveException exception)
@@ -81,8 +79,13 @@ namespace Checkers.UI
                         BoardViewModelObject.Game.Board.NumberOfWhitePiecesAtBeggining,
                         BoardViewModelObject.Game.Board.NumberOfBlackPiecesAtBeggining,
                         BoardViewModelObject.Game.Variant,
+<<<<<<< HEAD
+                        BoardViewModelObject.Game.WhitePlayerEngine.Kind,
+                        BoardViewModelObject.Game.BlackPlayerEngine.Kind,
+=======
                         BoardViewModelObject.Game.WhitePlayerEngine,
                         BoardViewModelObject.Game.BlackPlayerEngine,
+>>>>>>> master
                         BoardViewModelObject.MoveAnimationTime);
                     NotHumanMoveTimer.Start();
                 }
@@ -97,9 +100,16 @@ namespace Checkers.UI
                         BoardViewModelObject.Game.Board.NumberOfWhitePiecesAtBeggining,
                         BoardViewModelObject.Game.Board.NumberOfBlackPiecesAtBeggining,
                         BoardViewModelObject.Game.Variant,
+<<<<<<< HEAD
+                        BoardViewModelObject.Game.WhitePlayerEngine.Kind,
+                        BoardViewModelObject.Game.BlackPlayerEngine.Kind,
+                        BoardViewModelObject.MoveAnimationTime);
+=======
                         BoardViewModelObject.Game.WhitePlayerEngine,
                         BoardViewModelObject.Game.BlackPlayerEngine,
-                        BoardViewModelObject.MoveAnimationTime);
+                        BoardViewModelObject.MoveAnimationTime
+                        );
+>>>>>>> master
                     NotHumanMoveTimer.Start();
                 }
                 catch (WrongMoveException exception)
@@ -251,7 +261,6 @@ namespace Checkers.UI
                                     {
                                         BoardViewModelObject.DrawNextMove(move);
                                         HistoryViewModelObject.AddHistoryItem(BoardViewModelObject.Game.Board.Size, move);
-                                        BoardViewModelObject.ChangePlayer();
                                     }
                                     else
                                     {

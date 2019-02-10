@@ -80,41 +80,45 @@
                         HorizontalAlignment="Center" 
                         VerticalAlignment="Center"/>
                         <Controls:NumericUpDown 
-                        x:Name="NumberOfWhitePieces" 
-                        Width="80" 
-                        HorizontalAlignment="Center" 
-                        Margin="0 0 2 0" 
-                        Value="{Binding Path=WhitePiecesCount, Mode=TwoWay}"
-                        Minimum="1" 
-                        VerticalAlignment="Center"/>
+                            x:Name="NumberOfWhitePieces" 
+                            Width="80" 
+                            HorizontalAlignment="Center" 
+                            Margin="0 0 2 0" 
+                            Value="{Binding Path=WhitePiecesCount, Mode=TwoWay}"
+                            Minimum="1" 
+                            VerticalAlignment="Center">
+                        </Controls:NumericUpDown>
                         <Controls:NumericUpDown 
-                        x:Name="NumberOfBlackPieces" 
-                        Width="80" 
-                        HorizontalAlignment="Center" 
-                        Margin="0 0 2 0" 
-                        Value="{Binding Path=BlackPiecesCount, Mode=TwoWay}"
-                        Minimum="1" 
-                        VerticalAlignment="Center"/>
+                            x:Name="NumberOfBlackPieces" 
+                            Width="80" 
+                            HorizontalAlignment="Center" 
+                            Margin="0 0 2 0" 
+                            Value="{Binding Path=BlackPiecesCount, Mode=TwoWay}"
+                            Minimum="1" 
+                            VerticalAlignment="Center">
+                        </Controls:NumericUpDown>
                     </UniformGrid>
                     <UniformGrid Grid.Row="3" Margin="5" Columns="2" Rows="2">
                         <TextBlock Text="Silnik białego gracza" Margin="0 0 2 0" VerticalAlignment="Center"/>
                         <TextBlock Text="Silnik czarnego gracza" Margin="5 0 2 0" VerticalAlignment="Center"/>
                         <ComboBox 
-                        x:Name="WhitePlayerEngineCombobox" 
-                        ItemsSource="{Binding Path=WhitePlayerEngineKind, Converter={x1:EnumToCollectionConverter}, Mode=OneTime}"
-                        SelectedValue="{Binding Path=WhitePlayerEngineKind}"
-                        SelectedValuePath="Value"
-                        DisplayMemberPath="Description"
-                        VerticalAlignment="Center" 
-                        Margin="0 0 2 0"  />
+                            x:Name="WhitePlayerEngineCombobox" 
+                            ItemsSource="{Binding Path=WhitePlayerEngineKind, Converter={x1:EnumToCollectionConverter}, Mode=OneTime}"
+                            SelectedValue="{Binding Path=WhitePlayerEngineKind}"
+                            SelectedValuePath="Value"
+                            DisplayMemberPath="Description"
+                            VerticalAlignment="Center" 
+                            SelectionChanged="WhitePlayerEngineCombobox_SelectionChanged"
+                            Margin="0 0 2 0"  />
                         <ComboBox 
-                        x:Name="BlackPlayerEngineCombobox" 
-                        ItemsSource="{Binding Path=BlackPlayerEngineKind, Converter={x1:EnumToCollectionConverter}, Mode=OneTime}"
-                        SelectedValue="{Binding Path=BlackPlayerEngineKind}"
-                        SelectedValuePath="Value"
-                        DisplayMemberPath="Description"
-                        VerticalAlignment="Center"
-                        Margin="5 0 2 0"/>
+                            x:Name="BlackPlayerEngineCombobox" 
+                            ItemsSource="{Binding Path=BlackPlayerEngineKind, Converter={x1:EnumToCollectionConverter}, Mode=OneTime}"
+                            SelectedValue="{Binding Path=BlackPlayerEngineKind}"
+                            SelectedValuePath="Value"
+                            DisplayMemberPath="Description"
+                            VerticalAlignment="Center"
+                            SelectionChanged="BlackPlayerEngineCombobox_SelectionChanged"
+                            Margin="5 0 2 0"/>
                     </UniformGrid>
                     <UniformGrid Grid.Row="5" Margin="5" Columns="1" Rows="2">
                         <TextBlock Text="Wariant gry" Margin="0 0 2 0" VerticalAlignment="Center"/>
@@ -152,7 +156,6 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-
                         <UniformGrid Grid.Row="1" Margin="5" Columns="2" Rows="2">
                             <TextBlock Text="Losowe ziarno" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                             <TextBlock Text="Ziarno" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
@@ -180,6 +183,60 @@
                                     </Style>
                                 </TextBox.Style>
                             </TextBox>
+                        </UniformGrid>
+                    </Grid>
+                </GroupBox>
+            </Grid>
+            <Grid>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=WhitePlayerEngineCombobox, Path=SelectedIndex}" Value="2">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <GroupBox
+                  Margin="5"
+                  Header="Ustawienia białego gracza">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <UniformGrid Grid.Row="1" Margin="5" Columns="3" Rows="2">
+                            <TextBlock Text="Liczba iteracji MCTS" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Rozmiar grida GPU" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Rozmiar bloku GPU" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <Controls:NumericUpDown 
+                                x:Name="WhitePlayerCudaEngineMctsIterationNumeric" 
+                                Width="80" 
+                                Margin="0 0 2 0" 
+                                Value="{Binding Path=WhitePlayerCudaEngineMctsIteration, Mode=TwoWay}"
+                                Minimum="1" 
+                                Maximum="1000" 
+                                HorizontalAlignment="Center" 
+                                VerticalAlignment="Center"/>
+                            <Controls:NumericUpDown 
+                                x:Name="WhitePlayerCudaEngineGridSizeNumeric" 
+                                Width="80" 
+                                HorizontalAlignment="Center" 
+                                Margin="0 0 2 0" 
+                                Value="{Binding Path=WhitePlayerCudaEngineGridSize, Mode=TwoWay}"
+                                Minimum="1" 
+                                Maximum="512"
+                                VerticalAlignment="Center"/>
+                            <Controls:NumericUpDown 
+                                x:Name="WhitePlayerCudaEngineBlockSizeNumeric" 
+                                Width="80" 
+                                HorizontalAlignment="Center" 
+                                Margin="0 0 2 0" 
+                                Value="{Binding Path=WhitePlayerCudaEngineBlockSize, Mode=TwoWay}"
+                                Minimum="1" 
+                                Maximum="512"
+                                VerticalAlignment="Center"/>
                         </UniformGrid>
                     </Grid>
                 </GroupBox>
@@ -234,6 +291,60 @@
                                     </Style>
                                 </TextBox.Style>
                             </TextBox>
+                        </UniformGrid>
+                    </Grid>
+                </GroupBox>
+            </Grid>
+            <Grid>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=BlackPlayerEngineCombobox, Path=SelectedIndex}" Value="2">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <GroupBox
+                  Margin="5"
+                  Header="Ustawienia czarnego gracza">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <UniformGrid Grid.Row="1" Margin="5" Columns="3" Rows="2">
+                            <TextBlock Text="Liczba iteracji MCTS" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Rozmiar grida GPU" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Rozmiar bloku GPU" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <Controls:NumericUpDown 
+                                x:Name="BlackPlayerCudaEngineMctsIterationNumeric" 
+                                Width="80" 
+                                Margin="0 0 2 0" 
+                                Value="{Binding Path=BlackPlayerCudaEngineMctsIteration, Mode=TwoWay}"
+                                Minimum="1" 
+                                Maximum="1000" 
+                                HorizontalAlignment="Center" 
+                                VerticalAlignment="Center"/>
+                            <Controls:NumericUpDown 
+                                x:Name="BlackPlayerCudaEngineGridSizeNumeric" 
+                                Width="80" 
+                                HorizontalAlignment="Center" 
+                                Margin="0 0 2 0" 
+                                Value="{Binding Path=BlackPlayerCudaEngineGridSize, Mode=TwoWay}"
+                                Minimum="1" 
+                                Maximum="512"
+                                VerticalAlignment="Center"/>
+                            <Controls:NumericUpDown 
+                                x:Name="BlackPlayerCudaEngineBlockSizeNumeric" 
+                                Width="80" 
+                                HorizontalAlignment="Center" 
+                                Margin="0 0 2 0" 
+                                Value="{Binding Path=BlackPlayerCudaEngineBlockSize, Mode=TwoWay}"
+                                Minimum="1" 
+                                Maximum="512"
+                                VerticalAlignment="Center"/>
                         </UniformGrid>
                     </Grid>
                 </GroupBox>
