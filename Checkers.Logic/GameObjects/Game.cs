@@ -128,7 +128,8 @@ namespace Checkers.Logic.GameObjects
                 };
                 gameMoves.Add(gameMove);
             }
-            DatabaseLayer.AddGame(whitePlayerInformation, blackPlayerInformation, gameType, gameMoves, Board.Size, winner);
+            int moveCount = History.Count;
+            DatabaseLayer.AddGame(whitePlayerInformation, blackPlayerInformation, gameType, gameMoves, Board.Size, winner, moveCount);
         }
     }
 }
