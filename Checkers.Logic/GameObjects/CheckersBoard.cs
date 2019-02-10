@@ -420,5 +420,15 @@ namespace Checkers.Logic.GameObjects
                             break;
                     }
         }
+
+        public override string ToString()
+        {
+            string boardString = "";
+            foreach(var piece in PiecesOnBoard)
+            {
+                boardString += $"{piece.Position}:{(piece.Color == PieceColor.White ? 1 : -1) * (piece.IsKing ? 2 : 1)} ";
+            }
+            return boardString;
+        }
     }
 }

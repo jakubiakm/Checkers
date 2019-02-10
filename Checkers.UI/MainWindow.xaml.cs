@@ -74,7 +74,7 @@ namespace Checkers.UI
                 catch (NotAvailableMoveException exception)
                 {
                     NotHumanMoveTimer.Stop();
-                    await this.ShowMessageAsync("Remis", $"Gra zakończona remisem gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie może już wykonywać ruchów.");
+                    await this.ShowMessageAsync("Remis", $"Gra zakończona. Wygrywa gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "BIAŁY" : "CZARNY")}, bo gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie może już wykonywać ruchów.");
                     HistoryViewModelObject.History.Clear();
                     StartNewGame(
                         BoardViewModelObject.Game.Board.Size, 
@@ -279,7 +279,7 @@ namespace Checkers.UI
                 }
                 catch (NotAvailableMoveException exception)
                 {
-                    await this.ShowMessageAsync("Remis", $"Gra zakończona remisem gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie może już wykonywać ruchów.");
+                    await this.ShowMessageAsync("Remis", $"Gra zakończona. Wygrywa gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "BIAŁY" : "CZARNY")}, bo gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie może już wykonywać ruchów.");
                     StartNewGame(
                         BoardViewModelObject.Game.Board.Size,
                         BoardViewModelObject.Game.Board.NumberOfWhitePiecesAtBeggining,
@@ -305,7 +305,6 @@ namespace Checkers.UI
                 catch (WrongMoveException exception)
                 {
                     await this.ShowMessageAsync("Zły ruch", $"Gracz wykonał nielegalny ruch. Możliwa ilość pionków do bicia to {exception.MinimumBeatedPieces}.");
-
                 }
 
             }
