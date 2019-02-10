@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="3fe613ee561d4523abb446e68c8f04e9" Name="Diagram1">
+        <EntityTypeShape EntityType="CheckersModel.algorithm" Width="1.5" PointX="0.75" PointY="1.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="CheckersModel.game" Width="1.5" PointX="5.25" PointY="1.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="CheckersModel.game_move" Width="1.5" PointX="7.5" PointY="1" IsExpanded="true" />
+        <EntityTypeShape EntityType="CheckersModel.game_type" Width="1.5" PointX="3" PointY="5.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="CheckersModel.player" Width="1.5" PointX="0.75" PointY="5.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="CheckersModel.player_information" Width="1.5" PointX="3" PointY="1.25" IsExpanded="true" />
+        <AssociationConnector Association="CheckersModel.FK__player_in__algor__59FA5E80" ManuallyRouted="false" />
+        <AssociationConnector Association="CheckersModel.FK__game__black_play__5EBF139D" ManuallyRouted="false" />
+        <AssociationConnector Association="CheckersModel.FK__game__game_type___5FB337D6" ManuallyRouted="false" />
+        <AssociationConnector Association="CheckersModel.FK__game__white_play__5DCAEF64" ManuallyRouted="false" />
+        <AssociationConnector Association="CheckersModel.FK__game_move__game___6383C8BA" ManuallyRouted="false" />
+        <AssociationConnector Association="CheckersModel.FK__player_in__playe__59063A47" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

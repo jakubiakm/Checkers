@@ -13,8 +13,6 @@ using System.Windows.Markup;
 
 namespace Checkers.UI.ViewModel
 {
-
-
     public class SettingsViewModel : INotifyPropertyChanged
     {
         public SettingsViewModel(

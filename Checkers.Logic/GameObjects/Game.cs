@@ -43,22 +43,39 @@ namespace Checkers.Logic.GameObjects
 
         public Move MakeMove(PieceColor color)
         {
-            var x = Board.DeepClone();
-            switch(color)
+            try
             {
-                case PieceColor.White:
-                    Board.LastMove = Board.MakeMove(WhitePlayerEngine.MakeMove(Board, Variant));
-                    break;
-                case PieceColor.Black:
-                    Board.LastMove = Board.MakeMove(BlackPlayerEngine.MakeMove(Board, Variant));
-                    break;
+                var x = Board.DeepClone();
+                switch (color)
+                {
+                    case PieceColor.White:
+                        Board.LastMove = Board.MakeMove(WhitePlayerEngine.MakeMove(Board, Variant));
+                        break;
+                    case PieceColor.Black:
+                        Board.LastMove = Board.MakeMove(BlackPlayerEngine.MakeMove(Board, Variant));
+                        break;
+                }
+                if (Board.PiecesOnBoard.Where(p => p.Color == PieceColor.Black).Count() == 0)
+                {
+                    throw new NoAvailablePiecesException(PieceColor.Black, Board.LastMove);
+                }
+                if (Board.PiecesOnBoard.Where(p => p.Color == PieceColor.White).Count() == 0)
+                {
+                    throw new NoAvailablePiecesException(PieceColor.White, Board.LastMove);
+                }
+                History.Add(x);
+                return Board.LastMove;
             }
-            if (Board.PiecesOnBoard.Where(p => p.Color == PieceColor.Black).Count() == 0)
-                throw new NoAvailablePiecesException(PieceColor.Black, Board.LastMove);
-            if (Board.PiecesOnBoard.Where(p => p.Color == PieceColor.White).Count() == 0)
-                throw new NoAvailablePiecesException(PieceColor.White, Board.LastMove);
-            History.Add(x);
-            return Board.LastMove;
+            catch
+            {
+                AddGameToDatabase();
+                throw;
+            }
+        }
+
+        void AddGameToDatabase()
+        {
+
         }
     }
 }
