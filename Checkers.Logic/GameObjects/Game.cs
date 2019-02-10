@@ -14,6 +14,8 @@ namespace Checkers.Logic.GameObjects
 {
     public class Game
     {
+        private DatabaseLayer _databaseLayer = new DatabaseLayer();
+
         public List<HistoryBoard> History { get; private set; }
 
         public CheckersBoard Board { get; private set; }
@@ -24,6 +26,8 @@ namespace Checkers.Logic.GameObjects
 
         public GameVariant Variant { get; set; }
 
+        public DateTime StartDate { get; set; }
+
         public Game(IEngine whiteEngine, IEngine blackEngine, int boardSize, int numberOfWhitePieces, int numberOfBlackPieces, GameVariant variant)
         {
             WhitePlayerEngine = whiteEngine;
@@ -31,6 +35,7 @@ namespace Checkers.Logic.GameObjects
             Board = new CheckersBoard(boardSize, numberOfWhitePieces, numberOfBlackPieces);
             History = new List<HistoryBoard>();
             Variant = variant;
+            StartDate = DateTime.Now;
         }
 
         public Game(IEngine whiteEngine, IEngine blackEngine, int boardSize, List<Piece> pieces, GameVariant variant)
@@ -40,6 +45,7 @@ namespace Checkers.Logic.GameObjects
             Board = new CheckersBoard(boardSize, pieces);
             History = new List<HistoryBoard>();
             Variant = variant;
+            StartDate = DateTime.Now;
         }
 
         public Move MakeMove(PieceColor color)
@@ -79,9 +85,17 @@ namespace Checkers.Logic.GameObjects
             catch (NoAvailablePiecesException exception)
             {
                 string winner = "";
-                winner = exception.Color == PieceColor.Black ? 
-                    Variant == GameVariant.Checkers ? "W" : "B" :
-                    Variant == GameVariant.Anticheckers ? "B" : "W";
+                switch (exception.Color)
+                {
+                    case PieceColor.White when Variant == GameVariant.Checkers:
+                    case PieceColor.Black when Variant == GameVariant.Anticheckers:
+                        winner = "B";
+                        break;
+                    case PieceColor.Black when Variant == GameVariant.Checkers:
+                    case PieceColor.White when Variant == GameVariant.Anticheckers:
+                        winner = "W";
+                        break;
+                }
                 AddGameToDatabase(winner);
                 throw;
             }
@@ -113,7 +127,7 @@ namespace Checkers.Logic.GameObjects
             };
             game_type gameType = new game_type() { game_type_name = Variant.ToString() };
             List<game_move> gameMoves = new List<game_move>();
-            foreach(var move in History.Skip(1))
+            foreach (var move in History.Skip(1))
             {
                 var gameMove = new game_move()
                 {
@@ -129,7 +143,7 @@ namespace Checkers.Logic.GameObjects
                 gameMoves.Add(gameMove);
             }
             int moveCount = History.Count;
-            DatabaseLayer.AddGame(whitePlayerInformation, blackPlayerInformation, gameType, gameMoves, Board.Size, winner, moveCount);
+            _databaseLayer.AddGame(whitePlayerInformation, blackPlayerInformation, gameType, gameMoves, Board.Size, winner, moveCount, StartDate);
         }
     }
 }

@@ -26,6 +26,8 @@ namespace Checkers.Data
         public int game_type_id { get; set; }
         public int game_size { get; set; }
         public string game_result { get; set; }
+        public int move_count { get; set; }
+        public System.DateTime start_date { get; set; }
     
         public virtual player_information player_information { get; set; }
         public virtual game_type game_type { get; set; }

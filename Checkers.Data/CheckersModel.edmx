@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="CheckersModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="CheckersModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="algorithm">
           <Key>
             <PropertyRef Name="algorithm_id" />
@@ -22,6 +22,8 @@
           <Property Name="game_type_id" Type="int" Nullable="false" />
           <Property Name="game_size" Type="int" Nullable="false" />
           <Property Name="game_result" Type="varchar" MaxLength="1" Nullable="false" />
+          <Property Name="move_count" Type="int" Nullable="false" />
+          <Property Name="start_date" Type="datetime" Nullable="false" />
         </EntityType>
         <EntityType Name="game_move">
           <Key>
@@ -61,7 +63,7 @@
           <Property Name="algorithm_id" Type="int" Nullable="false" />
           <Property Name="number_of_pieces" Type="int" Nullable="false" />
         </EntityType>
-        <Association Name="FK__game__black_play__5EBF139D">
+        <Association Name="FK__game__black_play__66603565">
           <End Role="player_information" Type="Self.player_information" Multiplicity="1" />
           <End Role="game" Type="Self.game" Multiplicity="*" />
           <ReferentialConstraint>
@@ -73,7 +75,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__game__game_type___5FB337D6">
+        <Association Name="FK__game__game_type___6754599E">
           <End Role="game_type" Type="Self.game_type" Multiplicity="1" />
           <End Role="game" Type="Self.game" Multiplicity="*" />
           <ReferentialConstraint>
@@ -85,7 +87,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__game__white_play__5DCAEF64">
+        <Association Name="FK__game__white_play__68487DD7">
           <End Role="player_information" Type="Self.player_information" Multiplicity="1" />
           <End Role="game" Type="Self.game" Multiplicity="*" />
           <ReferentialConstraint>
@@ -140,15 +142,15 @@
           <EntitySet Name="game_type" EntityType="Self.game_type" Schema="cmn" store:Type="Tables" />
           <EntitySet Name="player" EntityType="Self.player" Schema="cmn" store:Type="Tables" />
           <EntitySet Name="player_information" EntityType="Self.player_information" Schema="cmn" store:Type="Tables" />
-          <AssociationSet Name="FK__game__black_play__5EBF139D" Association="Self.FK__game__black_play__5EBF139D">
+          <AssociationSet Name="FK__game__black_play__66603565" Association="Self.FK__game__black_play__66603565">
             <End Role="player_information" EntitySet="player_information" />
             <End Role="game" EntitySet="game" />
           </AssociationSet>
-          <AssociationSet Name="FK__game__game_type___5FB337D6" Association="Self.FK__game__game_type___5FB337D6">
+          <AssociationSet Name="FK__game__game_type___6754599E" Association="Self.FK__game__game_type___6754599E">
             <End Role="game_type" EntitySet="game_type" />
             <End Role="game" EntitySet="game" />
           </AssociationSet>
-          <AssociationSet Name="FK__game__white_play__5DCAEF64" Association="Self.FK__game__white_play__5DCAEF64">
+          <AssociationSet Name="FK__game__white_play__68487DD7" Association="Self.FK__game__white_play__68487DD7">
             <End Role="player_information" EntitySet="player_information" />
             <End Role="game" EntitySet="game" />
           </AssociationSet>
@@ -165,8 +167,7 @@
             <End Role="player_information" EntitySet="player_information" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="CheckersModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -192,6 +193,8 @@
           <NavigationProperty Name="game_type" Relationship="Self.FK__game__game_type___5FB337D6" FromRole="game" ToRole="game_type" />
           <NavigationProperty Name="player_information1" Relationship="Self.FK__game__white_play__5DCAEF64" FromRole="game" ToRole="player_information" />
           <NavigationProperty Name="game_move" Relationship="Self.FK__game_move__game___6383C8BA" FromRole="game" ToRole="game_move" />
+          <Property Name="move_count" Type="Int32" Nullable="false" />
+          <Property Name="start_date" Type="DateTime" Nullable="false" Precision="3" />
         </EntityType>
         <EntityType Name="game_move">
           <Key>
@@ -359,6 +362,8 @@
           <EntitySetMapping Name="games">
             <EntityTypeMapping TypeName="CheckersModel.game">
               <MappingFragment StoreEntitySet="game">
+                <ScalarProperty Name="start_date" ColumnName="start_date" />
+                <ScalarProperty Name="move_count" ColumnName="move_count" />
                 <ScalarProperty Name="game_id" ColumnName="game_id" />
                 <ScalarProperty Name="white_player_information_id" ColumnName="white_player_information_id" />
                 <ScalarProperty Name="black_player_information_id" ColumnName="black_player_information_id" />
