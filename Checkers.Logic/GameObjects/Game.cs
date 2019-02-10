@@ -1,4 +1,5 @@
-﻿using Checkers.Logic.Engines;
+﻿using Checkers.Data;
+using Checkers.Logic.Engines;
 using Checkers.Logic.Enums;
 using Checkers.Logic.Exceptions;
 using System;
@@ -75,7 +76,11 @@ namespace Checkers.Logic.GameObjects
 
         void AddGameToDatabase()
         {
-
+            player_information whitePlayerInformation = new player_information();
+            player_information blackPlayerInformation = new player_information();
+            game_type gameType = new game_type();
+            List<game_move> gameMoves = new List<game_move>();
+            DatabaseLayer.AddGame(whitePlayerInformation, blackPlayerInformation, gameType, gameMoves, 10, 'C');
         }
     }
 }

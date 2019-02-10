@@ -50,15 +50,38 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="algorithm.cs">
+      <DependentUpon>CheckersModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="CheckersModel.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>CheckersModel.Context.tt</DependentUpon>
     </Compile>
+    <Compile Include="CheckersModel.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CheckersModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="CheckersModel.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>CheckersModel.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="game.cs">
+      <DependentUpon>CheckersModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="game_move.cs">
+      <DependentUpon>CheckersModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="game_type.cs">
+      <DependentUpon>CheckersModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="player.cs">
+      <DependentUpon>CheckersModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="player_information.cs">
+      <DependentUpon>CheckersModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -79,6 +102,12 @@
     <Content Include="CheckersModel.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>CheckersModel.Context.cs</LastGenOutput>
+      <DependentUpon>CheckersModel.edmx</DependentUpon>
+    </Content>
+    <Content Include="CheckersModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>CheckersModel.edmx</DependentUpon>
+      <LastGenOutput>CheckersModel.cs</LastGenOutput>
     </Content>
   </ItemGroup>
   <ItemGroup>
