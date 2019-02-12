@@ -151,6 +151,8 @@ namespace Checkers.UI.Views
                     {
                         return new CudaEngine(color, viewModel.BlackPlayerCudaEngineMctsIteration, viewModel.BlackPlayerCudaEngineGridSize, viewModel.BlackPlayerCudaEngineBlockSize);
                     }
+                case EngineKind.MinMax:
+                    return new MinmaxEngine(color);
                 default:
                     throw new ArgumentException("Nierozpoznany typ silnika");
             }
