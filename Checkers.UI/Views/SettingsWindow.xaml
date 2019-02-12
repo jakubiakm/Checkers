@@ -242,6 +242,41 @@
                     </Grid>
                 </GroupBox>
             </Grid>
+            <Grid>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=WhitePlayerEngineCombobox, Path=SelectedIndex}" Value="3">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <GroupBox
+                  Margin="5"
+                  Header="Ustawienia białego gracza">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <UniformGrid Grid.Row="1" Margin="5" Columns="1" Rows="2">
+                            <TextBlock Text="Głębokość drzewa" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <Controls:NumericUpDown 
+                                x:Name="WhitePlayerMinmaxEngineTreeDepth" 
+                                Width="80" 
+                                Margin="0 0 2 0" 
+                                Value="{Binding Path=WhitePlayerMinmaxEngineTreeDepth, Mode=TwoWay}"
+                                Minimum="1" 
+                                Maximum="20" 
+                                HorizontalAlignment="Center" 
+                                VerticalAlignment="Center"
+                                />
+                        </UniformGrid>
+                    </Grid>
+                </GroupBox>
+            </Grid>
         </Grid>
 
         <Grid Grid.Row="2">
@@ -346,6 +381,41 @@
                                 Minimum="1" 
                                 Maximum="512"
                                 VerticalAlignment="Center"/>
+                        </UniformGrid>
+                    </Grid>
+                </GroupBox>
+            </Grid>
+            <Grid>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=BlackPlayerEngineCombobox, Path=SelectedIndex}" Value="3">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <GroupBox
+                  Margin="5"
+                  Header="Ustawienia czarnego gracza">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <UniformGrid Grid.Row="1" Margin="5" Columns="1" Rows="2">
+                            <TextBlock Text="Głębokość drzewa" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <Controls:NumericUpDown 
+                                x:Name="BlackPlayerMinmaxEngineTreeDepth" 
+                                Width="80" 
+                                Margin="0 0 2 0" 
+                                Value="{Binding Path=BlackPlayerMinmaxEngineTreeDepth, Mode=TwoWay}"
+                                Minimum="1" 
+                                Maximum="20" 
+                                HorizontalAlignment="Center" 
+                                VerticalAlignment="Center"
+                                />
                         </UniformGrid>
                     </Grid>
                 </GroupBox>

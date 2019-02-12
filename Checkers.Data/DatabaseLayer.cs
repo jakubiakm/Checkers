@@ -76,7 +76,8 @@ namespace Checkers.Data
             if (!context.player_information.Any(p => 
                 p.player_id == playerInformation.player.player_id &&
                 p.algorithm_id == playerInformation.algorithm.algorithm_id &&
-                p.number_of_pieces == playerInformation.number_of_pieces))
+                p.number_of_pieces == playerInformation.number_of_pieces &&
+                p.tree_depth == playerInformation.tree_depth))
             {
                 playerInformation = context.player_information.Add(playerInformation);
             }
@@ -85,7 +86,8 @@ namespace Checkers.Data
                 playerInformation = context.player_information.First(p =>
                     p.player_id == playerInformation.player.player_id &&
                     p.algorithm_id == playerInformation.algorithm.algorithm_id &&
-                    p.number_of_pieces == playerInformation.number_of_pieces);
+                    p.number_of_pieces == playerInformation.number_of_pieces &&
+                    p.tree_depth == playerInformation.tree_depth);
             }
             return playerInformation;
         }

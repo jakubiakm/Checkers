@@ -12,6 +12,8 @@ namespace Checkers.Logic.Engines
 {
     public class MinmaxEngine : IEngine
     {
+        public int MinmaxTreeDepth { get; set; }
+
         public EngineKind Kind
         {
             get
@@ -24,8 +26,9 @@ namespace Checkers.Logic.Engines
 
         private Random randomGenerator;
 
-        public MinmaxEngine(PieceColor color)
+        public MinmaxEngine(PieceColor color, int treeDepth)
         {
+            MinmaxTreeDepth = treeDepth;
             randomGenerator = new Random();
             Color = color;
         }
