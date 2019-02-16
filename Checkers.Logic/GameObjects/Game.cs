@@ -4,6 +4,7 @@ using Checkers.Logic.Enums;
 using Checkers.Logic.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -125,6 +126,16 @@ namespace Checkers.Logic.GameObjects
                 number_of_pieces = Board.NumberOfBlackPiecesAtBeggining,
                 player = BlackPlayerEngine.Kind == EngineKind.Human ? new player() { player_name = "syntaximus" } : new player() { player_name = "CPU" }
             };
+            if (WhitePlayerEngine.GetType() == typeof(AlphaBetaEngine))
+            {
+                var engine = (AlphaBetaEngine)WhitePlayerEngine;
+                whitePlayerInformation.tree_depth = engine.AlphaBetaTreeDepth;
+            }
+            if (BlackPlayerEngine.GetType() == typeof(AlphaBetaEngine))
+            {
+                var engine = (AlphaBetaEngine)BlackPlayerEngine;
+                blackPlayerInformation.tree_depth = engine.AlphaBetaTreeDepth;
+            }
             game_type gameType = new game_type() { game_type_name = Variant.ToString() };
             List<game_move> gameMoves = new List<game_move>();
             foreach (var move in History.Skip(1))
@@ -144,6 +155,8 @@ namespace Checkers.Logic.GameObjects
             }
             int moveCount = History.Count;
             _databaseLayer.AddGame(whitePlayerInformation, blackPlayerInformation, gameType, gameMoves, Board.Size, winner, moveCount, StartDate);
+
         }
+
     }
 }

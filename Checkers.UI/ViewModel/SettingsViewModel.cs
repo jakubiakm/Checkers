@@ -43,6 +43,8 @@ namespace Checkers.UI.ViewModel
             BlackPlayerCudaEngineMctsIteration = 25;
             #endregion
 
+            WhitePlayerAlphaBetaEngineTreeDepth = 5;
+            BlackPlayerAlphaBetaEngineTreeDepth = 5;
 
             switch (whitePlayerEngine.Kind)
             {
@@ -56,6 +58,10 @@ namespace Checkers.UI.ViewModel
                     WhitePlayerCudaEngineBlockSize = cudaEngine.BlockSize;
                     WhitePlayerCudaEngineGridSize = cudaEngine.GridSize;
                     WhitePlayerCudaEngineMctsIteration = cudaEngine.MctsIterationCount;
+                    break;
+                case EngineKind.AlphaBeta:
+                    var AlphaBetaEngine = (AlphaBetaEngine)whitePlayerEngine;
+                    WhitePlayerAlphaBetaEngineTreeDepth = AlphaBetaEngine.AlphaBetaTreeDepth;
                     break;
             }
 
@@ -71,6 +77,10 @@ namespace Checkers.UI.ViewModel
                     BlackPlayerCudaEngineBlockSize = cudaEngine.BlockSize;
                     BlackPlayerCudaEngineGridSize = cudaEngine.GridSize;
                     BlackPlayerCudaEngineMctsIteration = cudaEngine.MctsIterationCount;
+                    break;
+                case EngineKind.AlphaBeta:
+                    var AlphaBetaEngine = (AlphaBetaEngine)blackPlayerEngine;
+                    BlackPlayerAlphaBetaEngineTreeDepth = AlphaBetaEngine.AlphaBetaTreeDepth;
                     break;
             }
         }
@@ -129,6 +139,32 @@ namespace Checkers.UI.ViewModel
         public int WhitePlayerRandomEngineSeedValue { get; set; }
 
         public int BlackPlayerRandomEngineSeedValue { get; set; }
+
+        public int WhitePlayerAlphaBetaEngineTreeDepth
+        {
+            get
+            {
+                return whitePlayerAlphaBetaEngineTreeDepth;
+            }
+            set
+            {
+                whitePlayerAlphaBetaEngineTreeDepth = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public int BlackPlayerAlphaBetaEngineTreeDepth
+        {
+            get
+            {
+                return blackPlayerAlphaBetaEngineTreeDepth;
+            }
+            set
+            {
+                blackPlayerAlphaBetaEngineTreeDepth = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         public int WhitePlayerCudaEngineMctsIteration
         {
@@ -213,6 +249,10 @@ namespace Checkers.UI.ViewModel
         private int whitePiecesCount;
 
         private int blackPiecesCount;
+
+        private int whitePlayerAlphaBetaEngineTreeDepth;
+
+        private int blackPlayerAlphaBetaEngineTreeDepth;
 
         private int whitePlayerCudaEngineMctsIteration;
 
