@@ -50,9 +50,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AlgorithmObjects\MinMaxNode.cs" />
+    <Compile Include="AlgorithmObjects\MinMaxTree.cs" />
     <Compile Include="Engines\CudaEngine.cs" />
     <Compile Include="Engines\HumanEngine.cs" />
-    <Compile Include="Engines\MinmaxEngine.cs" />
+    <Compile Include="Engines\MinMaxEngine.cs" />
     <Compile Include="Enums\EngineKind.cs" />
     <Compile Include="Enums\GameVariant.cs" />
     <Compile Include="Exceptions\NoAvailablePiecesException.cs" />

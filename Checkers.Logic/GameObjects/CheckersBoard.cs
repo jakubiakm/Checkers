@@ -67,6 +67,13 @@ namespace Checkers.Logic.GameObjects
             return move;
         }
 
+        public CheckersBoard GetBoardAfterMove(Move move)
+        {
+            CheckersBoard ret = this.DeepClone();
+            ret.MakeMove(move);
+            return ret;
+        }
+
         public char[] GetBoardArray()
         {
             char[] array = new char[Size * Size];

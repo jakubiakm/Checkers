@@ -60,7 +60,7 @@ namespace Checkers.UI.ViewModel
                     WhitePlayerCudaEngineMctsIteration = cudaEngine.MctsIterationCount;
                     break;
                 case EngineKind.MinMax:
-                    var minmaxEngine = (MinmaxEngine)whitePlayerEngine;
+                    var minmaxEngine = (MinMaxEngine)whitePlayerEngine;
                     WhitePlayerMinmaxEngineTreeDepth = minmaxEngine.MinmaxTreeDepth;
                     break;
             }
@@ -79,7 +79,7 @@ namespace Checkers.UI.ViewModel
                     BlackPlayerCudaEngineMctsIteration = cudaEngine.MctsIterationCount;
                     break;
                 case EngineKind.MinMax:
-                    var minmaxEngine = (MinmaxEngine)blackPlayerEngine;
+                    var minmaxEngine = (MinMaxEngine)blackPlayerEngine;
                     BlackPlayerMinmaxEngineTreeDepth = minmaxEngine.MinmaxTreeDepth;
                     break;
             }

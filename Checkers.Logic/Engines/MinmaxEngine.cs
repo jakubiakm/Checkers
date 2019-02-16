@@ -1,4 +1,5 @@
-﻿using Checkers.Logic.Enums;
+﻿using Checkers.Logic.AlgorithmObjects;
+using Checkers.Logic.Enums;
 using Checkers.Logic.Exceptions;
 using Checkers.Logic.GameObjects;
 using System;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Checkers.Logic.Engines
 {
-    public class MinmaxEngine : IEngine
+    public class MinMaxEngine : IEngine
     {
         public int MinmaxTreeDepth { get; set; }
 
@@ -26,7 +27,7 @@ namespace Checkers.Logic.Engines
 
         private Random randomGenerator;
 
-        public MinmaxEngine(PieceColor color, int treeDepth)
+        public MinMaxEngine(PieceColor color, int treeDepth)
         {
             MinmaxTreeDepth = treeDepth;
             randomGenerator = new Random();
@@ -44,8 +45,17 @@ namespace Checkers.Logic.Engines
             int count = allPossibleMoves.Count;
             if (count == 0)
                 throw new NotAvailableMoveException(Color);
-            int elemIndex = randomGenerator.Next(count);
-            return allPossibleMoves[elemIndex];
+            if (count == 1)
+            {
+                return allPossibleMoves.First();
+            }
+            else
+            {
+                MinMaxTree tree = new MinMaxTree(MinmaxTreeDepth);
+                tree.BuildTree(currentBoard, Color);
+                int elemIndex = tree.ChooseBestMove();
+                return allPossibleMoves[elemIndex];
+            }
         }
     }
 }

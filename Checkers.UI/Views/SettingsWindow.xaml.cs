@@ -154,11 +154,11 @@ namespace Checkers.UI.Views
                 case EngineKind.MinMax:
                     if(color == PieceColor.White)
                     {
-                        return new MinmaxEngine(color, viewModel.WhitePlayerMinmaxEngineTreeDepth);
+                        return new MinMaxEngine(color, viewModel.WhitePlayerMinmaxEngineTreeDepth);
                     }
                     else
                     {
-                        return new MinmaxEngine(color, viewModel.BlackPlayerMinmaxEngineTreeDepth);
+                        return new MinMaxEngine(color, viewModel.BlackPlayerMinmaxEngineTreeDepth);
                     }
                 default:
                     throw new ArgumentException("Nierozpoznany typ silnika");
