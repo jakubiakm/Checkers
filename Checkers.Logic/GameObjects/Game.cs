@@ -125,15 +125,15 @@ namespace Checkers.Logic.GameObjects
                 number_of_pieces = Board.NumberOfBlackPiecesAtBeggining,
                 player = BlackPlayerEngine.Kind == EngineKind.Human ? new player() { player_name = "syntaximus" } : new player() { player_name = "CPU" }
             };
-            if (WhitePlayerEngine.GetType() == typeof(MinMaxEngine))
+            if (WhitePlayerEngine.GetType() == typeof(AlphaBetaEngine))
             {
-                var engine = (MinMaxEngine)WhitePlayerEngine;
-                whitePlayerInformation.tree_depth = engine.MinmaxTreeDepth;
+                var engine = (AlphaBetaEngine)WhitePlayerEngine;
+                whitePlayerInformation.tree_depth = engine.AlphaBetaTreeDepth;
             }
-            if (BlackPlayerEngine.GetType() == typeof(MinMaxEngine))
+            if (BlackPlayerEngine.GetType() == typeof(AlphaBetaEngine))
             {
-                var engine = (MinMaxEngine)BlackPlayerEngine;
-                blackPlayerInformation.tree_depth = engine.MinmaxTreeDepth;
+                var engine = (AlphaBetaEngine)BlackPlayerEngine;
+                blackPlayerInformation.tree_depth = engine.AlphaBetaTreeDepth;
             }
             game_type gameType = new game_type() { game_type_name = Variant.ToString() };
             List<game_move> gameMoves = new List<game_move>();

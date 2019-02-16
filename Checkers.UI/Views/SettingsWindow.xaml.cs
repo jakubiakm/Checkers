@@ -151,14 +151,14 @@ namespace Checkers.UI.Views
                     {
                         return new CudaEngine(color, viewModel.BlackPlayerCudaEngineMctsIteration, viewModel.BlackPlayerCudaEngineGridSize, viewModel.BlackPlayerCudaEngineBlockSize);
                     }
-                case EngineKind.MinMax:
+                case EngineKind.AlphaBeta:
                     if(color == PieceColor.White)
                     {
-                        return new MinMaxEngine(color, viewModel.WhitePlayerMinmaxEngineTreeDepth);
+                        return new AlphaBetaEngine(color, viewModel.WhitePlayerAlphaBetaEngineTreeDepth);
                     }
                     else
                     {
-                        return new MinMaxEngine(color, viewModel.BlackPlayerMinmaxEngineTreeDepth);
+                        return new AlphaBetaEngine(color, viewModel.BlackPlayerAlphaBetaEngineTreeDepth);
                     }
                 default:
                     throw new ArgumentException("Nierozpoznany typ silnika");

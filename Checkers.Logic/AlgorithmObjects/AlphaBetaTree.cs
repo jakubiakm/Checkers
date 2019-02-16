@@ -7,30 +7,30 @@ using System.Linq;
 
 namespace Checkers.Logic.AlgorithmObjects
 {
-    public class MinMaxTree
+    public class AlphaBetaTree
     {
-        public MinMaxNode Root { get; set; }
+        public AlphaBetaNode Root { get; set; }
 
-        public List<MinMaxNode> Leafs { get; set; }
+        public List<AlphaBetaNode> Leafs { get; set; }
 
         public int Depth { get; set; }
 
-        public MinMaxTree(int depth)
+        public AlphaBetaTree(int depth)
         {
             Depth = depth;
-            Leafs = new List<MinMaxNode>();
+            Leafs = new List<AlphaBetaNode>();
         }
 
         public void BuildTree(CheckersBoard board, PieceColor color)
         {
-            Root = new MinMaxNode(board, color, 0);
+            Root = new AlphaBetaNode(board, color, 0);
             List<Move> moves = Root.Board.GetAllPossibleMoves(Root.Color);
-            List<MinMaxNode> childrens = new List<MinMaxNode>();
+            List<AlphaBetaNode> childrens = new List<AlphaBetaNode>();
             foreach (var move in moves)
             {
                 var b = Root.Board.GetBoardAfterMove(move);
                 var c = Root.Color == PieceColor.Black ? PieceColor.White : PieceColor.Black;
-                var node = new MinMaxNode(b, c, 1);
+                var node = new AlphaBetaNode(b, c, 1);
                 node.Parent = Root;
                 childrens.Add(node);
             }
@@ -44,7 +44,7 @@ namespace Checkers.Logic.AlgorithmObjects
                     GenerateNodes(n, 2);
                 });
             }
-            for(int i = 0; i != Root.Children.Count; i++)
+            for (int i = 0; i != Root.Children.Count; i++)
             {
                 threads[i].Start();
             }
@@ -55,7 +55,7 @@ namespace Checkers.Logic.AlgorithmObjects
 
         }
 
-        public void GenerateNodes(MinMaxNode parent, int depth)
+        public void GenerateNodes(AlphaBetaNode parent, int depth)
         {
             if (depth == Depth)
             {
@@ -63,19 +63,19 @@ namespace Checkers.Logic.AlgorithmObjects
                 return;
             }
             List<Move> moves = parent.Board.GetAllPossibleMoves(parent.Color);
-            List<MinMaxNode> childrens = new List<MinMaxNode>();
+            List<AlphaBetaNode> childrens = new List<AlphaBetaNode>();
             foreach (var move in moves)
             {
                 var board = parent.Board.GetBoardAfterMove(move);
                 var color = parent.Color == PieceColor.Black ? PieceColor.White : PieceColor.Black;
-                var node = new MinMaxNode(board, color, depth + 1);
+                var node = new AlphaBetaNode(board, color, depth + 1);
                 node.Parent = parent;
                 childrens.Add(node);
             }
             parent.Children = childrens;
             foreach (var node in parent.Children)
             {
-                    GenerateNodes(node, depth + 1);
+                GenerateNodes(node, depth + 1);
             }
         }
 
@@ -83,7 +83,7 @@ namespace Checkers.Logic.AlgorithmObjects
         {
             foreach (var node in Root.Children)
             {
-                node.CurrentScore = GetScore(node);
+                node.CurrentScore = GetScore(node, int.MinValue, int.MaxValue);
             }
             int index = 0, max = int.MinValue, min = int.MaxValue;
             for (int i = 0; i != Root.Children.Count; i++)
@@ -108,11 +108,30 @@ namespace Checkers.Logic.AlgorithmObjects
             return index;
         }
 
-        private int GetScore(MinMaxNode node)
+        private int GetScore(AlphaBetaNode node, int alpha, int beta)
         {
             if (node.Children == null || node.Children.Count == 0)
                 return node.Score;
-            return node.Color == PieceColor.White ? node.Children.Max(n => GetScore(n)) : node.Children.Min(n => GetScore(n));
+            if (node.Color == PieceColor.Black)
+            {
+                foreach (var n in node.Children)
+                {
+                    beta = new List<int>() { beta, GetScore(n, alpha, beta) }.Min();
+                    if (alpha >= beta)
+                        break;
+                }
+                return beta;
+            }
+            else
+            {
+                foreach (var n in node.Children)
+                {
+                    alpha = new List<int>() { alpha, GetScore(n, alpha, beta) }.Max();
+                    if (alpha >= beta)
+                        break;
+                }
+                return alpha;
+            }
         }
     }
 }

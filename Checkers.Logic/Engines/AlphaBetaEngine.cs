@@ -11,15 +11,15 @@ using System.Threading.Tasks;
 
 namespace Checkers.Logic.Engines
 {
-    public class MinMaxEngine : IEngine
+    public class AlphaBetaEngine : IEngine
     {
-        public int MinmaxTreeDepth { get; set; }
+        public int AlphaBetaTreeDepth { get; set; }
 
         public EngineKind Kind
         {
             get
             {
-                return EngineKind.MinMax;
+                return EngineKind.AlphaBeta;
             }
         }
 
@@ -27,9 +27,9 @@ namespace Checkers.Logic.Engines
 
         private Random randomGenerator;
 
-        public MinMaxEngine(PieceColor color, int treeDepth)
+        public AlphaBetaEngine(PieceColor color, int treeDepth)
         {
-            MinmaxTreeDepth = treeDepth;
+            AlphaBetaTreeDepth = treeDepth;
             randomGenerator = new Random();
             Color = color;
         }
@@ -51,7 +51,7 @@ namespace Checkers.Logic.Engines
             }
             else
             {
-                MinMaxTree tree = new MinMaxTree(MinmaxTreeDepth);
+                AlphaBetaTree tree = new AlphaBetaTree(AlphaBetaTreeDepth);
                 tree.BuildTree(currentBoard, Color);
                 int elemIndex = tree.ChooseBestMove();
                 return allPossibleMoves[elemIndex];

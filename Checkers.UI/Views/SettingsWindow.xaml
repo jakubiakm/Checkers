@@ -264,10 +264,10 @@
                         <UniformGrid Grid.Row="1" Margin="5" Columns="1" Rows="2">
                             <TextBlock Text="Głębokość drzewa" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                             <Controls:NumericUpDown 
-                                x:Name="WhitePlayerMinmaxEngineTreeDepth" 
+                                x:Name="WhitePlayerAlphaBetaEngineTreeDepth" 
                                 Width="80" 
                                 Margin="0 0 2 0" 
-                                Value="{Binding Path=WhitePlayerMinmaxEngineTreeDepth, Mode=TwoWay}"
+                                Value="{Binding Path=WhitePlayerAlphaBetaEngineTreeDepth, Mode=TwoWay}"
                                 Minimum="1" 
                                 Maximum="20" 
                                 HorizontalAlignment="Center" 
@@ -407,10 +407,10 @@
                         <UniformGrid Grid.Row="1" Margin="5" Columns="1" Rows="2">
                             <TextBlock Text="Głębokość drzewa" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                             <Controls:NumericUpDown 
-                                x:Name="BlackPlayerMinmaxEngineTreeDepth" 
+                                x:Name="BlackPlayerAlphaBetaEngineTreeDepth" 
                                 Width="80" 
                                 Margin="0 0 2 0" 
-                                Value="{Binding Path=BlackPlayerMinmaxEngineTreeDepth, Mode=TwoWay}"
+                                Value="{Binding Path=BlackPlayerAlphaBetaEngineTreeDepth, Mode=TwoWay}"
                                 Minimum="1" 
                                 Maximum="20" 
                                 HorizontalAlignment="Center" 

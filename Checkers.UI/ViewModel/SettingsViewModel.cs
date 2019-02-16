@@ -43,8 +43,8 @@ namespace Checkers.UI.ViewModel
             BlackPlayerCudaEngineMctsIteration = 25;
             #endregion
 
-            WhitePlayerMinmaxEngineTreeDepth = 5;
-            BlackPlayerMinmaxEngineTreeDepth = 5;
+            WhitePlayerAlphaBetaEngineTreeDepth = 5;
+            BlackPlayerAlphaBetaEngineTreeDepth = 5;
 
             switch (whitePlayerEngine.Kind)
             {
@@ -59,9 +59,9 @@ namespace Checkers.UI.ViewModel
                     WhitePlayerCudaEngineGridSize = cudaEngine.GridSize;
                     WhitePlayerCudaEngineMctsIteration = cudaEngine.MctsIterationCount;
                     break;
-                case EngineKind.MinMax:
-                    var minmaxEngine = (MinMaxEngine)whitePlayerEngine;
-                    WhitePlayerMinmaxEngineTreeDepth = minmaxEngine.MinmaxTreeDepth;
+                case EngineKind.AlphaBeta:
+                    var AlphaBetaEngine = (AlphaBetaEngine)whitePlayerEngine;
+                    WhitePlayerAlphaBetaEngineTreeDepth = AlphaBetaEngine.AlphaBetaTreeDepth;
                     break;
             }
 
@@ -78,9 +78,9 @@ namespace Checkers.UI.ViewModel
                     BlackPlayerCudaEngineGridSize = cudaEngine.GridSize;
                     BlackPlayerCudaEngineMctsIteration = cudaEngine.MctsIterationCount;
                     break;
-                case EngineKind.MinMax:
-                    var minmaxEngine = (MinMaxEngine)blackPlayerEngine;
-                    BlackPlayerMinmaxEngineTreeDepth = minmaxEngine.MinmaxTreeDepth;
+                case EngineKind.AlphaBeta:
+                    var AlphaBetaEngine = (AlphaBetaEngine)blackPlayerEngine;
+                    BlackPlayerAlphaBetaEngineTreeDepth = AlphaBetaEngine.AlphaBetaTreeDepth;
                     break;
             }
         }
@@ -140,28 +140,28 @@ namespace Checkers.UI.ViewModel
 
         public int BlackPlayerRandomEngineSeedValue { get; set; }
 
-        public int WhitePlayerMinmaxEngineTreeDepth
+        public int WhitePlayerAlphaBetaEngineTreeDepth
         {
             get
             {
-                return whitePlayerMinmaxEngineTreeDepth;
+                return whitePlayerAlphaBetaEngineTreeDepth;
             }
             set
             {
-                whitePlayerMinmaxEngineTreeDepth = value;
+                whitePlayerAlphaBetaEngineTreeDepth = value;
                 NotifyPropertyChanged();
             }
         }
 
-        public int BlackPlayerMinmaxEngineTreeDepth
+        public int BlackPlayerAlphaBetaEngineTreeDepth
         {
             get
             {
-                return blackPlayerMinmaxEngineTreeDepth;
+                return blackPlayerAlphaBetaEngineTreeDepth;
             }
             set
             {
-                blackPlayerMinmaxEngineTreeDepth = value;
+                blackPlayerAlphaBetaEngineTreeDepth = value;
                 NotifyPropertyChanged();
             }
         }
@@ -250,9 +250,9 @@ namespace Checkers.UI.ViewModel
 
         private int blackPiecesCount;
 
-        private int whitePlayerMinmaxEngineTreeDepth;
+        private int whitePlayerAlphaBetaEngineTreeDepth;
 
-        private int blackPlayerMinmaxEngineTreeDepth;
+        private int blackPlayerAlphaBetaEngineTreeDepth;
 
         private int whitePlayerCudaEngineMctsIteration;
 

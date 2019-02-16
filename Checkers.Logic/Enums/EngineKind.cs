@@ -18,7 +18,7 @@ namespace Checkers.Logic.Enums
         [Description("Nvidia cuda mcts")]
         Cuda,
 
-        [Description("MinMax")]
-        MinMax
+        [Description("AlphaBeta")]
+        AlphaBeta
     }
 }

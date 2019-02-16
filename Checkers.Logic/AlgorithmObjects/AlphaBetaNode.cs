@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace Checkers.Logic.AlgorithmObjects
 {
-    public class MinMaxNode
+    public class AlphaBetaNode
     {
-        public MinMaxNode Parent { get; set; }
+        public AlphaBetaNode Parent { get; set; }
 
-        public List<MinMaxNode> Children { get; set; }
+        public List<AlphaBetaNode> Children { get; set; }
 
         public int DepthLevel { get; set; }
         
@@ -30,11 +30,15 @@ namespace Checkers.Logic.AlgorithmObjects
             }
         }
 
-        public MinMaxNode(CheckersBoard board, PieceColor color, int depthLevel)
+        public AlphaBetaNode(CheckersBoard board, PieceColor color, int depthLevel)
         {
             Board = board;
             Color = color;
             DepthLevel = depthLevel;
+            if (Color == PieceColor.White)
+                CurrentScore = int.MinValue;
+            else
+                CurrentScore = int.MaxValue;
         }
 
         private int GetScore()
