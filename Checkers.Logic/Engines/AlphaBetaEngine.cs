@@ -53,7 +53,7 @@ namespace Checkers.Logic.Engines
             {
                 AlphaBetaTree tree = new AlphaBetaTree(AlphaBetaTreeDepth);
                 tree.BuildTree(currentBoard, Color);
-                int elemIndex = tree.ChooseBestMove();
+                int elemIndex = tree.ChooseBestMove(variant);
                 return allPossibleMoves[elemIndex];
             }
         }

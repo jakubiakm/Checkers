@@ -15,20 +15,12 @@ namespace Checkers.Logic.AlgorithmObjects
         public List<AlphaBetaNode> Children { get; set; }
 
         public int DepthLevel { get; set; }
-        
+
         public int CurrentScore { get; set; }
 
         public CheckersBoard Board { get; set; }
 
         public PieceColor Color { get; set; }
-
-        public int Score
-        {
-            get
-            {
-                return GetScore();
-            }
-        }
 
         public AlphaBetaNode(CheckersBoard board, PieceColor color, int depthLevel)
         {
@@ -41,10 +33,10 @@ namespace Checkers.Logic.AlgorithmObjects
                 CurrentScore = int.MaxValue;
         }
 
-        private int GetScore()
+        public int GetHeuristicScore(GameVariant variant)
         {
             int score = 0;
-            foreach(var piece in Board.PiecesOnBoard)
+            foreach (var piece in Board.PiecesOnBoard)
             {
                 //za każdy pionek odpowiedniego koloru dodajemy lub odejmujemy punkty
                 //w przypadku królowych punkty są warte potrójną wartość
@@ -57,6 +49,10 @@ namespace Checkers.Logic.AlgorithmObjects
                 if (piece.Color == PieceColor.Black && !piece.IsKing)
                     score -= 1;
             }
+
+            //w przypadku antywarcabów odwracamy znak wyniku (dążymy do najgorszej pozycji)
+            if (variant == GameVariant.Anticheckers)
+                score = -score;
             return score;
         }
     }

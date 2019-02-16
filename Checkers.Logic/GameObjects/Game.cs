@@ -4,6 +4,7 @@ using Checkers.Logic.Enums;
 using Checkers.Logic.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -154,6 +155,8 @@ namespace Checkers.Logic.GameObjects
             }
             int moveCount = History.Count;
             _databaseLayer.AddGame(whitePlayerInformation, blackPlayerInformation, gameType, gameMoves, Board.Size, winner, moveCount, StartDate);
+
         }
+
     }
 }

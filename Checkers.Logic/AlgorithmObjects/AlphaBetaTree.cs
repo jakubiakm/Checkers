@@ -11,14 +11,11 @@ namespace Checkers.Logic.AlgorithmObjects
     {
         public AlphaBetaNode Root { get; set; }
 
-        public List<AlphaBetaNode> Leafs { get; set; }
-
         public int Depth { get; set; }
 
         public AlphaBetaTree(int depth)
         {
             Depth = depth;
-            Leafs = new List<AlphaBetaNode>();
         }
 
         public void BuildTree(CheckersBoard board, PieceColor color)
@@ -59,7 +56,6 @@ namespace Checkers.Logic.AlgorithmObjects
         {
             if (depth == Depth)
             {
-                Leafs.Add(parent);
                 return;
             }
             List<Move> moves = parent.Board.GetAllPossibleMoves(parent.Color);
@@ -79,59 +75,45 @@ namespace Checkers.Logic.AlgorithmObjects
             }
         }
 
-        public int ChooseBestMove()
+        public int ChooseBestMove(GameVariant variant)
         {
-            foreach (var node in Root.Children)
-            {
-                node.CurrentScore = GetScore(node, int.MinValue, int.MaxValue);
-            }
-            int index = 0, max = int.MinValue, min = int.MaxValue;
-            for (int i = 0; i != Root.Children.Count; i++)
-            {
-                if (Root.Color == PieceColor.White)
-                {
-                    if (Root.Children[i].CurrentScore > max)
-                    {
-                        max = Root.Children[i].CurrentScore;
-                        index = i;
-                    }
-                }
-                else
-                {
-                    if (Root.Children[i].CurrentScore < min)
-                    {
-                        min = Root.Children[i].CurrentScore;
-                        index = i;
-                    }
-                }
-            }
-            return index;
+            GetScore(variant, Root, int.MinValue, int.MaxValue);
+            return Root.Children.FindIndex(n => n.CurrentScore == Root.CurrentScore);
         }
 
-        private int GetScore(AlphaBetaNode node, int alpha, int beta)
+        private int GetScore(GameVariant variant, AlphaBetaNode node, int alpha, int beta)
         {
             if (node.Children == null || node.Children.Count == 0)
-                return node.Score;
+                return node.GetHeuristicScore(variant);
             if (node.Color == PieceColor.Black)
             {
                 foreach (var n in node.Children)
                 {
-                    beta = new List<int>() { beta, GetScore(n, alpha, beta) }.Min();
+                    beta = new List<int>() { beta, GetScore(variant, n, alpha, beta) }.Min();
                     if (alpha >= beta)
                         break;
                 }
+                node.CurrentScore = beta;
                 return beta;
             }
             else
             {
                 foreach (var n in node.Children)
                 {
-                    alpha = new List<int>() { alpha, GetScore(n, alpha, beta) }.Max();
+                    alpha = new List<int>() { alpha, GetScore(variant, n, alpha, beta) }.Max();
                     if (alpha >= beta)
                         break;
                 }
+                node.CurrentScore = alpha;
                 return alpha;
             }
         }
+
+        //private int GetScoreMinMax(GameVariant variant, AlphaBetaNode node)
+        //{
+        //    if (node.Children == null || node.Children.Count == 0)
+        //        return node.GetHeuristicScore(variant);
+        //    return node.Color == PieceColor.White ? node.Children.Max(n => GetScoreMinMax(variant, n)) : node.Children.Min(n => GetScoreMinMax(variant, n));
+        //}
     }
 }
