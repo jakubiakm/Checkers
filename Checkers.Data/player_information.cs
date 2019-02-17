@@ -26,6 +26,8 @@ namespace Checkers.Data
         public int algorithm_id { get; set; }
         public int number_of_pieces { get; set; }
         public Nullable<int> tree_depth { get; set; }
+        public Nullable<double> uct_parameter { get; set; }
+        public Nullable<int> number_of_iterations { get; set; }
     
         public virtual algorithm algorithm { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
