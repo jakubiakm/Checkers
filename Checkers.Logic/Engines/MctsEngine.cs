@@ -51,7 +51,19 @@ namespace Checkers.Logic.Engines
         public Move MakeMove(CheckersBoard currentBoard, GameVariant variant)
         {
             List<Move> allPossibleMoves = currentBoard.GetAllPossibleMoves(Color);
-            return allPossibleMoves[0];
+            int count = allPossibleMoves.Count;
+            if (count == 0)
+                throw new NotAvailableMoveException(Color);
+            if (count == 1)
+            {
+                return allPossibleMoves.First();
+            }
+            else
+            {
+                MctsTree tree = new MctsTree(NumberOfIterations, UctParameter, randomGenerator, currentBoard, Color);
+                int elemIndex = tree.ChooseBestMove(variant);
+                return allPossibleMoves[elemIndex];
+            }
         }
     }
 }

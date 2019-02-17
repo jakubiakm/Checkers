@@ -79,10 +79,6 @@ namespace Checkers.Logic.AlgorithmObjects
         {
             GetScore(variant, Root, int.MinValue, int.MaxValue);
             int index = Root.Children.FindIndex(n => n.CurrentScore == Root.CurrentScore);
-            if (index == -1)
-            {
-
-            }
             return index;
         }
 
