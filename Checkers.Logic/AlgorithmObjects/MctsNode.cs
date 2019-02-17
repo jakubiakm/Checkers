@@ -14,7 +14,7 @@ namespace Checkers.Logic.AlgorithmObjects
 
         public List<MctsNode> Children { get; set; }
 
-        public double Score { get; set; }
+        public double NumberOfWins { get; set; }
 
         public int NumberOfSimulations { get; set; }
 
@@ -27,7 +27,7 @@ namespace Checkers.Logic.AlgorithmObjects
             Color = color;
             Board = board;
             NumberOfSimulations = 0;
-            Score = 0;
+            NumberOfWins = 0;
         }
         public MctsNode(PieceColor color, CheckersBoard board, MctsNode parent)
         {
@@ -35,7 +35,7 @@ namespace Checkers.Logic.AlgorithmObjects
             Board = board;
             Parent = parent;
             NumberOfSimulations = 0;
-            Score = 0;
+            NumberOfWins = 0;
         }
     }
 }

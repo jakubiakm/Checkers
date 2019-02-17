@@ -26,7 +26,7 @@ namespace Checkers.Logic.AlgorithmObjects
             NumberOfIterations = numberOfIterations;
             UctParameter = uctParameter;
             RandomGenerator = generator;
-            Root = new MctsNode(color, board);
+            Root = new MctsNode(color == PieceColor.White ? PieceColor.Black : PieceColor.White, board);
         }
 
         public int ChooseBestMove(GameVariant variant)
@@ -42,7 +42,7 @@ namespace Checkers.Logic.AlgorithmObjects
                 else
                 {
                     Expand(leaf);
-                    if (leaf.Children != null && leaf.Children.Count == 0)
+                    if (leaf.Children != null && leaf.Children.Count > 0)
                     {
                         leaf = leaf.Children[0];
                         result = Rollout(leaf);
@@ -58,13 +58,12 @@ namespace Checkers.Logic.AlgorithmObjects
                 NumberOfTotalSimulations++;
             }
             int index = 0;
-            double maxUct = double.MinValue;
-            for(int i = 0; i != Root.Children.Count; i++)
+            int maxSimulations = 0;
+            for (int i = 0; i != Root.Children.Count; i++)
             {
-                var uct = Root.Children[i].Score + UctParameter * Math.Sqrt(Math.Log(NumberOfTotalSimulations) / Root.Children[i].NumberOfSimulations);
-                if(uct > maxUct)
+                if (maxSimulations > Root.Children[i].NumberOfSimulations)
                 {
-                    maxUct = uct;
+                    maxSimulations = Root.Children[i].NumberOfSimulations;
                     index = i;
                 }
             }
@@ -92,7 +91,7 @@ namespace Checkers.Logic.AlgorithmObjects
                         index = i;
                         break;
                     }
-                    currentUct = node.Children[i].Score + UctParameter * Math.Sqrt(Math.Log(NumberOfTotalSimulations) / node.Children[i].NumberOfSimulations);
+                    currentUct = node.Children[i].NumberOfWins / node.Children[i].NumberOfSimulations + UctParameter * Math.Sqrt(Math.Log(NumberOfTotalSimulations) / node.Children[i].NumberOfSimulations);
                     if (currentUct > maxUct)
                     {
                         index = i;
@@ -133,7 +132,7 @@ namespace Checkers.Logic.AlgorithmObjects
             int result = 0;
             CheckersBoard board = node.Board;
             PieceColor color = node.Color;
-            while(true)
+            while (true)
             {
                 var moves = board.GetAllPossibleMoves(color);
                 if (moves.Count > 0)
@@ -155,10 +154,13 @@ namespace Checkers.Logic.AlgorithmObjects
         /// </summary>
         private void Backpropagate(int result, MctsNode node)
         {
-            while(node != null)
+            while (node != null)
             {
                 node.NumberOfSimulations++;
-                node.Score += result;
+                if (result == 1 && node.Color == PieceColor.White)
+                    node.NumberOfWins++;
+                if (result == -1 && node.Color == PieceColor.Black)
+                    node.NumberOfWins++;
                 node = node.Parent;
             }
         }
