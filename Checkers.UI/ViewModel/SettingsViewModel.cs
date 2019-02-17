@@ -43,8 +43,19 @@ namespace Checkers.UI.ViewModel
             BlackPlayerCudaEngineMctsIteration = 25;
             #endregion
 
+            #region ALPHA BETA
             WhitePlayerAlphaBetaEngineTreeDepth = 5;
             BlackPlayerAlphaBetaEngineTreeDepth = 5;
+            #endregion
+
+            #region MCTS
+            WhitePlayerMctsEngineNumberOfIterations = 1000000;
+            WhitePlayerMctsEngineUctParameter = 1.5;
+            WhitePlayerMctsEngineRandomSeed = null;
+            BlackPlayerMctsEngineNumberOfIterations = 1000000;
+            BlackPlayerMctsEngineUctParameter = 1.5;
+            BlackPlayerMctsEngineRandomSeed = null;
+            #endregion
 
             switch (whitePlayerEngine.Kind)
             {
@@ -62,6 +73,12 @@ namespace Checkers.UI.ViewModel
                 case EngineKind.AlphaBeta:
                     var AlphaBetaEngine = (AlphaBetaEngine)whitePlayerEngine;
                     WhitePlayerAlphaBetaEngineTreeDepth = AlphaBetaEngine.AlphaBetaTreeDepth;
+                    break;
+                case EngineKind.Mcts:
+                    var MctsEngine = (MctsEngine)whitePlayerEngine;
+                    WhitePlayerMctsEngineNumberOfIterations = MctsEngine.NumberOfIterations;
+                    WhitePlayerMctsEngineUctParameter = MctsEngine.UctParameter;
+                    WhitePlayerMctsEngineRandomSeed = MctsEngine.Seed;
                     break;
             }
 
@@ -81,6 +98,12 @@ namespace Checkers.UI.ViewModel
                 case EngineKind.AlphaBeta:
                     var AlphaBetaEngine = (AlphaBetaEngine)blackPlayerEngine;
                     BlackPlayerAlphaBetaEngineTreeDepth = AlphaBetaEngine.AlphaBetaTreeDepth;
+                    break;
+                case EngineKind.Mcts:
+                    var MctsEngine = (MctsEngine)blackPlayerEngine;
+                    BlackPlayerMctsEngineNumberOfIterations = MctsEngine.NumberOfIterations;
+                    BlackPlayerMctsEngineUctParameter = MctsEngine.UctParameter;
+                    BlackPlayerMctsEngineRandomSeed = MctsEngine.Seed;
                     break;
             }
         }
@@ -162,6 +185,84 @@ namespace Checkers.UI.ViewModel
             set
             {
                 blackPlayerAlphaBetaEngineTreeDepth = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public int WhitePlayerMctsEngineNumberOfIterations
+        {
+            get
+            {
+                return whitePlayerMctsEngineNumberOfIterations;
+            }
+            set
+            {
+                whitePlayerMctsEngineNumberOfIterations = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public double WhitePlayerMctsEngineUctParameter
+        {
+            get
+            {
+                return whitePlayerMctsEngineUctParameter;
+            }
+            set
+            {
+                whitePlayerMctsEngineUctParameter = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public int? WhitePlayerMctsEngineRandomSeed
+        {
+            get
+            {
+                return whitePlayerMctsEngineRandomSeed;
+            }
+            set
+            {
+                whitePlayerMctsEngineRandomSeed = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public int BlackPlayerMctsEngineNumberOfIterations
+        {
+            get
+            {
+                return blackPlayerMctsEngineNumberOfIterations;
+            }
+            set
+            {
+                blackPlayerMctsEngineNumberOfIterations = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public double BlackPlayerMctsEngineUctParameter
+        {
+            get
+            {
+                return blackPlayerMctsEngineUctParameter;
+            }
+            set
+            {
+                blackPlayerMctsEngineUctParameter = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public int? BlackPlayerMctsEngineRandomSeed
+        {
+            get
+            {
+                return blackPlayerMctsEngineRandomSeed;
+            }
+            set
+            {
+                blackPlayerMctsEngineRandomSeed = value;
                 NotifyPropertyChanged();
             }
         }
@@ -253,6 +354,18 @@ namespace Checkers.UI.ViewModel
         private int whitePlayerAlphaBetaEngineTreeDepth;
 
         private int blackPlayerAlphaBetaEngineTreeDepth;
+
+        private int whitePlayerMctsEngineNumberOfIterations;
+
+        private double whitePlayerMctsEngineUctParameter;
+
+        private int? whitePlayerMctsEngineRandomSeed;
+
+        private int blackPlayerMctsEngineNumberOfIterations;
+
+        private double blackPlayerMctsEngineUctParameter;
+
+        private int? blackPlayerMctsEngineRandomSeed;
 
         private int whitePlayerCudaEngineMctsIteration;
 
