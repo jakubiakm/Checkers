@@ -66,11 +66,11 @@ namespace Checkers.Logic.GameObjects
                 }
                 var endTime = DateTime.Now;
                 History.Add(new HistoryBoard(startTime, endTime, board, color));
-                if (Board.PiecesOnBoard.Where(p => p.Color == PieceColor.Black).Count() == 0)
+                if (Board.BoardArray.Where(p => p < 0).Count() == 0)
                 {
                     throw new NoAvailablePiecesException(PieceColor.Black, Board.LastMove);
                 }
-                if (Board.PiecesOnBoard.Where(p => p.Color == PieceColor.White).Count() == 0)
+                if (Board.BoardArray.Where(p => p > 0).Count() == 0)
                 {
                     throw new NoAvailablePiecesException(PieceColor.White, Board.LastMove);
                 }

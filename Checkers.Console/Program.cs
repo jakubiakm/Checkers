@@ -14,8 +14,6 @@ namespace Checkers.Console
     {
         static void Main(string[] args)
         {
-
-            System.Console.WriteLine((double)3.424 / (int)4);
             var game = new Game(new RandomEngine(PieceColor.Black, null), new RandomEngine(PieceColor.White, null), 10, 20, 20, GameVariant.Checkers);
             var random = new Random();
             Stopwatch watch = new Stopwatch();
@@ -36,7 +34,7 @@ namespace Checkers.Console
                 if (i % 100 == 0)
                 {
                     times.Add(watch.ElapsedMilliseconds);
-                    System.Console.WriteLine($"{i / 100}\t{times.Last()}\tśrednia: {times.Average()}");
+                    System.Console.WriteLine($"{i / 100}\t{times.Last()}\tśrednia: {times.Average()}\tśrednia na symulację: {times.Last() / 100}");
                     watch.Restart();
                 }
             }

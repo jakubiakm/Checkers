@@ -151,31 +151,35 @@ namespace Checkers.UI.ViewModel
                     }
                 }
             }
-            foreach (var elem in Game.Board.PiecesOnBoard)
+            for (int pos = 0; pos != Game.Board.Size * Game.Board.Size + 1; pos++)
             {
-                BoardCanvasElements.Add(new Model.CanvasElement
+                if (Game.Board.BoardArray[pos] != 0)
                 {
-                    Row = skipSize * (Game.Board.Size - 1 - elem.Row) + skipSize / 2,
-                    Column = skipSize * elem.Column + skipSize / 2,
-                    Geometry = new EllipseGeometry { RadiusX = skipSize / 3, RadiusY = skipSize / 3 },
-                    Fill = elem.Color == PieceColor.Black ? Brushes.Black : Brushes.White,
-                    X = elem.Row,
-                    Y = elem.Column,
-                    Color = elem.Color
-                });
-                if (elem.IsKing)
-                {
+                    var elem = new Piece(pos, Game.Board.BoardArray[pos] > 0 ? PieceColor.White : PieceColor.Black, Game.Board.Size, Game.Board.BoardArray[pos] == 2 || Game.Board.BoardArray[pos] == -2);
                     BoardCanvasElements.Add(new Model.CanvasElement
                     {
                         Row = skipSize * (Game.Board.Size - 1 - elem.Row) + skipSize / 2,
                         Column = skipSize * elem.Column + skipSize / 2,
-                        Geometry = new EllipseGeometry { RadiusX = skipSize / 4, RadiusY = skipSize / 4 },
-                        Stroke = elem.Color == PieceColor.Black ? Brushes.White : Brushes.Black,
-                        Thickness = 2,
+                        Geometry = new EllipseGeometry { RadiusX = skipSize / 3, RadiusY = skipSize / 3 },
+                        Fill = elem.Color == PieceColor.Black ? Brushes.Black : Brushes.White,
                         X = elem.Row,
                         Y = elem.Column,
                         Color = elem.Color
                     });
+                    if (elem.IsKing)
+                    {
+                        BoardCanvasElements.Add(new Model.CanvasElement
+                        {
+                            Row = skipSize * (Game.Board.Size - 1 - elem.Row) + skipSize / 2,
+                            Column = skipSize * elem.Column + skipSize / 2,
+                            Geometry = new EllipseGeometry { RadiusX = skipSize / 4, RadiusY = skipSize / 4 },
+                            Stroke = elem.Color == PieceColor.Black ? Brushes.White : Brushes.Black,
+                            Thickness = 2,
+                            X = elem.Row,
+                            Y = elem.Column,
+                            Color = elem.Color
+                        });
+                    }
                 }
             }
         }
@@ -221,29 +225,33 @@ namespace Checkers.UI.ViewModel
                     elem.Fill = Brushes.Crimson;
                 }
             }
-            foreach (var elem in Game.History[moveNumber].Board.PiecesOnBoard)
+            for (int pos = 0; pos != Game.History[moveNumber].Board.Size * Game.History[moveNumber].Board.Size + 1; pos++)
             {
-                BoardCanvasElements.Add(new Model.CanvasElement
+                if (Game.History[moveNumber].Board.BoardArray[pos] != 0)
                 {
-                    Row = skipSize * (Game.Board.Size - 1 - elem.Row) + skipSize / 2,
-                    Column = skipSize * elem.Column + skipSize / 2,
-                    Geometry = new EllipseGeometry { RadiusX = skipSize / 3, RadiusY = skipSize / 3 },
-                    Fill = elem.Color == PieceColor.Black ? Brushes.Black : Brushes.White,
-                    X = elem.Row,
-                    Y = elem.Column
-                });
-                if (elem.IsKing)
-                {
+                    var elem = new Piece(pos, Game.History[moveNumber].Board.BoardArray[pos] > 0 ? PieceColor.White : PieceColor.Black, Game.History[moveNumber].Board.Size, Game.History[moveNumber].Board.BoardArray[pos] == 2 || Game.History[moveNumber].Board.BoardArray[pos] == -2);
                     BoardCanvasElements.Add(new Model.CanvasElement
                     {
                         Row = skipSize * (Game.Board.Size - 1 - elem.Row) + skipSize / 2,
                         Column = skipSize * elem.Column + skipSize / 2,
-                        Geometry = new EllipseGeometry { RadiusX = skipSize / 4, RadiusY = skipSize / 4 },
-                        Stroke = elem.Color == PieceColor.Black ? Brushes.White : Brushes.Black,
-                        Thickness = 2,
+                        Geometry = new EllipseGeometry { RadiusX = skipSize / 3, RadiusY = skipSize / 3 },
+                        Fill = elem.Color == PieceColor.Black ? Brushes.Black : Brushes.White,
                         X = elem.Row,
                         Y = elem.Column
                     });
+                    if (elem.IsKing)
+                    {
+                        BoardCanvasElements.Add(new Model.CanvasElement
+                        {
+                            Row = skipSize * (Game.Board.Size - 1 - elem.Row) + skipSize / 2,
+                            Column = skipSize * elem.Column + skipSize / 2,
+                            Geometry = new EllipseGeometry { RadiusX = skipSize / 4, RadiusY = skipSize / 4 },
+                            Stroke = elem.Color == PieceColor.Black ? Brushes.White : Brushes.Black,
+                            Thickness = 2,
+                            X = elem.Row,
+                            Y = elem.Column
+                        });
+                    }
                 }
             }
         }
