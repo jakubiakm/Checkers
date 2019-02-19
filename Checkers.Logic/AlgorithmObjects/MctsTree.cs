@@ -26,7 +26,7 @@ namespace Checkers.Logic.AlgorithmObjects
             NumberOfIterations = numberOfIterations;
             UctParameter = uctParameter;
             RandomGenerator = generator;
-            Root = new MctsNode(color == PieceColor.White ? PieceColor.Black : PieceColor.White, board);
+            Root = new MctsNode(color, board);
         }
 
         public int ChooseBestMove(GameVariant variant)
@@ -61,7 +61,7 @@ namespace Checkers.Logic.AlgorithmObjects
             int maxSimulations = 0;
             for (int i = 0; i != Root.Children.Count; i++)
             {
-                if (maxSimulations > Root.Children[i].NumberOfSimulations)
+                if (maxSimulations < Root.Children[i].NumberOfSimulations)
                 {
                     maxSimulations = Root.Children[i].NumberOfSimulations;
                     index = i;
@@ -157,9 +157,9 @@ namespace Checkers.Logic.AlgorithmObjects
             while (node != null)
             {
                 node.NumberOfSimulations++;
-                if (result == 1 && node.Color == PieceColor.White)
+                if (result == -1 && node.Color == PieceColor.White)
                     node.NumberOfWins++;
-                if (result == -1 && node.Color == PieceColor.Black)
+                if (result == 1 && node.Color == PieceColor.Black)
                     node.NumberOfWins++;
                 node = node.Parent;
             }
