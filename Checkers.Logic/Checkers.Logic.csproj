@@ -52,9 +52,12 @@
   <ItemGroup>
     <Compile Include="AlgorithmObjects\AlphaBetaNode.cs" />
     <Compile Include="AlgorithmObjects\AlphaBetaTree.cs" />
+    <Compile Include="AlgorithmObjects\MctsNode.cs" />
+    <Compile Include="AlgorithmObjects\MctsTree.cs" />
     <Compile Include="Engines\CudaEngine.cs" />
     <Compile Include="Engines\HumanEngine.cs" />
     <Compile Include="Engines\AlphaBetaEngine.cs" />
+    <Compile Include="Engines\MctsEngine.cs" />
     <Compile Include="Enums\EngineKind.cs" />
     <Compile Include="Enums\GameVariant.cs" />
     <Compile Include="Exceptions\NoAvailablePiecesException.cs" />

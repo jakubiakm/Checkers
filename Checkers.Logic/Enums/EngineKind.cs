@@ -19,6 +19,9 @@ namespace Checkers.Logic.Enums
         Cuda,
 
         [Description("AlphaBeta")]
-        AlphaBeta
+        AlphaBeta,
+
+        [Description("MCTS z metodą UCT")]
+        Mcts
     }
 }

@@ -136,6 +136,18 @@ namespace Checkers.Logic.GameObjects
                 var engine = (AlphaBetaEngine)BlackPlayerEngine;
                 blackPlayerInformation.tree_depth = engine.AlphaBetaTreeDepth;
             }
+            if (WhitePlayerEngine.GetType() == typeof(MctsEngine))
+            {
+                var engine = (MctsEngine)WhitePlayerEngine;
+                whitePlayerInformation.uct_parameter = engine.UctParameter;
+                whitePlayerInformation.number_of_iterations = engine.NumberOfIterations;
+            }
+            if (BlackPlayerEngine.GetType() == typeof(MctsEngine))
+            {
+                var engine = (MctsEngine)BlackPlayerEngine;
+                blackPlayerInformation.uct_parameter = engine.UctParameter;
+                blackPlayerInformation.number_of_iterations = engine.NumberOfIterations;
+            }
             game_type gameType = new game_type() { game_type_name = Variant.ToString() };
             List<game_move> gameMoves = new List<game_move>();
             foreach (var move in History.Skip(1))

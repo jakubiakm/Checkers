@@ -78,13 +78,17 @@ namespace Checkers.Logic.AlgorithmObjects
         public int ChooseBestMove(GameVariant variant)
         {
             GetScore(variant, Root, int.MinValue, int.MaxValue);
-            return Root.Children.FindIndex(n => n.CurrentScore == Root.CurrentScore);
+            int index = Root.Children.FindIndex(n => n.CurrentScore == Root.CurrentScore);
+            return index;
         }
 
         private int GetScore(GameVariant variant, AlphaBetaNode node, int alpha, int beta)
         {
             if (node.Children == null || node.Children.Count == 0)
+            {
+                node.CurrentScore = node.GetHeuristicScore(variant);
                 return node.GetHeuristicScore(variant);
+            }
             if (node.Color == PieceColor.Black)
             {
                 foreach (var n in node.Children)

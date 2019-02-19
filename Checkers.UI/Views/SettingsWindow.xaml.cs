@@ -160,6 +160,15 @@ namespace Checkers.UI.Views
                     {
                         return new AlphaBetaEngine(color, viewModel.BlackPlayerAlphaBetaEngineTreeDepth);
                     }
+                case EngineKind.Mcts:
+                    if (color == PieceColor.White)
+                    {
+                        return new MctsEngine(color, viewModel.WhitePlayerMctsEngineRandomSeed, viewModel.WhitePlayerMctsEngineUctParameter, viewModel.WhitePlayerMctsEngineNumberOfIterations);
+                    }
+                    else
+                    {
+                        return new MctsEngine(color, viewModel.BlackPlayerMctsEngineRandomSeed, viewModel.BlackPlayerMctsEngineUctParameter, viewModel.BlackPlayerMctsEngineNumberOfIterations);
+                    }
                 default:
                     throw new ArgumentException("Nierozpoznany typ silnika");
             }

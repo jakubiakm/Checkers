@@ -63,6 +63,8 @@
           <Property Name="algorithm_id" Type="int" Nullable="false" />
           <Property Name="number_of_pieces" Type="int" Nullable="false" />
           <Property Name="tree_depth" Type="int" />
+          <Property Name="uct_parameter" Type="float" />
+          <Property Name="number_of_iterations" Type="int" />
         </EntityType>
         <Association Name="FK__game__black_play__4F7CD00D">
           <End Role="player_information" Type="Self.player_information" Multiplicity="1" />
@@ -498,6 +500,8 @@
           <NavigationProperty Name="games1" Relationship="Self.FK__game__white_play__5DCAEF64" FromRole="player_information" ToRole="game" />
           <NavigationProperty Name="player" Relationship="Self.FK__player_in__playe__59063A47" FromRole="player_information" ToRole="player" />
           <Property Name="tree_depth" Type="Int32" />
+          <Property Name="uct_parameter" Type="Double" />
+          <Property Name="number_of_iterations" Type="Int32" />
         </EntityType>
         <Association Name="FK__player_in__algor__59FA5E80">
           <End Role="algorithm" Type="Self.algorithm" Multiplicity="1" />
@@ -666,6 +670,8 @@
           <EntitySetMapping Name="player_information">
             <EntityTypeMapping TypeName="CheckersModel.player_information">
               <MappingFragment StoreEntitySet="player_information">
+                <ScalarProperty Name="number_of_iterations" ColumnName="number_of_iterations" />
+                <ScalarProperty Name="uct_parameter" ColumnName="uct_parameter" />
                 <ScalarProperty Name="tree_depth" ColumnName="tree_depth" />
                 <ScalarProperty Name="player_information_id" ColumnName="player_information_id" />
                 <ScalarProperty Name="player_id" ColumnName="player_id" />

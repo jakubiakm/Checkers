@@ -51,7 +51,7 @@ namespace Checkers.Data
             {
                 //TODO: obsługa błędu połączenia z bazą danych   
             }
-}
+        }
 
         private player AddOrLoadPlayer(player player)
         {
@@ -81,11 +81,13 @@ namespace Checkers.Data
 
         private player_information AddOrLoadPlayerInformation(player_information playerInformation)
         {
-            if (!context.player_information.Any(p => 
+            if (!context.player_information.Any(p =>
                 p.player_id == playerInformation.player.player_id &&
                 p.algorithm_id == playerInformation.algorithm.algorithm_id &&
                 p.number_of_pieces == playerInformation.number_of_pieces &&
-                p.tree_depth == playerInformation.tree_depth))
+                p.tree_depth == playerInformation.tree_depth &&
+                p.uct_parameter == playerInformation.uct_parameter &&
+                p.number_of_iterations == playerInformation.number_of_iterations))
             {
                 playerInformation = context.player_information.Add(playerInformation);
             }
@@ -95,7 +97,9 @@ namespace Checkers.Data
                     p.player_id == playerInformation.player.player_id &&
                     p.algorithm_id == playerInformation.algorithm.algorithm_id &&
                     p.number_of_pieces == playerInformation.number_of_pieces &&
-                    p.tree_depth == playerInformation.tree_depth);
+                    p.tree_depth == playerInformation.tree_depth &&
+                    p.uct_parameter == playerInformation.uct_parameter &&
+                    p.number_of_iterations == playerInformation.number_of_iterations);
             }
             return playerInformation;
         }
