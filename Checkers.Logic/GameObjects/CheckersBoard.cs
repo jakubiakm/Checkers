@@ -94,18 +94,6 @@ namespace Checkers.Logic.GameObjects
             var maximumBeatedPieces = possibleMoves.Count == 0 ? 0 : possibleMoves.Max(m => m.BeatedPieces?.Count ?? 0);
             possibleMoves = possibleMoves.Where(m => (m.BeatedPieces?.Count ?? 0) == maximumBeatedPieces)?.ToList() ?? new List<Move>();
             possibleMoves.ForEach(move => move.NewPiece.IsKing = move.OldPiece.IsKing || (move.NewPiece.Color == PieceColor.White ? move.NewPiece.Row == Size - 1 : move.NewPiece.Row == 0));
-            for (int i = 0; i != possibleMoves.Count; i++)
-            {
-                for (int j = 0; j != possibleMoves.Count; j++)
-                {
-                    if (i != j)
-                    {
-                        if (possibleMoves[i].NewPiece.Position == possibleMoves[j].NewPiece.Position &&
-                            possibleMoves[i].OldPiece.Position == possibleMoves[j].OldPiece.Position)
-                            possibleMoves.RemoveAt(j--);
-                    }
-                }
-            }
             return possibleMoves;
         }
 
