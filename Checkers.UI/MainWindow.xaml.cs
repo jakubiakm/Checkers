@@ -160,7 +160,7 @@ namespace Checkers.UI
                 blackCountSize: 20,
                 gameVariant: GameVariant.Checkers,
                 whiteEngine: new HumanEngine(PieceColor.White),
-                blackEngine: new RandomEngine(PieceColor.Black, null),
+                blackEngine: new AlphaBetaEngine(PieceColor.Black, 5),
                 moveAnimationTime: 33);
             BoardViewControl.DataContext = BoardViewModelObject;
             BoardCanvas = UiHelper.FindChild<Canvas>(BoardViewControl, "BoardCanvas");

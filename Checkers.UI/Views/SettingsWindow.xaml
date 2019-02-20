@@ -242,6 +242,92 @@
                     </Grid>
                 </GroupBox>
             </Grid>
+            <Grid>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=WhitePlayerEngineCombobox, Path=SelectedIndex}" Value="3">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <GroupBox
+                  Margin="5"
+                  Header="Ustawienia białego gracza">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <UniformGrid Grid.Row="1" Margin="5" Columns="1" Rows="2">
+                            <TextBlock Text="Głębokość drzewa" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <Controls:NumericUpDown 
+                                x:Name="WhitePlayerAlphaBetaEngineTreeDepth" 
+                                Width="80" 
+                                Margin="0 0 2 0" 
+                                Value="{Binding Path=WhitePlayerAlphaBetaEngineTreeDepth, Mode=TwoWay}"
+                                Minimum="1" 
+                                Maximum="20" 
+                                HorizontalAlignment="Center" 
+                                VerticalAlignment="Center"
+                                />
+                        </UniformGrid>
+                    </Grid>
+                </GroupBox>
+            </Grid>
+            <Grid>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=WhitePlayerEngineCombobox, Path=SelectedIndex}" Value="4">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <GroupBox
+                  Margin="5"
+                  Header="Ustawienia białego gracza">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <UniformGrid Grid.Row="1" Margin="5" Columns="3" Rows="2">
+                            <TextBlock Text="Liczba iteracji" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Parameter UCT" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Ziarno" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBox
+                                x:Name="WhitePlayerMctsEngineNumberOfIterations" 
+                                Width="80" 
+                                Margin="0 0 2 0" 
+                                Text="{Binding Path=WhitePlayerMctsEngineNumberOfIterations, Mode=TwoWay}"
+                                HorizontalAlignment="Center" 
+                                VerticalAlignment="Center"
+                                />
+                            <TextBox
+                                x:Name="WhitePlayerMctsEngineUctParameter" 
+                                Width="80" 
+                                Margin="0 0 2 0" 
+                                Text="{Binding Path=WhitePlayerMctsEngineUctParameter, Mode=TwoWay}"
+                                HorizontalAlignment="Center" 
+                                VerticalAlignment="Center"
+                                />
+                            <TextBox
+                                x:Name="WhitePlayerMctsEngineRandomSeed" 
+                                Width="80" 
+                                Margin="0 0 2 0" 
+                                Text="{Binding Path=WhitePlayerMctsEngineRandomSeed, Mode=TwoWay}"
+                                HorizontalAlignment="Center" 
+                                VerticalAlignment="Center"
+                                />
+                        </UniformGrid>
+                    </Grid>
+                </GroupBox>
+            </Grid>
         </Grid>
 
         <Grid Grid.Row="2">
@@ -346,6 +432,92 @@
                                 Minimum="1" 
                                 Maximum="512"
                                 VerticalAlignment="Center"/>
+                        </UniformGrid>
+                    </Grid>
+                </GroupBox>
+            </Grid>
+            <Grid>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=BlackPlayerEngineCombobox, Path=SelectedIndex}" Value="3">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <GroupBox
+                  Margin="5"
+                  Header="Ustawienia czarnego gracza">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <UniformGrid Grid.Row="1" Margin="5" Columns="1" Rows="2">
+                            <TextBlock Text="Głębokość drzewa" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <Controls:NumericUpDown 
+                                x:Name="BlackPlayerAlphaBetaEngineTreeDepth" 
+                                Width="80" 
+                                Margin="0 0 2 0" 
+                                Value="{Binding Path=BlackPlayerAlphaBetaEngineTreeDepth, Mode=TwoWay}"
+                                Minimum="1" 
+                                Maximum="20" 
+                                HorizontalAlignment="Center" 
+                                VerticalAlignment="Center"
+                                />
+                        </UniformGrid>
+                    </Grid>
+                </GroupBox>
+            </Grid>
+            <Grid>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=BlackPlayerEngineCombobox, Path=SelectedIndex}" Value="4">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <GroupBox
+                  Margin="5"
+                  Header="Ustawienia czarnego gracza">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <UniformGrid Grid.Row="1" Margin="5" Columns="3" Rows="2">
+                            <TextBlock Text="Liczba iteracji" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Parameter UCT" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Ziarno" Margin="0 0 2 0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBox
+                                x:Name="BlackPlayerMctsEngineNumberOfIterations" 
+                                Width="80" 
+                                Margin="0 0 2 0" 
+                                Text="{Binding Path=BlackPlayerMctsEngineNumberOfIterations, Mode=TwoWay}"
+                                HorizontalAlignment="Center" 
+                                VerticalAlignment="Center"
+                                />
+                            <TextBox
+                                x:Name="BlackPlayerMctsEngineUctParameter" 
+                                Width="80" 
+                                Margin="0 0 2 0" 
+                                Text="{Binding Path=BlackPlayerMctsEngineUctParameter, Mode=TwoWay}"
+                                HorizontalAlignment="Center" 
+                                VerticalAlignment="Center"
+                                />
+                            <TextBox
+                                x:Name="BlackPlayerMctsEngineRandomSeed" 
+                                Width="80" 
+                                Margin="0 0 2 0" 
+                                Text="{Binding Path=BlackPlayerMctsEngineRandomSeed, Mode=TwoWay}"
+                                HorizontalAlignment="Center" 
+                                VerticalAlignment="Center"
+                                />
                         </UniformGrid>
                     </Grid>
                 </GroupBox>
