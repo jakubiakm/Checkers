@@ -49,10 +49,10 @@ namespace Checkers.UI.ViewModel
             #endregion
 
             #region MCTS
-            WhitePlayerMctsEngineNumberOfIterations = 1000000;
+            WhitePlayerMctsEngineNumberOfIterations = 2500;
             WhitePlayerMctsEngineUctParameter = 1.5;
             WhitePlayerMctsEngineRandomSeed = null;
-            BlackPlayerMctsEngineNumberOfIterations = 1000000;
+            BlackPlayerMctsEngineNumberOfIterations = 2500;
             BlackPlayerMctsEngineUctParameter = 1.5;
             BlackPlayerMctsEngineRandomSeed = null;
             #endregion

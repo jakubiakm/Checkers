@@ -13,78 +13,34 @@ namespace Checkers.Logic.AlgorithmObjects
 
         public int Depth { get; set; }
 
-        public AlphaBetaTree(int depth)
+        public AlphaBetaTree(int depth, PieceColor color, CheckersBoard board)
         {
             Depth = depth;
-        }
-
-        public void BuildTree(CheckersBoard board, PieceColor color)
-        {
             Root = new AlphaBetaNode(board, color, 0);
-            List<Move> moves = Root.Board.GetAllPossibleMoves(Root.Color);
-            List<AlphaBetaNode> childrens = new List<AlphaBetaNode>();
-            foreach (var move in moves)
-            {
-                var b = Root.Board.GetBoardAfterMove(move);
-                var c = Root.Color == PieceColor.Black ? PieceColor.White : PieceColor.Black;
-                var node = new AlphaBetaNode(b, c, 1);
-                node.Parent = Root;
-                childrens.Add(node);
-            }
-            Root.Children = childrens;
-            Thread[] threads = new Thread[Root.Children.Count];
-            for (int i = 0; i != Root.Children.Count; i++)
-            {
-                var n = Root.Children[i];
-                threads[i] = new Thread(() =>
-                {
-                    GenerateNodes(n, 2);
-                });
-            }
-            for (int i = 0; i != Root.Children.Count; i++)
-            {
-                threads[i].Start();
-            }
-            for (int i = 0; i != Root.Children.Count; i++)
-            {
-                threads[i].Join();
-            }
-
-        }
-
-        public void GenerateNodes(AlphaBetaNode parent, int depth)
-        {
-            if (depth == Depth)
-            {
-                return;
-            }
-            List<Move> moves = parent.Board.GetAllPossibleMoves(parent.Color);
-            List<AlphaBetaNode> childrens = new List<AlphaBetaNode>();
-            foreach (var move in moves)
-            {
-                var board = parent.Board.GetBoardAfterMove(move);
-                var color = parent.Color == PieceColor.Black ? PieceColor.White : PieceColor.Black;
-                var node = new AlphaBetaNode(board, color, depth + 1);
-                node.Parent = parent;
-                childrens.Add(node);
-            }
-            parent.Children = childrens;
-            foreach (var node in parent.Children)
-            {
-                GenerateNodes(node, depth + 1);
-            }
         }
 
         public int ChooseBestMove(GameVariant variant)
         {
-            GetScore(variant, Root, int.MinValue, int.MaxValue);
+            GetScore(variant, Root, int.MinValue, int.MaxValue, 0);
             int index = Root.Children.FindIndex(n => n.CurrentScore == Root.CurrentScore);
             return index;
         }
 
-        private int GetScore(GameVariant variant, AlphaBetaNode node, int alpha, int beta)
+        private int GetScore(GameVariant variant, AlphaBetaNode node, int alpha, int beta, int depth)
         {
-            if (node.Children == null || node.Children.Count == 0)
+            List<Move> moves = node.Board.GetAllPossibleMoves(node.Color);
+            List<AlphaBetaNode> childrens = new List<AlphaBetaNode>();
+            foreach (var move in moves)
+            {
+                
+                var board = node.Board.GetBoardAfterMove(move);
+                var color = node.Color == PieceColor.Black ? PieceColor.White : PieceColor.Black;
+                var child = new AlphaBetaNode(board, color, depth + 1);
+                child.Parent = node;
+                childrens.Add(child);
+            }
+            node.Children = childrens;
+            if (node.Children == null || node.Children.Count == 0 || depth + 1 == Depth)
             {
                 node.CurrentScore = node.GetHeuristicScore(variant);
                 return node.GetHeuristicScore(variant);
@@ -93,7 +49,7 @@ namespace Checkers.Logic.AlgorithmObjects
             {
                 foreach (var n in node.Children)
                 {
-                    beta = new List<int>() { beta, GetScore(variant, n, alpha, beta) }.Min();
+                    beta = new List<int>() { beta, GetScore(variant, n, alpha, beta, depth + 1) }.Min();
                     if (alpha >= beta)
                         break;
                 }
@@ -104,7 +60,7 @@ namespace Checkers.Logic.AlgorithmObjects
             {
                 foreach (var n in node.Children)
                 {
-                    alpha = new List<int>() { alpha, GetScore(variant, n, alpha, beta) }.Max();
+                    alpha = new List<int>() { alpha, GetScore(variant, n, alpha, beta, depth + 1) }.Max();
                     if (alpha >= beta)
                         break;
                 }

@@ -36,17 +36,17 @@ namespace Checkers.Logic.AlgorithmObjects
         public int GetHeuristicScore(GameVariant variant)
         {
             int score = 0;
-            foreach (var piece in Board.PiecesOnBoard)
+            foreach (var piece in Board.BoardArray)
             {
                 //za każdy pionek odpowiedniego koloru dodajemy lub odejmujemy punkty
                 //w przypadku królowych punkty są warte potrójną wartość
-                if (piece.Color == PieceColor.White && piece.IsKing)
+                if (piece == 2)
                     score += 3;
-                if (piece.Color == PieceColor.White && !piece.IsKing)
+                if (piece == 1)
                     score += 1;
-                if (piece.Color == PieceColor.Black && piece.IsKing)
+                if (piece == -2)
                     score -= 3;
-                if (piece.Color == PieceColor.Black && !piece.IsKing)
+                if (piece == -1)
                     score -= 1;
             }
 
