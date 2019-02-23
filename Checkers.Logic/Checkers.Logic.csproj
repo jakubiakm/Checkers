@@ -60,6 +60,7 @@
     <Compile Include="Engines\MctsEngine.cs" />
     <Compile Include="Enums\EngineKind.cs" />
     <Compile Include="Enums\GameVariant.cs" />
+    <Compile Include="Exceptions\DrawException.cs" />
     <Compile Include="Exceptions\NoAvailablePiecesException.cs" />
     <Compile Include="Exceptions\NotAvailableMoveException.cs" />
     <Compile Include="Exceptions\WrongMoveException.cs" />

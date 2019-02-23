@@ -49,7 +49,7 @@ namespace Checkers.Logic.Engines
 
         }
 
-        public Move MakeMove(CheckersBoard currentBoard, GameVariant variant)
+        public Move MakeMove(CheckersBoard currentBoard, GameVariant variant, List<Move> gameMoves)
         {
             Random random = new Random();
             List<Move> allPossibleMoves = currentBoard.GetAllPossibleMoves(Color);

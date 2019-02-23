@@ -20,22 +20,27 @@ namespace Checkers.Logic.AlgorithmObjects
 
         public CheckersBoard Board { get; set; }
 
+        public Move Move { get; set; }
+
         public PieceColor Color { get; set; }
 
-        public AlphaBetaNode(CheckersBoard board, PieceColor color, int depthLevel)
+        public AlphaBetaNode(CheckersBoard board, Move move, PieceColor color, int depthLevel)
         {
             Board = board;
             Color = color;
             DepthLevel = depthLevel;
+            Move = move;
             if (Color == PieceColor.White)
                 CurrentScore = int.MinValue;
             else
                 CurrentScore = int.MaxValue;
         }
 
-        public int GetHeuristicScore(GameVariant variant)
+        public int GetHeuristicScore(GameVariant variant, bool isDraw)
         {
             int score = 0;
+            if (isDraw)
+                return 0;
             foreach (var piece in Board.BoardArray)
             {
                 //za każdy pionek odpowiedniego koloru dodajemy lub odejmujemy punkty

@@ -48,7 +48,7 @@ namespace Checkers.Logic.Engines
             randomGenerator = new Random();
         }
 
-        public Move MakeMove(CheckersBoard currentBoard, GameVariant variant)
+        public Move MakeMove(CheckersBoard currentBoard, GameVariant variant, List<Move> gameMoves)
         {
             List<Move> allPossibleMoves = currentBoard.GetAllPossibleMoves(Color);
             int count = allPossibleMoves.Count;
@@ -61,7 +61,7 @@ namespace Checkers.Logic.Engines
             else
             {
                 MctsTree tree = new MctsTree(NumberOfIterations, UctParameter, randomGenerator, currentBoard, Color);
-                int elemIndex = tree.ChooseBestMove(variant);
+                int elemIndex = tree.ChooseBestMove(variant, gameMoves);
                 return allPossibleMoves[elemIndex];
             }
         }

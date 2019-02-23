@@ -20,17 +20,21 @@ namespace Checkers.Logic.AlgorithmObjects
 
         public CheckersBoard Board { get; set; }
 
+        public Move Move { get; set; }
+
         public PieceColor Color { get; set; }
 
-        public MctsNode(PieceColor color, CheckersBoard board)
+        public MctsNode(PieceColor color, CheckersBoard board, Move move)
         {
+            Move = move;
             Color = color;
             Board = board;
             NumberOfSimulations = 0;
             NumberOfWins = 0;
         }
-        public MctsNode(PieceColor color, CheckersBoard board, MctsNode parent)
+        public MctsNode(PieceColor color, CheckersBoard board, MctsNode parent, Move move)
         {
+            Move = move;
             Color = color;
             Board = board;
             Parent = parent;
