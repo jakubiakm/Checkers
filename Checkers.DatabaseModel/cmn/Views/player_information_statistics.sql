@@ -1,4 +1,5 @@
 ﻿
+
   
   
 /****** Script for SelectTopNRows command from SSMS  ******/  
@@ -15,6 +16,7 @@ CREATE VIEW [cmn].[player_information_statistics] AS
 			, CAST(SUM(1) AS real) AS games_number
 			, AVG(moves_statistics.white_time) AS white_time
 			, AVG(moves_statistics.black_time) AS black_time
+			, AVG(moves_statistics.game_time) AS game_time
 		FROM 
 			cmn.game g
 			CROSS APPLY (
@@ -32,7 +34,8 @@ CREATE VIEW [cmn].[player_information_statistics] AS
 								CASE WHEN DATEDIFF(MILLISECOND, start_time, end_time) = 0 THEN NULL 
 								ELSE DATEDIFF(MILLISECOND, start_time, end_time) 
 							END 
-						END) AS black_time
+						END) AS black_time,
+					DATEDIFF(SECOND, MIN(start_time), MAX(end_time)) AS game_time
 				FROM cmn.game_move WHERE game_id = g.game_id
 			) AS moves_statistics
 		GROUP BY 
@@ -65,8 +68,9 @@ CREATE VIEW [cmn].[player_information_statistics] AS
 		, s.white_wins / s.games_number AS white_wins_ratio
 		, s.black_wins / s.games_number AS black_wins_ratio
 		, s.draws / s.games_number AS draws_ratio
-		, s.white_time AS white_move_average_time
-		, s.black_time AS black_move_average_time
+		, s.white_time AS white_move_average_time_ms
+		, s.black_time AS black_move_average_time_ms
+		, s.game_time AS average_game_time_s
 	FROM 
 		stats s
 		JOIN cmn.player_information wpi ON wpi.player_information_id = s.white_player_information_id
