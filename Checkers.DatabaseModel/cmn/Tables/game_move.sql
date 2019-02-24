@@ -17,3 +17,10 @@
     FOREIGN KEY ([game_id]) REFERENCES [cmn].[game] ([game_id])
 );
 
+
+
+
+GO
+CREATE NONCLUSTERED INDEX [IX_game_move_game_id_player_start_time]
+    ON [cmn].[game_move]([game_id] ASC, [player] ASC, [start_time] ASC, [end_time] ASC);
+
