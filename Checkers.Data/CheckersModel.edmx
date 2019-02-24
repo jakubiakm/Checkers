@@ -62,8 +62,11 @@
           <Property Name="player_id" Type="int" Nullable="false" />
           <Property Name="algorithm_id" Type="int" Nullable="false" />
           <Property Name="number_of_pieces" Type="int" Nullable="false" />
+          <Property Name="tree_depth" Type="int" />
+          <Property Name="uct_parameter" Type="float" />
+          <Property Name="number_of_iterations" Type="int" />
         </EntityType>
-        <Association Name="FK__game__black_play__66603565">
+        <Association Name="FK__game__black_play__4F7CD00D">
           <End Role="player_information" Type="Self.player_information" Multiplicity="1" />
           <End Role="game" Type="Self.game" Multiplicity="*" />
           <ReferentialConstraint>
@@ -75,7 +78,19 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__game__game_type___6754599E">
+        <Association Name="FK__game__black_play__68487DD7">
+          <End Role="player_information" Type="Self.player_information" Multiplicity="1" />
+          <End Role="game" Type="Self.game" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="player_information">
+              <PropertyRef Name="player_information_id" />
+            </Principal>
+            <Dependent Role="game">
+              <PropertyRef Name="black_player_information_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__game__game_type___403A8C7D">
           <End Role="game_type" Type="Self.game_type" Multiplicity="1" />
           <End Role="game" Type="Self.game" Multiplicity="*" />
           <ReferentialConstraint>
@@ -87,7 +102,31 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__game__white_play__68487DD7">
+        <Association Name="FK__game__game_type___5070F446">
+          <End Role="game_type" Type="Self.game_type" Multiplicity="1" />
+          <End Role="game" Type="Self.game" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="game_type">
+              <PropertyRef Name="game_type_id" />
+            </Principal>
+            <Dependent Role="game">
+              <PropertyRef Name="game_type_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__game__game_type___693CA210">
+          <End Role="game_type" Type="Self.game_type" Multiplicity="1" />
+          <End Role="game" Type="Self.game" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="game_type">
+              <PropertyRef Name="game_type_id" />
+            </Principal>
+            <Dependent Role="game">
+              <PropertyRef Name="game_type_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__game__white_play__5165187F">
           <End Role="player_information" Type="Self.player_information" Multiplicity="1" />
           <End Role="game" Type="Self.game" Multiplicity="*" />
           <ReferentialConstraint>
@@ -99,7 +138,19 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__game_move__game___6383C8BA">
+        <Association Name="FK__game__white_play__6A30C649">
+          <End Role="player_information" Type="Self.player_information" Multiplicity="1" />
+          <End Role="game" Type="Self.game" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="player_information">
+              <PropertyRef Name="player_information_id" />
+            </Principal>
+            <Dependent Role="game">
+              <PropertyRef Name="white_player_information_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__game_move__game___628FA481">
           <End Role="game" Type="Self.game" Multiplicity="1" />
           <End Role="game_move" Type="Self.game_move" Multiplicity="*" />
           <ReferentialConstraint>
@@ -108,6 +159,42 @@
             </Principal>
             <Dependent Role="game_move">
               <PropertyRef Name="game_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__game_move__game___656C112C">
+          <End Role="game" Type="Self.game" Multiplicity="1" />
+          <End Role="game_move" Type="Self.game_move" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="game">
+              <PropertyRef Name="game_id" />
+            </Principal>
+            <Dependent Role="game_move">
+              <PropertyRef Name="game_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__player_in__algor__5441852A">
+          <End Role="algorithm" Type="Self.algorithm" Multiplicity="1" />
+          <End Role="player_information" Type="Self.player_information" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="algorithm">
+              <PropertyRef Name="algorithm_id" />
+            </Principal>
+            <Dependent Role="player_information">
+              <PropertyRef Name="algorithm_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__player_in__algor__571DF1D5">
+          <End Role="algorithm" Type="Self.algorithm" Multiplicity="1" />
+          <End Role="player_information" Type="Self.player_information" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="algorithm">
+              <PropertyRef Name="algorithm_id" />
+            </Principal>
+            <Dependent Role="player_information">
+              <PropertyRef Name="algorithm_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -123,7 +210,115 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__player_in__playe__59063A47">
+        <Association Name="FK__player_in__algor__5CD6CB2B">
+          <End Role="algorithm" Type="Self.algorithm" Multiplicity="1" />
+          <End Role="player_information" Type="Self.player_information" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="algorithm">
+              <PropertyRef Name="algorithm_id" />
+            </Principal>
+            <Dependent Role="player_information">
+              <PropertyRef Name="algorithm_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__player_in__algor__5FB337D6">
+          <End Role="algorithm" Type="Self.algorithm" Multiplicity="1" />
+          <End Role="player_information" Type="Self.player_information" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="algorithm">
+              <PropertyRef Name="algorithm_id" />
+            </Principal>
+            <Dependent Role="player_information">
+              <PropertyRef Name="algorithm_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__player_in__playe__45F365D3">
+          <End Role="player" Type="Self.player" Multiplicity="1" />
+          <End Role="player_information" Type="Self.player_information" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="player">
+              <PropertyRef Name="player_id" />
+            </Principal>
+            <Dependent Role="player_information">
+              <PropertyRef Name="player_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__player_in__playe__48CFD27E">
+          <End Role="player" Type="Self.player" Multiplicity="1" />
+          <End Role="player_information" Type="Self.player_information" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="player">
+              <PropertyRef Name="player_id" />
+            </Principal>
+            <Dependent Role="player_information">
+              <PropertyRef Name="player_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__player_in__playe__4BAC3F29">
+          <End Role="player" Type="Self.player" Multiplicity="1" />
+          <End Role="player_information" Type="Self.player_information" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="player">
+              <PropertyRef Name="player_id" />
+            </Principal>
+            <Dependent Role="player_information">
+              <PropertyRef Name="player_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__player_in__playe__5535A963">
+          <End Role="player" Type="Self.player" Multiplicity="1" />
+          <End Role="player_information" Type="Self.player_information" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="player">
+              <PropertyRef Name="player_id" />
+            </Principal>
+            <Dependent Role="player_information">
+              <PropertyRef Name="player_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__player_in__playe__5812160E">
+          <End Role="player" Type="Self.player" Multiplicity="1" />
+          <End Role="player_information" Type="Self.player_information" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="player">
+              <PropertyRef Name="player_id" />
+            </Principal>
+            <Dependent Role="player_information">
+              <PropertyRef Name="player_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__player_in__playe__5AEE82B9">
+          <End Role="player" Type="Self.player" Multiplicity="1" />
+          <End Role="player_information" Type="Self.player_information" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="player">
+              <PropertyRef Name="player_id" />
+            </Principal>
+            <Dependent Role="player_information">
+              <PropertyRef Name="player_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__player_in__playe__5DCAEF64">
+          <End Role="player" Type="Self.player" Multiplicity="1" />
+          <End Role="player_information" Type="Self.player_information" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="player">
+              <PropertyRef Name="player_id" />
+            </Principal>
+            <Dependent Role="player_information">
+              <PropertyRef Name="player_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__player_in__playe__60A75C0F">
           <End Role="player" Type="Self.player" Multiplicity="1" />
           <End Role="player_information" Type="Self.player_information" Multiplicity="*" />
           <ReferentialConstraint>
@@ -142,27 +337,91 @@
           <EntitySet Name="game_type" EntityType="Self.game_type" Schema="cmn" store:Type="Tables" />
           <EntitySet Name="player" EntityType="Self.player" Schema="cmn" store:Type="Tables" />
           <EntitySet Name="player_information" EntityType="Self.player_information" Schema="cmn" store:Type="Tables" />
-          <AssociationSet Name="FK__game__black_play__66603565" Association="Self.FK__game__black_play__66603565">
+          <AssociationSet Name="FK__game__black_play__4F7CD00D" Association="Self.FK__game__black_play__4F7CD00D">
             <End Role="player_information" EntitySet="player_information" />
             <End Role="game" EntitySet="game" />
           </AssociationSet>
-          <AssociationSet Name="FK__game__game_type___6754599E" Association="Self.FK__game__game_type___6754599E">
+          <AssociationSet Name="FK__game__black_play__68487DD7" Association="Self.FK__game__black_play__68487DD7">
+            <End Role="player_information" EntitySet="player_information" />
+            <End Role="game" EntitySet="game" />
+          </AssociationSet>
+          <AssociationSet Name="FK__game__game_type___403A8C7D" Association="Self.FK__game__game_type___403A8C7D">
             <End Role="game_type" EntitySet="game_type" />
             <End Role="game" EntitySet="game" />
           </AssociationSet>
-          <AssociationSet Name="FK__game__white_play__68487DD7" Association="Self.FK__game__white_play__68487DD7">
+          <AssociationSet Name="FK__game__game_type___5070F446" Association="Self.FK__game__game_type___5070F446">
+            <End Role="game_type" EntitySet="game_type" />
+            <End Role="game" EntitySet="game" />
+          </AssociationSet>
+          <AssociationSet Name="FK__game__game_type___693CA210" Association="Self.FK__game__game_type___693CA210">
+            <End Role="game_type" EntitySet="game_type" />
+            <End Role="game" EntitySet="game" />
+          </AssociationSet>
+          <AssociationSet Name="FK__game__white_play__5165187F" Association="Self.FK__game__white_play__5165187F">
             <End Role="player_information" EntitySet="player_information" />
             <End Role="game" EntitySet="game" />
           </AssociationSet>
-          <AssociationSet Name="FK__game_move__game___6383C8BA" Association="Self.FK__game_move__game___6383C8BA">
+          <AssociationSet Name="FK__game__white_play__6A30C649" Association="Self.FK__game__white_play__6A30C649">
+            <End Role="player_information" EntitySet="player_information" />
+            <End Role="game" EntitySet="game" />
+          </AssociationSet>
+          <AssociationSet Name="FK__game_move__game___628FA481" Association="Self.FK__game_move__game___628FA481">
             <End Role="game" EntitySet="game" />
             <End Role="game_move" EntitySet="game_move" />
+          </AssociationSet>
+          <AssociationSet Name="FK__game_move__game___656C112C" Association="Self.FK__game_move__game___656C112C">
+            <End Role="game" EntitySet="game" />
+            <End Role="game_move" EntitySet="game_move" />
+          </AssociationSet>
+          <AssociationSet Name="FK__player_in__algor__5441852A" Association="Self.FK__player_in__algor__5441852A">
+            <End Role="algorithm" EntitySet="algorithm" />
+            <End Role="player_information" EntitySet="player_information" />
+          </AssociationSet>
+          <AssociationSet Name="FK__player_in__algor__571DF1D5" Association="Self.FK__player_in__algor__571DF1D5">
+            <End Role="algorithm" EntitySet="algorithm" />
+            <End Role="player_information" EntitySet="player_information" />
           </AssociationSet>
           <AssociationSet Name="FK__player_in__algor__59FA5E80" Association="Self.FK__player_in__algor__59FA5E80">
             <End Role="algorithm" EntitySet="algorithm" />
             <End Role="player_information" EntitySet="player_information" />
           </AssociationSet>
-          <AssociationSet Name="FK__player_in__playe__59063A47" Association="Self.FK__player_in__playe__59063A47">
+          <AssociationSet Name="FK__player_in__algor__5CD6CB2B" Association="Self.FK__player_in__algor__5CD6CB2B">
+            <End Role="algorithm" EntitySet="algorithm" />
+            <End Role="player_information" EntitySet="player_information" />
+          </AssociationSet>
+          <AssociationSet Name="FK__player_in__algor__5FB337D6" Association="Self.FK__player_in__algor__5FB337D6">
+            <End Role="algorithm" EntitySet="algorithm" />
+            <End Role="player_information" EntitySet="player_information" />
+          </AssociationSet>
+          <AssociationSet Name="FK__player_in__playe__45F365D3" Association="Self.FK__player_in__playe__45F365D3">
+            <End Role="player" EntitySet="player" />
+            <End Role="player_information" EntitySet="player_information" />
+          </AssociationSet>
+          <AssociationSet Name="FK__player_in__playe__48CFD27E" Association="Self.FK__player_in__playe__48CFD27E">
+            <End Role="player" EntitySet="player" />
+            <End Role="player_information" EntitySet="player_information" />
+          </AssociationSet>
+          <AssociationSet Name="FK__player_in__playe__4BAC3F29" Association="Self.FK__player_in__playe__4BAC3F29">
+            <End Role="player" EntitySet="player" />
+            <End Role="player_information" EntitySet="player_information" />
+          </AssociationSet>
+          <AssociationSet Name="FK__player_in__playe__5535A963" Association="Self.FK__player_in__playe__5535A963">
+            <End Role="player" EntitySet="player" />
+            <End Role="player_information" EntitySet="player_information" />
+          </AssociationSet>
+          <AssociationSet Name="FK__player_in__playe__5812160E" Association="Self.FK__player_in__playe__5812160E">
+            <End Role="player" EntitySet="player" />
+            <End Role="player_information" EntitySet="player_information" />
+          </AssociationSet>
+          <AssociationSet Name="FK__player_in__playe__5AEE82B9" Association="Self.FK__player_in__playe__5AEE82B9">
+            <End Role="player" EntitySet="player" />
+            <End Role="player_information" EntitySet="player_information" />
+          </AssociationSet>
+          <AssociationSet Name="FK__player_in__playe__5DCAEF64" Association="Self.FK__player_in__playe__5DCAEF64">
+            <End Role="player" EntitySet="player" />
+            <End Role="player_information" EntitySet="player_information" />
+          </AssociationSet>
+          <AssociationSet Name="FK__player_in__playe__60A75C0F" Association="Self.FK__player_in__playe__60A75C0F">
             <End Role="player" EntitySet="player" />
             <End Role="player_information" EntitySet="player_information" />
           </AssociationSet>
@@ -240,6 +499,9 @@
           <NavigationProperty Name="games" Relationship="Self.FK__game__black_play__5EBF139D" FromRole="player_information" ToRole="game" />
           <NavigationProperty Name="games1" Relationship="Self.FK__game__white_play__5DCAEF64" FromRole="player_information" ToRole="game" />
           <NavigationProperty Name="player" Relationship="Self.FK__player_in__playe__59063A47" FromRole="player_information" ToRole="player" />
+          <Property Name="tree_depth" Type="Int32" />
+          <Property Name="uct_parameter" Type="Double" />
+          <Property Name="number_of_iterations" Type="Int32" />
         </EntityType>
         <Association Name="FK__player_in__algor__59FA5E80">
           <End Role="algorithm" Type="Self.algorithm" Multiplicity="1" />
@@ -408,6 +670,9 @@
           <EntitySetMapping Name="player_information">
             <EntityTypeMapping TypeName="CheckersModel.player_information">
               <MappingFragment StoreEntitySet="player_information">
+                <ScalarProperty Name="number_of_iterations" ColumnName="number_of_iterations" />
+                <ScalarProperty Name="uct_parameter" ColumnName="uct_parameter" />
+                <ScalarProperty Name="tree_depth" ColumnName="tree_depth" />
                 <ScalarProperty Name="player_information_id" ColumnName="player_information_id" />
                 <ScalarProperty Name="player_id" ColumnName="player_id" />
                 <ScalarProperty Name="algorithm_id" ColumnName="algorithm_id" />

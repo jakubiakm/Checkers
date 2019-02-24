@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,37 +13,44 @@ namespace Checkers.Data
 
         public void AddGame(player_information whitePlayerInformation, player_information blackPlayerInformation, game_type gameType, List<game_move> gameMoves, int gameSize, string gameResult, int moveCount, DateTime startDate)
         {
-            game game = new game();
-
-            whitePlayerInformation.player = AddOrLoadPlayer(whitePlayerInformation.player);
-            whitePlayerInformation.algorithm = AddOrLoadAlgorithm(whitePlayerInformation.algorithm);
-            whitePlayerInformation = AddOrLoadPlayerInformation(whitePlayerInformation);
-
-            context.SaveChanges();
-
-            blackPlayerInformation.player = AddOrLoadPlayer(blackPlayerInformation.player);
-            blackPlayerInformation.algorithm = AddOrLoadAlgorithm(blackPlayerInformation.algorithm);
-            blackPlayerInformation = AddOrLoadPlayerInformation(blackPlayerInformation);
-
-            context.SaveChanges();
-
-            game.white_player_information_id = whitePlayerInformation.player_information_id;
-            game.black_player_information_id = blackPlayerInformation.player_information_id;
-            game.game_type = AddOrLoadGameType(gameType);
-            game.game_size = gameSize;
-            game.game_result = gameResult;
-            game.move_count = moveCount;
-            game.start_date = startDate;
-
-            game = context.games.Add(game);
-            
-            foreach(var game_move in gameMoves)
+            try
             {
-                game_move.game_id = game.game_id;
-                context.game_move.Add(game_move);
-            }
+                game game = new game();
 
-            context.SaveChanges();
+                whitePlayerInformation.player = AddOrLoadPlayer(whitePlayerInformation.player);
+                whitePlayerInformation.algorithm = AddOrLoadAlgorithm(whitePlayerInformation.algorithm);
+                whitePlayerInformation = AddOrLoadPlayerInformation(whitePlayerInformation);
+
+                context.SaveChanges();
+
+                blackPlayerInformation.player = AddOrLoadPlayer(blackPlayerInformation.player);
+                blackPlayerInformation.algorithm = AddOrLoadAlgorithm(blackPlayerInformation.algorithm);
+                blackPlayerInformation = AddOrLoadPlayerInformation(blackPlayerInformation);
+
+                context.SaveChanges();
+
+                game.white_player_information_id = whitePlayerInformation.player_information_id;
+                game.black_player_information_id = blackPlayerInformation.player_information_id;
+                game.game_type = AddOrLoadGameType(gameType);
+                game.game_size = gameSize;
+                game.game_result = gameResult;
+                game.move_count = moveCount;
+                game.start_date = startDate;
+
+                game = context.games.Add(game);
+
+                foreach (var game_move in gameMoves)
+                {
+                    game_move.game_id = game.game_id;
+                    context.game_move.Add(game_move);
+                }
+
+                context.SaveChanges();
+            }
+            catch (Exception)
+            {
+                //TODO: obsługa błędu połączenia z bazą danych   
+            }
         }
 
         private player AddOrLoadPlayer(player player)
@@ -73,10 +81,13 @@ namespace Checkers.Data
 
         private player_information AddOrLoadPlayerInformation(player_information playerInformation)
         {
-            if (!context.player_information.Any(p => 
+            if (!context.player_information.Any(p =>
                 p.player_id == playerInformation.player.player_id &&
                 p.algorithm_id == playerInformation.algorithm.algorithm_id &&
-                p.number_of_pieces == playerInformation.number_of_pieces))
+                p.number_of_pieces == playerInformation.number_of_pieces &&
+                p.tree_depth == playerInformation.tree_depth &&
+                p.uct_parameter == playerInformation.uct_parameter &&
+                p.number_of_iterations == playerInformation.number_of_iterations))
             {
                 playerInformation = context.player_information.Add(playerInformation);
             }
@@ -85,7 +96,10 @@ namespace Checkers.Data
                 playerInformation = context.player_information.First(p =>
                     p.player_id == playerInformation.player.player_id &&
                     p.algorithm_id == playerInformation.algorithm.algorithm_id &&
-                    p.number_of_pieces == playerInformation.number_of_pieces);
+                    p.number_of_pieces == playerInformation.number_of_pieces &&
+                    p.tree_depth == playerInformation.tree_depth &&
+                    p.uct_parameter == playerInformation.uct_parameter &&
+                    p.number_of_iterations == playerInformation.number_of_iterations);
             }
             return playerInformation;
         }

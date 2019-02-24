@@ -1,13 +1,18 @@
-﻿/****** Script for SelectTopNRows command from SSMS  ******/
+﻿
+
+/****** Script for SelectTopNRows command from SSMS  ******/
 
 
-CREATE VIEW cmn.player_information_statistics AS
+CREATE VIEW [cmn].[player_information_statistics] AS
 (
 	SELECT
 		[pi].player_information_id,
 		p.player_name,
 		a.algorithm_name,
 		[pi].number_of_pieces,
+		[pi].tree_depth,
+		[pi].uct_parameter,
+		[pi].number_of_iterations,
 		white_stats.games_count + black_stats.games_count AS total_games,
 		ISNULL(white_stats.wins, 0) + ISNULL(black_stats.wins, 0) AS total_wins,
 		(ISNULL(white_stats.wins, 0) + ISNULL(black_stats.wins, 0)) / CAST((white_stats.games_count + black_stats.games_count) AS real) AS total_win_ratio,

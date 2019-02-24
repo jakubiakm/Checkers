@@ -4,16 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{ADF960B2-4B29-4F34-AFB8-4C26D216245F}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Checkers.Logic</RootNamespace>
-    <AssemblyName>Checkers.Logic</AssemblyName>
+    <ProjectGuid>{4224732A-31A8-4A69-B78C-C65321A68D3C}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Checkers.Console</RootNamespace>
+    <AssemblyName>Checkers.Console</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x64</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -21,23 +21,23 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ManagedCuda, Version=10.0.31.0, Culture=neutral, PublicKeyToken=242d898828717aa0, processorArchitecture=MSIL">
-      <HintPath>..\packages\ManagedCuda-100.10.0.31\lib\net46\ManagedCuda.dll</HintPath>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
-    <Reference Include="NPP, Version=10.0.31.0, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\packages\ManagedCuda-NPP.10.0.31\lib\net46\NPP.dll</HintPath>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -50,39 +50,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AlgorithmObjects\AlphaBetaNode.cs" />
-    <Compile Include="AlgorithmObjects\AlphaBetaTree.cs" />
-    <Compile Include="AlgorithmObjects\MctsNode.cs" />
-    <Compile Include="AlgorithmObjects\MctsTree.cs" />
-    <Compile Include="Engines\CudaEngine.cs" />
-    <Compile Include="Engines\HumanEngine.cs" />
-    <Compile Include="Engines\AlphaBetaEngine.cs" />
-    <Compile Include="Engines\MctsEngine.cs" />
-    <Compile Include="Enums\EngineKind.cs" />
-    <Compile Include="Enums\GameVariant.cs" />
-    <Compile Include="Exceptions\DrawException.cs" />
-    <Compile Include="Exceptions\NoAvailablePiecesException.cs" />
-    <Compile Include="Exceptions\NotAvailableMoveException.cs" />
-    <Compile Include="Exceptions\WrongMoveException.cs" />
-    <Compile Include="GameObjects\BeatedPiece.cs" />
-    <Compile Include="GameObjects\CheckersBoard.cs" />
-    <Compile Include="Engines\IEngine.cs" />
-    <Compile Include="Engines\RandomEngine.cs" />
-    <Compile Include="ExtensionMethods.cs" />
-    <Compile Include="GameObjects\Game.cs" />
-    <Compile Include="GameObjects\HistoryBoard.cs" />
-    <Compile Include="GameObjects\Move.cs" />
-    <Compile Include="GameObjects\Piece.cs" />
-    <Compile Include="Enums\PieceColor.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Checkers.Data\Checkers.Data.csproj">
-      <Project>{c1e851e7-1f8e-468e-b93b-b742795a84b9}</Project>
+      <Project>{C1E851E7-1F8E-468E-B93B-B742795A84B9}</Project>
       <Name>Checkers.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Checkers.Logic\Checkers.Logic.csproj">
+      <Project>{ADF960B2-4B29-4F34-AFB8-4C26D216245F}</Project>
+      <Name>Checkers.Logic</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,4 +1,5 @@
-﻿using Checkers.Logic.Enums;
+﻿using Checkers.Logic.AlgorithmObjects;
+using Checkers.Logic.Enums;
 using Checkers.Logic.Exceptions;
 using Checkers.Logic.GameObjects;
 using System;
@@ -10,38 +11,32 @@ using System.Threading.Tasks;
 
 namespace Checkers.Logic.Engines
 {
-    public class RandomEngine : IEngine
+    public class AlphaBetaEngine : IEngine
     {
+        public int AlphaBetaTreeDepth { get; set; }
+
         public EngineKind Kind
         {
             get
             {
-                return EngineKind.Random;
+                return EngineKind.AlphaBeta;
             }
         }
 
         public PieceColor Color { get; set; }
 
-        public int? Seed { get; private set; }
-
         private Random randomGenerator;
 
-        public RandomEngine(PieceColor color, int? seed)
+        public AlphaBetaEngine(PieceColor color, int treeDepth)
         {
-            Seed = seed;
-            if (Seed != null)
-                randomGenerator = new Random((int)Seed);
-            else
-                randomGenerator = new Random();
+            AlphaBetaTreeDepth = treeDepth;
+            randomGenerator = new Random();
             Color = color;
         }
 
         public void Reset()
         {
-            if (Seed != null)
-                randomGenerator = new Random((int)Seed);
-            else
-                randomGenerator = new Random();
+            randomGenerator = new Random();
         }
 
         public Move MakeMove(CheckersBoard currentBoard, GameVariant variant, List<Move> gameMoves)
@@ -50,8 +45,16 @@ namespace Checkers.Logic.Engines
             int count = allPossibleMoves.Count;
             if (count == 0)
                 throw new NotAvailableMoveException(Color);
-            int elemIndex = randomGenerator.Next(count);       
-            return allPossibleMoves[elemIndex];
+            if (count == 1)
+            {
+                return allPossibleMoves.First();
+            }
+            else
+            {
+                AlphaBetaTree tree = new AlphaBetaTree(AlphaBetaTreeDepth, Color, currentBoard);
+                int elemIndex = tree.ChooseBestMove(variant, gameMoves);
+                return allPossibleMoves[elemIndex];
+            }
         }
     }
 }

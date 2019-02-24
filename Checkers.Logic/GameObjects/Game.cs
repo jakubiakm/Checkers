@@ -4,6 +4,7 @@ using Checkers.Logic.Enums;
 using Checkers.Logic.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -28,11 +29,14 @@ namespace Checkers.Logic.GameObjects
 
         public DateTime StartDate { get; set; }
 
+        public List<Move> GameMoves { get; set; }
+
         public Game(IEngine whiteEngine, IEngine blackEngine, int boardSize, int numberOfWhitePieces, int numberOfBlackPieces, GameVariant variant)
         {
             WhitePlayerEngine = whiteEngine;
             BlackPlayerEngine = blackEngine;
             Board = new CheckersBoard(boardSize, numberOfWhitePieces, numberOfBlackPieces);
+            GameMoves = new List<Move>();
             History = new List<HistoryBoard>();
             Variant = variant;
             StartDate = DateTime.Now;
@@ -46,6 +50,7 @@ namespace Checkers.Logic.GameObjects
             History = new List<HistoryBoard>();
             Variant = variant;
             StartDate = DateTime.Now;
+            GameMoves = new List<Move>();
         }
 
         public Move MakeMove(PieceColor color)
@@ -57,21 +62,26 @@ namespace Checkers.Logic.GameObjects
                 switch (color)
                 {
                     case PieceColor.White:
-                        Board.LastMove = Board.MakeMove(WhitePlayerEngine.MakeMove(Board, Variant));
+                        Board.LastMove = Board.MakeMove(WhitePlayerEngine.MakeMove(Board, Variant, GameMoves));
                         break;
                     case PieceColor.Black:
-                        Board.LastMove = Board.MakeMove(BlackPlayerEngine.MakeMove(Board, Variant));
+                        Board.LastMove = Board.MakeMove(BlackPlayerEngine.MakeMove(Board, Variant, GameMoves));
                         break;
                 }
                 var endTime = DateTime.Now;
                 History.Add(new HistoryBoard(startTime, endTime, board, color));
-                if (Board.PiecesOnBoard.Where(p => p.Color == PieceColor.Black).Count() == 0)
+                if (Board.BoardArray.Where(p => p < 0).Count() == 0)
                 {
                     throw new NoAvailablePiecesException(PieceColor.Black, Board.LastMove);
                 }
-                if (Board.PiecesOnBoard.Where(p => p.Color == PieceColor.White).Count() == 0)
+                if (Board.BoardArray.Where(p => p > 0).Count() == 0)
                 {
                     throw new NoAvailablePiecesException(PieceColor.White, Board.LastMove);
+                }
+                GameMoves.Add(Board.LastMove);
+                if (IsDraw())
+                {
+                    throw new DrawException();
                 }
                 return Board.LastMove;
             }
@@ -97,6 +107,11 @@ namespace Checkers.Logic.GameObjects
                         break;
                 }
                 AddGameToDatabase(winner);
+                throw;
+            }
+            catch(DrawException)
+            {
+                AddGameToDatabase("D");
                 throw;
             }
             catch
@@ -125,6 +140,28 @@ namespace Checkers.Logic.GameObjects
                 number_of_pieces = Board.NumberOfBlackPiecesAtBeggining,
                 player = BlackPlayerEngine.Kind == EngineKind.Human ? new player() { player_name = "syntaximus" } : new player() { player_name = "CPU" }
             };
+            if (WhitePlayerEngine.GetType() == typeof(AlphaBetaEngine))
+            {
+                var engine = (AlphaBetaEngine)WhitePlayerEngine;
+                whitePlayerInformation.tree_depth = engine.AlphaBetaTreeDepth;
+            }
+            if (BlackPlayerEngine.GetType() == typeof(AlphaBetaEngine))
+            {
+                var engine = (AlphaBetaEngine)BlackPlayerEngine;
+                blackPlayerInformation.tree_depth = engine.AlphaBetaTreeDepth;
+            }
+            if (WhitePlayerEngine.GetType() == typeof(MctsEngine))
+            {
+                var engine = (MctsEngine)WhitePlayerEngine;
+                whitePlayerInformation.uct_parameter = engine.UctParameter;
+                whitePlayerInformation.number_of_iterations = engine.NumberOfIterations;
+            }
+            if (BlackPlayerEngine.GetType() == typeof(MctsEngine))
+            {
+                var engine = (MctsEngine)BlackPlayerEngine;
+                blackPlayerInformation.uct_parameter = engine.UctParameter;
+                blackPlayerInformation.number_of_iterations = engine.NumberOfIterations;
+            }
             game_type gameType = new game_type() { game_type_name = Variant.ToString() };
             List<game_move> gameMoves = new List<game_move>();
             foreach (var move in History.Skip(1))
@@ -144,6 +181,22 @@ namespace Checkers.Logic.GameObjects
             }
             int moveCount = History.Count;
             _databaseLayer.AddGame(whitePlayerInformation, blackPlayerInformation, gameType, gameMoves, Board.Size, winner, moveCount, StartDate);
+        }
+
+
+        private bool IsDraw()
+        {
+            //Jeżeli przez 25 kolejnych posunięć obu graczy, jedynie damki były przestawiane, nie wykonano żadnego ruchu pionem i nie wykonano żadnego bicia to grę uważa się za remisową.
+            var lastMoves = GameMoves.Skip(Math.Max(0, GameMoves.Count - 2 * 25)).ToList();
+            foreach(var move in lastMoves)
+            {
+                if (move.BeatedPieces != null && move.BeatedPieces.Count > 0)
+                    return false;
+                if (!move.OldPiece.IsKing)
+                    return false;
+            }
+
+            return true;
         }
     }
 }

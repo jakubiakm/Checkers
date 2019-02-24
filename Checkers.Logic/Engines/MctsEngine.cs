@@ -1,4 +1,5 @@
-﻿using Checkers.Logic.Enums;
+﻿using Checkers.Logic.AlgorithmObjects;
+using Checkers.Logic.Enums;
 using Checkers.Logic.Exceptions;
 using Checkers.Logic.GameObjects;
 using System;
@@ -10,13 +11,13 @@ using System.Threading.Tasks;
 
 namespace Checkers.Logic.Engines
 {
-    public class RandomEngine : IEngine
+    public class MctsEngine : IEngine
     {
         public EngineKind Kind
         {
             get
             {
-                return EngineKind.Random;
+                return EngineKind.Mcts;
             }
         }
 
@@ -24,9 +25,13 @@ namespace Checkers.Logic.Engines
 
         public int? Seed { get; private set; }
 
+        public double UctParameter { get; private set; }
+
+        public int NumberOfIterations { get; private set; }
+
         private Random randomGenerator;
 
-        public RandomEngine(PieceColor color, int? seed)
+        public MctsEngine(PieceColor color, int? seed, double uctParameter, int numberOfIterations)
         {
             Seed = seed;
             if (Seed != null)
@@ -34,14 +39,13 @@ namespace Checkers.Logic.Engines
             else
                 randomGenerator = new Random();
             Color = color;
+            UctParameter = uctParameter;
+            NumberOfIterations = numberOfIterations;
         }
 
         public void Reset()
         {
-            if (Seed != null)
-                randomGenerator = new Random((int)Seed);
-            else
-                randomGenerator = new Random();
+            randomGenerator = new Random();
         }
 
         public Move MakeMove(CheckersBoard currentBoard, GameVariant variant, List<Move> gameMoves)
@@ -50,8 +54,16 @@ namespace Checkers.Logic.Engines
             int count = allPossibleMoves.Count;
             if (count == 0)
                 throw new NotAvailableMoveException(Color);
-            int elemIndex = randomGenerator.Next(count);       
-            return allPossibleMoves[elemIndex];
+            if (count == 1)
+            {
+                return allPossibleMoves.First();
+            }
+            else
+            {
+                MctsTree tree = new MctsTree(NumberOfIterations, UctParameter, randomGenerator, currentBoard, Color);
+                int elemIndex = tree.ChooseBestMove(variant, gameMoves);
+                return allPossibleMoves[elemIndex];
+            }
         }
     }
 }

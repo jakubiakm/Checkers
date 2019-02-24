@@ -76,10 +76,10 @@ namespace Checkers.UI
                 catch (NotAvailableMoveException exception)
                 {
                     NotHumanMoveTimer.Stop();
-                    await this.ShowMessageAsync("Remis", $"Gra zakończona. Wygrywa gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "BIAŁY" : "CZARNY")}, bo gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie może już wykonywać ruchów.");
+                    await this.ShowMessageAsync("Koniec gry", $"Gra zakończona. Wygrywa gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "BIAŁY" : "CZARNY")}, bo gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie może już wykonywać ruchów.");
                     HistoryViewModelObject.History.Clear();
                     StartNewGame(
-                        BoardViewModelObject.Game.Board.Size, 
+                        BoardViewModelObject.Game.Board.Size,
                         BoardViewModelObject.Game.Board.NumberOfWhitePiecesAtBeggining,
                         BoardViewModelObject.Game.Board.NumberOfBlackPiecesAtBeggining,
                         BoardViewModelObject.Game.Variant,
@@ -93,6 +93,21 @@ namespace Checkers.UI
                     NotHumanMoveTimer.Stop();
                     BoardViewModelObject.DrawNextMove(exception.LastMove);
                     await this.ShowMessageAsync("Koniec gry", $"Gra zakończony. Gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie ma już pionków.");
+                    HistoryViewModelObject.History.Clear();
+                    StartNewGame(
+                        BoardViewModelObject.Game.Board.Size,
+                        BoardViewModelObject.Game.Board.NumberOfWhitePiecesAtBeggining,
+                        BoardViewModelObject.Game.Board.NumberOfBlackPiecesAtBeggining,
+                        BoardViewModelObject.Game.Variant,
+                        BoardViewModelObject.Game.WhitePlayerEngine,
+                        BoardViewModelObject.Game.BlackPlayerEngine,
+                        BoardViewModelObject.MoveAnimationTime);
+                    NotHumanMoveTimer.Start();
+                }
+                catch (DrawException)
+                {
+                    NotHumanMoveTimer.Stop();
+                    await this.ShowMessageAsync("Remis", "Gra zakończyła się remisem, ponieważ przez 25 kolejnych posunięć obu graczy, jedynie damki były przestawiane, nie wykonano żadnego ruchu pionem i nie wykonano żadnego bicia.");
                     HistoryViewModelObject.History.Clear();
                     StartNewGame(
                         BoardViewModelObject.Game.Board.Size,
@@ -125,9 +140,9 @@ namespace Checkers.UI
         HistoryViewModel HistoryViewModelObject;
 
         public async void StartNewGame(
-            int boardSize, 
-            int whiteCountSize, 
-            int blackCountSize, 
+            int boardSize,
+            int whiteCountSize,
+            int blackCountSize,
             GameVariant gameVariant,
             IEngine whiteEngine,
             IEngine blackEngine,
@@ -136,8 +151,8 @@ namespace Checkers.UI
             try
             {
                 BoardViewModelObject.StartNewGame(
-                    boardSize, 
-                    whiteCountSize, 
+                    boardSize,
+                    whiteCountSize,
                     blackCountSize,
                     gameVariant,
                     whiteEngine,
@@ -160,7 +175,7 @@ namespace Checkers.UI
                 blackCountSize: 20,
                 gameVariant: GameVariant.Checkers,
                 whiteEngine: new HumanEngine(PieceColor.White),
-                blackEngine: new RandomEngine(PieceColor.Black, null),
+                blackEngine: new AlphaBetaEngine(PieceColor.Black, 5),
                 moveAnimationTime: 33);
             BoardViewControl.DataContext = BoardViewModelObject;
             BoardCanvas = UiHelper.FindChild<Canvas>(BoardViewControl, "BoardCanvas");
@@ -281,7 +296,7 @@ namespace Checkers.UI
                 }
                 catch (NotAvailableMoveException exception)
                 {
-                    await this.ShowMessageAsync("Remis", $"Gra zakończona. Wygrywa gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "BIAŁY" : "CZARNY")}, bo gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie może już wykonywać ruchów.");
+                    await this.ShowMessageAsync("Koniec gry", $"Gra zakończona. Wygrywa gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "BIAŁY" : "CZARNY")}, bo gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie może już wykonywać ruchów.");
                     StartNewGame(
                         BoardViewModelObject.Game.Board.Size,
                         BoardViewModelObject.Game.Board.NumberOfWhitePiecesAtBeggining,
@@ -294,7 +309,20 @@ namespace Checkers.UI
                 catch (NoAvailablePiecesException exception)
                 {
                     BoardViewModelObject.DrawNextMove(exception.LastMove);
-                    await this.ShowMessageAsync("Koniec gry", $"Gra zakończony. Gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie ma już pionków.");
+                    await this.ShowMessageAsync("Koniec gry", $"Gra zakończona. Gracz {(exception.Color == Logic.Enums.PieceColor.Black ? "CZARNY" : "BIAŁY")} nie ma już pionków.");
+                    StartNewGame(
+                        BoardViewModelObject.Game.Board.Size,
+                        BoardViewModelObject.Game.Board.NumberOfWhitePiecesAtBeggining,
+                        BoardViewModelObject.Game.Board.NumberOfBlackPiecesAtBeggining,
+                        BoardViewModelObject.Game.Variant,
+                        BoardViewModelObject.Game.WhitePlayerEngine,
+                        BoardViewModelObject.Game.BlackPlayerEngine,
+                        BoardViewModelObject.MoveAnimationTime);
+                }
+                catch (DrawException)
+                {
+                    await this.ShowMessageAsync("Remis", "Gra zakończyła się remisem, ponieważ przez 25 kolejnych posunięć obu graczy, jedynie damki były przestawiane, nie wykonano żadnego ruchu pionem i nie wykonano żadnego bicia.");
+                    HistoryViewModelObject.History.Clear();
                     StartNewGame(
                         BoardViewModelObject.Game.Board.Size,
                         BoardViewModelObject.Game.Board.NumberOfWhitePiecesAtBeggining,

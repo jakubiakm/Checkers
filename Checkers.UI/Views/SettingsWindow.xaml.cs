@@ -151,6 +151,24 @@ namespace Checkers.UI.Views
                     {
                         return new CudaEngine(color, viewModel.BlackPlayerCudaEngineMctsIteration, viewModel.BlackPlayerCudaEngineGridSize, viewModel.BlackPlayerCudaEngineBlockSize);
                     }
+                case EngineKind.AlphaBeta:
+                    if(color == PieceColor.White)
+                    {
+                        return new AlphaBetaEngine(color, viewModel.WhitePlayerAlphaBetaEngineTreeDepth);
+                    }
+                    else
+                    {
+                        return new AlphaBetaEngine(color, viewModel.BlackPlayerAlphaBetaEngineTreeDepth);
+                    }
+                case EngineKind.Mcts:
+                    if (color == PieceColor.White)
+                    {
+                        return new MctsEngine(color, viewModel.WhitePlayerMctsEngineRandomSeed, viewModel.WhitePlayerMctsEngineUctParameter, viewModel.WhitePlayerMctsEngineNumberOfIterations);
+                    }
+                    else
+                    {
+                        return new MctsEngine(color, viewModel.BlackPlayerMctsEngineRandomSeed, viewModel.BlackPlayerMctsEngineUctParameter, viewModel.BlackPlayerMctsEngineNumberOfIterations);
+                    }
                 default:
                     throw new ArgumentException("Nierozpoznany typ silnika");
             }
