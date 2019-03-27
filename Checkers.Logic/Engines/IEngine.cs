@@ -25,8 +25,9 @@ namespace Checkers.Logic.Engines
         /// </summary>
         /// <param name="currentBoard">Aktualna plansza na której ma być wygenerowany ruch</param>
         /// <param name="variant">Wariant gry dla którego ma być znaleziony ruch</param>
+        /// <param name="gameMoves">Lista ostatnio wykonanych ruchów w grze (służy do sprawdzenia czy był remis)</param>
         /// <returns></returns>
-        Move MakeMove(CheckersBoard currentBoard, GameVariant variant);
+        Move MakeMove(CheckersBoard currentBoard, GameVariant variant, List<Move> gameMoves);
 
         /// <summary>
         /// Resetowanie silnika - po każdej rozegranej grze wartości silnika powinny zostać zresetowane (jak np. ziarno do generatora liczb pseudolosowych)

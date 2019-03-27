@@ -26,18 +26,28 @@ namespace Checkers.Logic.AlgorithmObjects
             NumberOfIterations = numberOfIterations;
             UctParameter = uctParameter;
             RandomGenerator = generator;
-            Root = new MctsNode(color, board);
+            Root = new MctsNode(color, board, null);
         }
 
-        public int ChooseBestMove(GameVariant variant)
+        public int ChooseBestMove(GameVariant variant, List<Move> gameMoves)
         {
+            var lastMoves = gameMoves.Skip(Math.Max(0, gameMoves.Count - 2 * 25)).Reverse().ToList();
+            int numberOfLastKingMovesWithoutBeat = 0;
+            foreach (var move in lastMoves)
+            {
+                if (move.OldPiece.IsKing && (move.BeatedPieces == null || move.BeatedPieces.Count == 0))
+                    numberOfLastKingMovesWithoutBeat++;
+                else
+                    break;
+            }
             for (int it = 0; it < NumberOfIterations; it++)
             {
-                int result = 0;
-                var leaf = Select();
+                var tempNumberOfLastKingMovesWithoutBeat = numberOfLastKingMovesWithoutBeat;
+                double result = 0;
+                var leaf = Select(ref tempNumberOfLastKingMovesWithoutBeat);
                 if (leaf.NumberOfSimulations == 0)
                 {
-                    result = Rollout(leaf);
+                    result = Rollout(leaf, tempNumberOfLastKingMovesWithoutBeat);
                 }
                 else
                 {
@@ -45,13 +55,21 @@ namespace Checkers.Logic.AlgorithmObjects
                     if (leaf.Children != null && leaf.Children.Count > 0)
                     {
                         leaf = leaf.Children[0];
-                        result = Rollout(leaf);
+                        if (leaf.Move.OldPiece.IsKing && (leaf.Move.BeatedPieces == null || leaf.Move.BeatedPieces.Count == 0))
+                            tempNumberOfLastKingMovesWithoutBeat++;
+                        else
+                            tempNumberOfLastKingMovesWithoutBeat = 0;
+                        result = Rollout(leaf, tempNumberOfLastKingMovesWithoutBeat);
+
                     }
                     else
                     {
                         //w przypadku gdy po fazie "Expand" nie ma liści, to znaczy, że gra została już zakończona
                         //i wygrywa gracz, który ma jeszcze możliwe ruchy
-                        result = leaf.Color == PieceColor.Black ? 1 : -1;
+                        if (tempNumberOfLastKingMovesWithoutBeat > 49)
+                            result = 0.5;
+                        else
+                            result = leaf.Color == PieceColor.Black ? 1 : -1;
                     }
                 }
                 Backpropagate(result, leaf);
@@ -74,7 +92,7 @@ namespace Checkers.Logic.AlgorithmObjects
         /// Wybieramy liść w drzewie za pomocą doboru wartości UCT
         /// </summary>
         /// <returns></returns>
-        private MctsNode Select()
+        private MctsNode Select(ref int numberOfLastKingMovesWithoutBeat)
         {
             var node = Root;
             while (node.Children != null && node.Children.Count > 0)
@@ -99,6 +117,10 @@ namespace Checkers.Logic.AlgorithmObjects
                     }
                 }
                 node = node.Children[index];
+                if (node.Move.OldPiece.IsKing && (node.Move.BeatedPieces == null || node.Move.BeatedPieces.Count == 0))
+                    numberOfLastKingMovesWithoutBeat++;
+                else
+                    numberOfLastKingMovesWithoutBeat = 0;
             }
             return node;
         }
@@ -117,7 +139,7 @@ namespace Checkers.Logic.AlgorithmObjects
                 {
                     var board = node.Board.GetBoardAfterMove(move);
                     var color = node.Color == PieceColor.White ? PieceColor.Black : PieceColor.White;
-                    children.Add(new MctsNode(color, board, node));
+                    children.Add(new MctsNode(color, board, node, move));
                 }
                 node.Children = children;
             }
@@ -127,7 +149,7 @@ namespace Checkers.Logic.AlgorithmObjects
         /// Wykonujemy symulacje
         /// </summary>
         /// <returns></returns>
-        private int Rollout(MctsNode node)
+        private double Rollout(MctsNode node, int numberOfLastKingMovesWithoutBeat)
         {
             int result = 0;
             CheckersBoard board = node.Board;
@@ -137,7 +159,14 @@ namespace Checkers.Logic.AlgorithmObjects
                 var moves = board.GetAllPossibleMoves(color);
                 if (moves.Count > 0)
                 {
-                    board = board.GetBoardAfterMove(moves[RandomGenerator.Next(0, moves.Count - 1)]);
+                    var move = moves[RandomGenerator.Next(0, moves.Count - 1)];
+                    board = board.GetBoardAfterMove(move);
+                    if (move.OldPiece.IsKing && (move.BeatedPieces == null || move.BeatedPieces.Count == 0))
+                        numberOfLastKingMovesWithoutBeat++;
+                    else
+                        numberOfLastKingMovesWithoutBeat = 0;
+                    if (numberOfLastKingMovesWithoutBeat > 49)
+                        return 0.5;
                 }
                 else
                 {
@@ -152,11 +181,15 @@ namespace Checkers.Logic.AlgorithmObjects
         /// <summary>
         /// Wrzucamy wyniki wyżej
         /// </summary>
-        private void Backpropagate(int result, MctsNode node)
+        private void Backpropagate(double result, MctsNode node)
         {
             while (node != null)
             {
                 node.NumberOfSimulations++;
+                if (result == 0.5)
+                {
+                    node.NumberOfWins += 0.5;
+                }
                 if (result == -1 && node.Color == PieceColor.White)
                     node.NumberOfWins++;
                 if (result == 1 && node.Color == PieceColor.Black)
