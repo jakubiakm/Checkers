@@ -186,8 +186,8 @@ namespace Checkers.Logic.GameObjects
 
         private bool IsDraw()
         {
-            //Jeżeli przez 25 kolejnych posunięć obu graczy, jedynie damki były przestawiane, nie wykonano żadnego ruchu pionem i nie wykonano żadnego bicia to grę uważa się za remisową.
-            var lastMoves = GameMoves.Skip(Math.Max(0, GameMoves.Count - 2 * 25)).ToList();
+            //Jeżeli przez 10 kolejnych posunięć obu graczy, jedynie damki były przestawiane, nie wykonano żadnego ruchu pionem i nie wykonano żadnego bicia to grę uważa się za remisową.
+            var lastMoves = GameMoves.Skip(Math.Max(0, GameMoves.Count - 2 * 10)).ToList();
             foreach(var move in lastMoves)
             {
                 if (move.BeatedPieces != null && move.BeatedPieces.Count > 0)

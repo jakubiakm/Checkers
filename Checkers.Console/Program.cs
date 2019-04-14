@@ -34,57 +34,57 @@ namespace Checkers.Console
         public static void SimulateGames()
         {
             List<simulator> simulations = new List<simulator>();
-            simulations.Add(new simulator(50, 2, 100));
-            simulations.Add(new simulator(100, 2, 50));
-            simulations.Add(new simulator(150, 2, 33));
-            simulations.Add(new simulator(200, 2, 25));
+            //simulations.Add(new simulator(50, 2, 100));
+            //simulations.Add(new simulator(100, 2, 50));
+            //simulations.Add(new simulator(150, 2, 33));
+            //simulations.Add(new simulator(200, 2, 25));
 
-            simulations.Add(new simulator(50, 3, 100));
-            simulations.Add(new simulator(100, 3, 50));
-            simulations.Add(new simulator(150, 3, 33));
-            simulations.Add(new simulator(200, 3, 25));
+            //simulations.Add(new simulator(50, 3, 100));
+            //simulations.Add(new simulator(100, 3, 50));
+            //simulations.Add(new simulator(150, 3, 33));
+            //simulations.Add(new simulator(200, 3, 25));
 
-            simulations.Add(new simulator(50, 4, 100));
-            simulations.Add(new simulator(100, 4, 50));
-            simulations.Add(new simulator(150, 4, 33));
-            simulations.Add(new simulator(200, 4, 25));
+            //simulations.Add(new simulator(50, 4, 100));
+            //simulations.Add(new simulator(100, 4, 50));
+            //simulations.Add(new simulator(150, 4, 33));
+            //simulations.Add(new simulator(200, 4, 25));
 
-            simulations.Add(new simulator(150, 5, 10));
-            simulations.Add(new simulator(200, 5, 10));
-            simulations.Add(new simulator(250, 5, 10));
-            simulations.Add(new simulator(300, 5, 10));
-            simulations.Add(new simulator(350, 5, 10));
-            simulations.Add(new simulator(400, 5, 10));
-            simulations.Add(new simulator(450, 5, 10));
-            simulations.Add(new simulator(500, 5, 10));
+            //simulations.Add(new simulator(150, 5, 10));
+            //simulations.Add(new simulator(200, 5, 10));
+            //simulations.Add(new simulator(250, 5, 10));
+            //simulations.Add(new simulator(300, 5, 10));
+            //simulations.Add(new simulator(350, 5, 10));
+            //simulations.Add(new simulator(400, 5, 10));
+            //simulations.Add(new simulator(450, 5, 10));
+            //simulations.Add(new simulator(500, 5, 10));
 
-            simulations.Add(new simulator(200, 6, 10));
-            simulations.Add(new simulator(300, 6, 10));
-            simulations.Add(new simulator(400, 6, 10));
-            simulations.Add(new simulator(500, 6, 10));
-            simulations.Add(new simulator(600, 6, 10));
-            simulations.Add(new simulator(700, 6, 10));
-            simulations.Add(new simulator(800, 6, 10));
-            simulations.Add(new simulator(900, 6, 10));
+            //simulations.Add(new simulator(200, 6, 10));
+            //simulations.Add(new simulator(300, 6, 10));
+            //simulations.Add(new simulator(400, 6, 10));
+            //simulations.Add(new simulator(500, 6, 10));
+            //simulations.Add(new simulator(600, 6, 10));
+            //simulations.Add(new simulator(700, 6, 10));
+            //simulations.Add(new simulator(800, 6, 10));
+            //simulations.Add(new simulator(900, 6, 8));
 
-            simulations.Add(new simulator(500, 7, 10));
-            simulations.Add(new simulator(7500, 7, 10));
-            simulations.Add(new simulator(1000, 7, 10));
-            simulations.Add(new simulator(2500, 7, 10));
-            simulations.Add(new simulator(5000, 7, 10));
-            simulations.Add(new simulator(7500, 7, 10));
-            simulations.Add(new simulator(10000, 7, 10));
+            //simulations.Add(new simulator(500, 7, 10));
+            //simulations.Add(new simulator(750, 7, 10));
+            //simulations.Add(new simulator(1000, 7, 10));
+            //simulations.Add(new simulator(2500, 7, 10));
+            //simulations.Add(new simulator(5000, 7, 10));
+            //simulations.Add(new simulator(7500, 7, 1));
+            //simulations.Add(new simulator(10000, 7, 10));
 
-            simulations.Add(new simulator(500, 8, 10));
-            simulations.Add(new simulator(7500, 8, 10));
-            simulations.Add(new simulator(1000, 8, 10));
-            simulations.Add(new simulator(2500, 8, 10));
-            simulations.Add(new simulator(5000, 8, 10));
-            simulations.Add(new simulator(7500, 8, 10));
-            simulations.Add(new simulator(10000, 8, 10));
+            //simulations.Add(new simulator(500, 8, 10));
+            //simulations.Add(new simulator(750, 8, 10));
+            //simulations.Add(new simulator(1000, 8, 10));
+            //simulations.Add(new simulator(2500, 8, 10));
+            //simulations.Add(new simulator(5000, 8, 10));
+            //simulations.Add(new simulator(7500, 8, 10));
+            //simulations.Add(new simulator(10000, 8, 10));
 
-            simulations.Add(new simulator(500, 9, 10));
-            simulations.Add(new simulator(1000, 9, 10));
+            //simulations.Add(new simulator(500, 9, 10));
+            //simulations.Add(new simulator(1000, 9, 10));
             simulations.Add(new simulator(2500, 9, 10));
             simulations.Add(new simulator(5000, 9, 10));
             simulations.Add(new simulator(10000, 9, 10));
@@ -109,12 +109,12 @@ namespace Checkers.Console
 
                 mctsIterations = simulation.mctsIterations;
                 alphaBetaDeep = simulation.alphaBetaDeep;
-                white = new MctsEngine(PieceColor.White, null, mctsUctParameter, (int)mctsIterations);
-                black = new AlphaBetaEngine(PieceColor.Black, (int)alphaBetaDeep);
-
-                System.Console.WriteLine($"Gracz biały: MCTS. Liczba iteracji: {mctsIterations},\t parametr UCT: {mctsUctParameter}.");
-                System.Console.WriteLine($"Gracz czarny: Alpha-Beta. Głębokość drzewa {alphaBetaDeep}.");
-
+                white = new AlphaBetaEngine(PieceColor.White, (int)alphaBetaDeep);
+                black = new MctsEngine(PieceColor.Black, null, mctsUctParameter, (int)mctsIterations);
+                var mctsParameters = $" Liczba iteracji: {mctsIterations},\t parametr UCT: {mctsUctParameter}.";
+                var alphaBetaParameters = $" Głębokość drzewa {alphaBetaDeep}.";
+                System.Console.WriteLine($"Gracz biały: {white.Kind}." + (white.Kind == EngineKind.AlphaBeta ? alphaBetaParameters : mctsParameters));
+                System.Console.WriteLine($"Gracz czarny: {black.Kind}." + (black.Kind == EngineKind.AlphaBeta ? alphaBetaParameters : mctsParameters));
 
                 System.Console.WriteLine($"Liczba iteracji: {simulation.numberOfSimulations}");
 
