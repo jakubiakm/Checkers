@@ -41,18 +41,36 @@ namespace Checkers.Logic.AlgorithmObjects
             int score = 0;
             if (isDraw)
                 return 0;
-            foreach (var piece in Board.BoardArray)
+            for (int ind = 1; ind != Board.BoardArray.Length; ind++)
             {
-                //za każdy pionek odpowiedniego koloru dodajemy lub odejmujemy punkty
-                //w przypadku królowych punkty są warte potrójną wartość
-                if (piece == 2)
-                    score += 3;
-                if (piece == 1)
-                    score += 1;
-                if (piece == -2)
-                    score -= 3;
-                if (piece == -1)
+                //-2 - czarna dama
+                //-1 - czarny pion
+                // 0 - brak piona
+                // 1 - biały pion
+                // 2 - biała dama
+
+                //za każdy pionek odpowiedniego koloru dodajemy lub odejmujemy 2 punkty
+                //w przypadku królowych dostajemy lub tracimy 6 punktów
+                if (Board.BoardArray[ind] == 2)
+                    score += 6;
+                if (Board.BoardArray[ind] == 1)
+                    score += 2;
+                if (Board.BoardArray[ind] == -2)
+                    score -= 6;
+                if (Board.BoardArray[ind] == -1)
+                    score -= 2;
+
+                //czarne pionki w pierwszym rzędzie są dodatkowo punktowane dla czarnych 
+                if(Board.BoardArray[ind] < 0 && Piece.ToRow(ind, Board.Size) == Board.Size - 1)
+                {
                     score -= 1;
+                }
+
+                //białe pionki ostatnim rzędzie planszy są dodatkowo punktowane dla białych
+                if (Board.BoardArray[ind] > 0 && Piece.ToRow(ind, Board.Size) == 0)
+                {
+                    score += 1;
+                }
             }
 
             //w przypadku antywarcabów odwracamy znak wyniku (dążymy do najgorszej pozycji)
